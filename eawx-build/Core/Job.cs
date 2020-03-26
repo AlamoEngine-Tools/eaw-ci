@@ -4,18 +4,14 @@ namespace EawXBuild.Core
 {
     public class Job : IJob
     {
-        private readonly string _name;
         private readonly List<ITask> tasks = new List<ITask>();
 
         public Job(string name)
         {
-            _name = name;
+            Name = name;
         }
 
-        public string GetName()
-        {
-            return _name;
-        }
+        public string Name { get; private set; }
 
         public void Run()
         {

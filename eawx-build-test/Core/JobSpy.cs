@@ -7,8 +7,6 @@ namespace EawXBuildTest.Core
 
         public string Name { get; set; }
 
-        public string GetName() => Name;
-
         public bool WasRun { get; private set; }
 
         public void Run()

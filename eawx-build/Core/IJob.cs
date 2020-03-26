@@ -4,7 +4,7 @@ namespace EawXBuild.Core
 {
     public interface IJob
     {
-        string GetName();
+        string Name { get; }
 
         void Run();
     }

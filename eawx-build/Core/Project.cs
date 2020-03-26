@@ -10,8 +10,8 @@ namespace EawXBuild.Core
 
         public void AddJob(IJob job)
         {
-            if (HasJobWithName(job.GetName()))
-                throw new DuplicateJobNameException(job.GetName());
+            if (HasJobWithName(job.Name))
+                throw new DuplicateJobNameException(job.Name);
 
             jobs.Add(job);
         }
@@ -27,12 +27,12 @@ namespace EawXBuild.Core
 
         private IJob FindJobWithName(string jobName)
         {
-            return jobs.Find(job => job.GetName().Equals(jobName));
+            return jobs.Find(job => job.Name.Equals(jobName));
         }
 
         private bool HasJobWithName(string jobName)
         {
-            return jobs.Exists(j => j.GetName().Equals(jobName));
+            return jobs.Exists(j => j.Name.Equals(jobName));
         }
     }
 }
