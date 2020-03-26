@@ -1,40 +1,39 @@
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild;
-using EawXBuild.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Tasks
 {
-    class CopyTaskTest
+    [TestClass]
+    public class CopyTaskTest
     {
 
-        private MockFileSystem fileSystem;
-        private CopyTask sut;
+        private MockFileSystem _fileSystem;
+        private EawXBuild.Tasks.CopyTask _sut;
 
-        [SetUp]
+        [TestInitialize]
         public void SetUp()
         {
-            fileSystem = new MockFileSystem();
-            sut = new CopyTask(fileSystem);
+            _fileSystem = new MockFileSystem();
+            _sut = new EawXBuild.Tasks.CopyTask(_fileSystem);
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCreateFileAtDestination()
         {
             AddFile("Data/MyFile.txt", string.Empty);
 
             const string destination = "Copy/MyFile.txt";
 
-            sut.Source = "Data/MyFile.txt";
-            sut.Destination = destination;
+            _sut.Source = "Data/MyFile.txt";
+            _sut.Destination = destination;
 
-            sut.Run();
+            _sut.Run();
 
             AssertFileExist(destination);
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCopyFileToDestination()
         {
             const string sourceFile = "Data/MyFile.txt";
@@ -42,31 +41,31 @@ namespace EawXBuildTest.Tasks
 
             AddFile(sourceFile, "File Content");
 
-            sut.Source = sourceFile;
-            sut.Destination = destFile;
+            _sut.Source = sourceFile;
+            _sut.Destination = destFile;
 
-            sut.Run();
+            _sut.Run();
 
             AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectory__WhenCallingRun__ShouldCreateDirectoryAtDestination()
         {
             const string sourceDirectory = "Data/SourceXML";
             const string destDirectory = "Copy/XML";
 
-            fileSystem.AddDirectory(sourceDirectory);
+            _fileSystem.AddDirectory(sourceDirectory);
 
-            sut.Source = sourceDirectory;
-            sut.Destination = destDirectory;
+            _sut.Source = sourceDirectory;
+            _sut.Destination = destDirectory;
 
-            sut.Run();
+            _sut.Run();
 
             AssertDirectoryExists(destDirectory);
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectoryWithFile__WhenCallingRun__ShouldCreateDirectoryWithFileAtDestination()
         {
             const string sourceDirectory = "Data/SourceXML";
@@ -75,19 +74,19 @@ namespace EawXBuildTest.Tasks
             const string destDirectory = "Copy/XML";
             const string destFileName = "Copy/XML/MyFile.xml";
 
-            fileSystem.AddDirectory(sourceDirectory);
+            _fileSystem.AddDirectory(sourceDirectory);
             AddFile(sourceFileName, "File Content");
 
-            sut.Source = sourceDirectory;
-            sut.Destination = destDirectory;
+            _sut.Source = sourceDirectory;
+            _sut.Destination = destDirectory;
 
-            sut.Run();
+            _sut.Run();
 
             AssertFileExist(destFileName);
             AssertFileContentsAreEqual(GetFile(sourceFileName), GetFile(destFileName));
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectoryWithSubDirectory__WhenCallingRun__ShouldAlsoCopySubDirectory()
         {
             const string sourceDirectory = "Data/SourceXML";
@@ -96,44 +95,44 @@ namespace EawXBuildTest.Tasks
             const string destDirectory = "Copy/XML";
             const string destSubDirectory = "Copy/XML/SubDirectory";
 
-            fileSystem.AddDirectory(sourceDirectory);
-            fileSystem.AddDirectory(sourceSubDirectory);
+            _fileSystem.AddDirectory(sourceDirectory);
+            _fileSystem.AddDirectory(sourceSubDirectory);
 
-            sut.Source = sourceDirectory;
-            sut.Destination = destDirectory;
+            _sut.Source = sourceDirectory;
+            _sut.Destination = destDirectory;
 
-            sut.Run();
+            _sut.Run();
 
             AssertDirectoryExists(destSubDirectory);
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectoryWithTwoSubDirectoryLevels__WhenCallingRun__ShouldCopyBothLevels()
         {
-            fileSystem.AddDirectory("Data/SourceXML");
-            fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
-            fileSystem.AddDirectory("Data/SourceXML/SubDirectory/SubDirectory2");
+            _fileSystem.AddDirectory("Data/SourceXML");
+            _fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
+            _fileSystem.AddDirectory("Data/SourceXML/SubDirectory/SubDirectory2");
 
-            sut.Source = "Data/SourceXML";
-            sut.Destination = "Copy/XML";
+            _sut.Source = "Data/SourceXML";
+            _sut.Destination = "Copy/XML";
 
-            sut.Run();
+            _sut.Run();
 
             AssertDirectoryExists("Copy/XML/SubDirectory/SubDirectory2");
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectoryWithSubDirectoryWithFile__WhenCallingRun__ShouldCopySubDirectoryWithFile()
         {
-            fileSystem.AddDirectory("Data/SourceXML");
-            fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
+            _fileSystem.AddDirectory("Data/SourceXML");
+            _fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
 
             AddFile("Data/SourceXML/SubDirectory/MyFile.xml", "File Content");
 
-            sut.Source = "Data/SourceXML";
-            sut.Destination = "Copy/XML";
+            _sut.Source = "Data/SourceXML";
+            _sut.Destination = "Copy/XML";
 
-            sut.Run();
+            _sut.Run();
 
             const string expected = "Data/SourceXML/SubDirectory/MyFile.xml";
             const string actual = "Copy/XML/SubDirectory/MyFile.xml";
@@ -141,49 +140,49 @@ namespace EawXBuildTest.Tasks
             AssertFileContentsAreEqual(GetFile(expected), GetFile(actual));
         }
 
-        [Test]
+        [TestMethod]
         public void GivenDirectoryWithSubDirectoryWithoutRecursive__WhenCallingRun__ShouldNotCopySubDirectory()
         {
             const string sourceDirectory = "Data/SourceXML";
             const string sourceSubDirectory = "Data/SourceXML/SubDirectory";
-            
+
             const string destDirectory = "Copy/XML";
-            
-            fileSystem.AddDirectory(sourceDirectory);
-            fileSystem.AddDirectory(sourceSubDirectory);
 
-            sut.Source = sourceDirectory;
-            sut.Destination = destDirectory;
-            sut.Recursive = false;
+            _fileSystem.AddDirectory(sourceDirectory);
+            _fileSystem.AddDirectory(sourceSubDirectory);
 
-            sut.Run();
+            _sut.Source = sourceDirectory;
+            _sut.Destination = destDirectory;
+            _sut.Recursive = false;
+
+            _sut.Run();
 
             const string destSubDirectory = "Copy/XML/SubDirectory";
             AssertDirectoryDoesNotExist(destSubDirectory);
         }
 
-        [Test]
+
+
+        [TestMethod]
+        [ExpectedException(typeof(NoSuchFileSystemObjectException))]
         public void GivenNonExistantSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException()
         {
-            sut.Source = "NonExistantPath";
-
-            TestDelegate expectedFail = () => sut.Run();
-
-            Assert.Throws<NoSuchFileSystemObjectException>(expectedFail);
+            _sut.Source = "NonExistantPath";
+            _sut.Run();
         }
 
         private MockFileData GetFile(string path)
         {
-            return fileSystem.GetFile(path);
+            return _fileSystem.GetFile(path);
         }
 
         private void AddFile(string path, string content)
         {
-            fileSystem.AddFile(path, new MockFileData(content));
+            _fileSystem.AddFile(path, new MockFileData(content));
         }
         private void AssertFileExist(string expected)
         {
-            Assert.True(fileSystem.FileExists(expected), $"File {expected} should exist, but doesn'nt");
+            Assert.IsTrue(_fileSystem.FileExists(expected), $"File {expected} should exist, but doesn'nt");
         }
         private static void AssertFileContentsAreEqual(MockFileData expected, MockFileData actual)
         {
@@ -192,12 +191,12 @@ namespace EawXBuildTest.Tasks
 
         private void AssertDirectoryExists(string directory)
         {
-            Assert.True(fileSystem.Directory.Exists(directory), $"Directory {directory} should exist, but doesn't.");
+            Assert.IsTrue(_fileSystem.Directory.Exists(directory), $"Directory {directory} should exist, but doesn't.");
         }
 
         private void AssertDirectoryDoesNotExist(string directory)
         {
-            Assert.False(fileSystem.Directory.Exists(directory), $"Directory {directory} should not exist, but does.");
+            Assert.IsFalse(_fileSystem.Directory.Exists(directory), $"Directory {directory} should not exist, but does.");
         }
 
     }

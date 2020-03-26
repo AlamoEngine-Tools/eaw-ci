@@ -1,62 +1,62 @@
 using EawXBuild.Core.Exceptions;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core
 {
-    class ProjectTest
+    [TestClass]
+    public class ProjectTest
     {
 
-        private EawXBuild.Core.Project sut;
+        private EawXBuild.Core.Project _sut;
 
-        [SetUp]
+        [TestInitialize]
         public void SetUp()
         {
-            sut = new EawXBuild.Core.Project();
+            _sut = new EawXBuild.Core.Project();
         }
 
-        [Test]
+        [TestMethod]
         public async System.Threading.Tasks.Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
         {
-            var jobSpy = MakeJobSpy("job");
-            sut.AddJob(jobSpy);
+            JobSpy jobSpy = MakeJobSpy("job");
+            _sut.AddJob(jobSpy);
 
-            await sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job");
 
             AssertJobWasRun(jobSpy);
         }
 
-        [Test]
+        [TestMethod]
         public async System.Threading.Tasks.Task GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
         {
-            var otherJob = MakeJobSpy("other");
-            sut.AddJob(otherJob);
-            var expected = MakeJobSpy("job");
-            sut.AddJob(expected);
+            JobSpy otherJob = MakeJobSpy("other");
+            _sut.AddJob(otherJob);
+            JobSpy expected = MakeJobSpy("job");
+            _sut.AddJob(expected);
 
-            await sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job");
 
             AssertJobWasRun(expected);
             AssertJobWasNotRun(otherJob);
         }
 
 
-        [Test]
+        [TestMethod]
+        [ExpectedException(typeof(JobNotFoundException))]
         public void GivenProjectWithNoJobs__WhenCallingRunJob__ShouldThrowJobNotFoundException()
         {
-            AsyncTestDelegate expectedFail = () => sut.RunJobAsync("job");
-
-            Assert.ThrowsAsync<JobNotFoundException>(expectedFail, "Should have thrown JobNotFoundException, but did not.");
+            _sut.RunJobAsync("job");
         }
 
-        [Test]
+        [TestMethod]
+        [ExpectedException(typeof(DuplicateJobNameException))]
         public void GivenProjectWithJob__WhenAddingJobWithSameName__ShouldThrowDuplicateJobNameException()
         {
             JobSpy jobSpy = MakeJobSpy("job");
 
-            sut.AddJob(jobSpy);
-
-            TestDelegate expectedFail = () => sut.AddJob(MakeJobSpy("job"));
-            Assert.Throws<DuplicateJobNameException>(expectedFail, "Should have thrown DuplicateJobNameException, but did not.");
+            Assert.IsNotNull(_sut != null, nameof(_sut) + " != null");
+            _sut.AddJob(jobSpy);
+            _sut.AddJob(MakeJobSpy("job"));
         }
 
         private static JobSpy MakeJobSpy(string name)
@@ -71,11 +71,13 @@ namespace EawXBuildTest.Core
 
         private static void AssertJobWasRun(JobSpy jobSpy)
         {
+            Assert.IsNotNull(jobSpy != null, nameof(jobSpy) + " != null");
             Assert.IsTrue(jobSpy.WasRun, $"Job {jobSpy.Name} should have been run, but wasn't.");
         }
         private static void AssertJobWasNotRun(JobSpy otherJob)
         {
-            Assert.False(otherJob.WasRun, $"Should not have run Job {otherJob.Name}, but did.");
+            Assert.IsNotNull(otherJob != null, nameof(otherJob) + " != null");
+            Assert.IsFalse(otherJob.WasRun, $"Should not have run Job {otherJob.Name}, but did.");
         }
     }
 }
