@@ -162,8 +162,6 @@ namespace EawXBuildTest.Tasks
             AssertDirectoryDoesNotExist(destSubDirectory);
         }
 
-
-
         [Test]
         public void GivenNonExistantSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException()
         {

@@ -24,7 +24,7 @@ namespace EawXBuild.Tasks
 
             if (directory.Exists) CreateDestDirectoryAndCopySourceDirectory(directory);
             else if (sourceFile.Exists) CopySingleFile(sourceFile);
-            else throw new NoSuchFileSystemObjectException(Destination);
+            else throw new NoSuchFileSystemObjectException(Source);
         }
 
         private void CreateDestDirectoryAndCopySourceDirectory(IDirectoryInfo directory)
