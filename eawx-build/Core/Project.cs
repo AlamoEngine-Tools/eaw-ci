@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using EawXBuild.Core.Exceptions;
 
 namespace EawXBuild.Core
@@ -16,13 +15,13 @@ namespace EawXBuild.Core
             jobs.Add(job);
         }
 
-        public Task RunJobAsync(string jobName)
+        public System.Threading.Tasks.Task RunJobAsync(string jobName)
         {
             var job = FindJobWithName(jobName);
             if (job == null)
                 throw new JobNotFoundException(jobName);
-            
-            return Task.Run(() => job.Run());
+
+            return System.Threading.Tasks.Task.Run(() => job.Run());
         }
 
         private IJob FindJobWithName(string jobName)

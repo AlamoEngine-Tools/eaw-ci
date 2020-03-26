@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using EawXBuild.Core;
 using EawXBuild.Core.Exceptions;
 using NUnit.Framework;
 
@@ -8,16 +6,16 @@ namespace EawXBuildTest.Core
     class ProjectTest
     {
 
-        private Project sut;
+        private EawXBuild.Core.Project sut;
 
         [SetUp]
         public void SetUp()
         {
-            sut = new Project();
+            sut = new EawXBuild.Core.Project();
         }
 
         [Test]
-        public async Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
+        public async System.Threading.Tasks.Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
         {
             var jobSpy = MakeJobSpy("job");
             sut.AddJob(jobSpy);
@@ -28,7 +26,7 @@ namespace EawXBuildTest.Core
         }
 
         [Test]
-        public async Task GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
+        public async System.Threading.Tasks.Task GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
         {
             var otherJob = MakeJobSpy("other");
             sut.AddJob(otherJob);
