@@ -20,25 +20,26 @@ namespace EawXBuild.Tasks
         public void Run()
         {
             var directory = fileSystem.DirectoryInfo.FromDirectoryName(Source);
-            if (directory.Exists)
-            {
-                IDirectoryInfo destinationDirectory = fileSystem.Directory.CreateDirectory(Destination);
-                CopyDirectory(directory, destinationDirectory);
-                return;
-            }
-
             var sourceFile = fileSystem.FileInfo.FromFileName(Source);
-            if (sourceFile.Exists)
-            {
-                var destFile = fileSystem.FileInfo.FromFileName(Destination);
-                if (!destFile.Directory.Exists)
-                    destFile.Directory.Create();
 
-                fileSystem.File.Copy(Source, Destination);
-                return;
-            }
+            if (directory.Exists) CreateDestDirectoryAndCopySourceDirectory(directory);
+            else if (sourceFile.Exists) CopySingleFile(sourceFile);
+            else throw new NoSuchFileSystemObjectException(Destination);
+        }
 
-            throw new NoSuchFileSystemObjectException(Destination);
+        private void CreateDestDirectoryAndCopySourceDirectory(IDirectoryInfo directory)
+        {
+            IDirectoryInfo destinationDirectory = fileSystem.Directory.CreateDirectory(Destination);
+            CopyDirectory(directory, destinationDirectory);
+        }
+
+        private void CopySingleFile(IFileInfo sourceFile)
+        {
+            var destFile = fileSystem.FileInfo.FromFileName(Destination);
+            if (!destFile.Directory.Exists)
+                destFile.Directory.Create();
+
+            sourceFile.CopyTo(destFile.FullName);
         }
 
         private void CopyDirectory(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory)
