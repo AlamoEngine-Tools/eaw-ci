@@ -1,8 +1,9 @@
 using EawXBuild.Core;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core
 {
-    class JobSpy : IJob
+    public class JobSpy : IJob
     {
 
         public string Name { get; set; }

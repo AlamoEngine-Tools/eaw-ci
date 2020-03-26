@@ -1,16 +1,16 @@
-using EawXBuild.Core;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core
 {
-    class JobTest
+    [TestClass]
+    public class JobTest
     {
-        [Test]
+        [TestMethod]
         public void GivenJobWithTwoTasks__WhenRunningJob__ShouldExecuteAllTasks()
         {
-            var sut = new Job("job");
-            var firstTask = new TaskSpy();
-            var secondTask = new TaskSpy();
+            EawXBuild.Core.Job sut = new EawXBuild.Core.Job("job");
+            TaskSpy firstTask = new TaskSpy();
+            TaskSpy secondTask = new TaskSpy();
             sut.AddTask(firstTask);
             sut.AddTask(secondTask);
 
@@ -22,7 +22,7 @@ namespace EawXBuildTest.Core
 
         private static void AssertTaskWasRun(TaskSpy firstTask)
         {
-            Assert.True(firstTask.WasRun, "Task should have been run, but wasn't.");
+            Assert.IsTrue(firstTask.WasRun, "Task should have been run, but wasn't.");
         }
     }
 }
