@@ -1,12 +1,13 @@
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Tasks
 {
+    [TestClass]
     class CleanTaskTest
     {
-        [Test]
+        [TestMethod]
         public void GivenPathToFile__WhenCallingRun__ShouldDeleteFile()
         {
             const string dirPath = "Data";
@@ -21,10 +22,10 @@ namespace EawXBuildTest.Tasks
 
             sut.Run();
 
-            Assert.False(fileSystem.FileExists(filePath), $"File {filePath} should not exist, but does.");
+            Assert.IsFalse(fileSystem.FileExists(filePath), $"File {filePath} should not exist, but does.");
         }
 
-        [Test]
+        [TestMethod]
         public void GivenPathToDirectory__WhenCallingRun__ShouldDeleteDirectory()
         {
             const string dirPath = "Data";
@@ -37,7 +38,7 @@ namespace EawXBuildTest.Tasks
 
             sut.Run();
 
-            Assert.False(fileSystem.Directory.Exists(dirPath), $"Directory {dirPath} should not exist, but does.");
+            Assert.IsFalse(fileSystem.Directory.Exists(dirPath), $"Directory {dirPath} should not exist, but does.");
         }
     }
 }

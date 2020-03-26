@@ -186,7 +186,7 @@ namespace EawXBuildTest.Tasks
         }
         private static void AssertFileContentsAreEqual(MockFileData expected, MockFileData actual)
         {
-            Assert.AreEqual(expected.Contents, actual.Contents);
+            CollectionAssert.AreEqual(expected.Contents, actual.Contents);
         }
 
         private void AssertDirectoryExists(string directory)
