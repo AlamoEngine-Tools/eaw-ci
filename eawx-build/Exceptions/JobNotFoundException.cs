@@ -1,8 +1,12 @@
-namespace EawXBuild.Core.Exceptions
+using System;
+
+namespace EawXBuild.Exceptions
 {
-    [System.Serializable]
-    public class JobNotFoundException : System.Exception
+    [Serializable]
+    public class JobNotFoundException : Exception
     {
-        public JobNotFoundException(string jobName) : base($"No Job with name {jobName}") { }
+        public JobNotFoundException(string jobName) : base($"No Job with name {jobName}")
+        {
+        }
     }
 }

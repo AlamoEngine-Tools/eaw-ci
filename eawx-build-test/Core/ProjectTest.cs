@@ -1,4 +1,4 @@
-using EawXBuild.Core.Exceptions;
+using EawXBuild.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core
@@ -6,7 +6,6 @@ namespace EawXBuildTest.Core
     [TestClass]
     public class ProjectTest
     {
-
         private EawXBuild.Core.Project _sut;
 
         [TestInitialize]
@@ -18,7 +17,7 @@ namespace EawXBuildTest.Core
         [TestMethod]
         public async System.Threading.Tasks.Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
         {
-            JobSpy jobSpy = MakeJobSpy("job");
+            var jobSpy = MakeJobSpy("job");
             _sut.AddJob(jobSpy);
 
             await _sut.RunJobAsync("job");
@@ -27,11 +26,12 @@ namespace EawXBuildTest.Core
         }
 
         [TestMethod]
-        public async System.Threading.Tasks.Task GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
+        public async System.Threading.Tasks.Task
+            GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
         {
-            JobSpy otherJob = MakeJobSpy("other");
+            var otherJob = MakeJobSpy("other");
             _sut.AddJob(otherJob);
-            JobSpy expected = MakeJobSpy("job");
+            var expected = MakeJobSpy("job");
             _sut.AddJob(expected);
 
             await _sut.RunJobAsync("job");
@@ -52,7 +52,7 @@ namespace EawXBuildTest.Core
         [ExpectedException(typeof(DuplicateJobNameException))]
         public void GivenProjectWithJob__WhenAddingJobWithSameName__ShouldThrowDuplicateJobNameException()
         {
-            JobSpy jobSpy = MakeJobSpy("job");
+            var jobSpy = MakeJobSpy("job");
 
             Assert.IsNotNull(_sut != null, nameof(_sut) + " != null");
             _sut.AddJob(jobSpy);
@@ -61,7 +61,7 @@ namespace EawXBuildTest.Core
 
         private static JobSpy MakeJobSpy(string name)
         {
-            JobSpy jobSpy = new JobSpy
+            var jobSpy = new JobSpy
             {
                 Name = name
             };
@@ -74,6 +74,7 @@ namespace EawXBuildTest.Core
             Assert.IsNotNull(jobSpy != null, nameof(jobSpy) + " != null");
             Assert.IsTrue(jobSpy.WasRun, $"Job {jobSpy.Name} should have been run, but wasn't.");
         }
+
         private static void AssertJobWasNotRun(JobSpy otherJob)
         {
             Assert.IsNotNull(otherJob != null, nameof(otherJob) + " != null");

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using EawXBuild.Core.Exceptions;
+using EawXBuild.Exceptions;
 
 namespace EawXBuild.Core
 {

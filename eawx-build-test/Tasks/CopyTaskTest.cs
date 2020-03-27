@@ -1,5 +1,6 @@
+using System;
 using System.IO.Abstractions.TestingHelpers;
-using EawXBuild;
+using EawXBuild.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Tasks
@@ -7,14 +8,15 @@ namespace EawXBuildTest.Tasks
     [TestClass]
     public class CopyTaskTest
     {
-
         private MockFileSystem _fileSystem;
+        private FileSystemAssertions _assertions;
         private EawXBuild.Tasks.CopyTask _sut;
 
         [TestInitialize]
         public void SetUp()
         {
             _fileSystem = new MockFileSystem();
+            _assertions = new FileSystemAssertions(_fileSystem);
             _sut = new EawXBuild.Tasks.CopyTask(_fileSystem);
         }
 
@@ -30,7 +32,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertFileExist(destination);
+            _assertions.AssertFileExists(destination);
         }
 
         [TestMethod]
@@ -46,7 +48,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
+            _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
         }
 
         [TestMethod]
@@ -62,7 +64,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertDirectoryExists(destDirectory);
+            _assertions.AssertDirectoryExists(destDirectory);
         }
 
         [TestMethod]
@@ -82,8 +84,8 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertFileExist(destFileName);
-            AssertFileContentsAreEqual(GetFile(sourceFileName), GetFile(destFileName));
+            _assertions.AssertFileExists(destFileName);
+            _assertions.AssertFileContentsAreEqual(GetFile(sourceFileName), GetFile(destFileName));
         }
 
         [TestMethod]
@@ -103,7 +105,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertDirectoryExists(destSubDirectory);
+            _assertions.AssertDirectoryExists(destSubDirectory);
         }
 
         [TestMethod]
@@ -118,7 +120,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Run();
 
-            AssertDirectoryExists("Copy/XML/SubDirectory/SubDirectory2");
+            _assertions.AssertDirectoryExists("Copy/XML/SubDirectory/SubDirectory2");
         }
 
         [TestMethod]
@@ -136,8 +138,8 @@ namespace EawXBuildTest.Tasks
 
             const string expected = "Data/SourceXML/SubDirectory/MyFile.xml";
             const string actual = "Copy/XML/SubDirectory/MyFile.xml";
-            AssertFileExist(actual);
-            AssertFileContentsAreEqual(GetFile(expected), GetFile(actual));
+            _assertions.AssertFileExists(actual);
+            _assertions.AssertFileContentsAreEqual(GetFile(expected), GetFile(actual));
         }
 
         [TestMethod]
@@ -158,16 +160,98 @@ namespace EawXBuildTest.Tasks
             _sut.Run();
 
             const string destSubDirectory = "Copy/XML/SubDirectory";
-            AssertDirectoryDoesNotExist(destSubDirectory);
+            _assertions.AssertDirectoryDoesNotExist(destSubDirectory);
         }
 
+        [TestMethod]
+        public void GivenDestFileExistsButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideDestFile()
+        {
+            const string sourceFile = "Data/MyFile.txt";
+            const string destFile = "Copy/MyFile.txt";
 
+            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            AddFile(sourceFile, "New Content", newerWriteTime);
+            
+            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            AddFile(destFile, "Old Content", olderWriteTime);
+
+            _sut.Source = sourceFile;
+            _sut.Destination = destFile;
+
+            _sut.Run();
+
+            _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
+        }
+
+        [TestMethod]
+        public void GivenDestFileExistAndHasNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile()
+        {
+            const string sourceFile = "Data/MyFile.txt";
+            const string destFile = "Copy/MyFile.txt";
+
+            const string expectedContent = "New Content";
+            
+            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            AddFile(sourceFile, "Old Content", olderWriteTime);
+            
+            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            AddFile(destFile, expectedContent, newerWriteTime);
+
+            _sut.Source = sourceFile;
+            _sut.Destination = destFile;
+
+            _sut.Run();
+            
+            _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
+        }
+        
+        [TestMethod]
+        public void GivenDestDirectoryWithExistingFileButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideFileInDestDirectory()
+        {
+            const string sourceDir = "Data";
+            const string sourceFile = "Data/Sub/MyFile.txt";
+
+            const string destDir = "Copy";
+            const string destFile = "Copy/Sub/MyFile.txt";
+            
+            AddFile(sourceFile, "New Content", NewerWriteTime);
+            AddFile(destFile, "Old Content", OlderWriteTime);
+
+            _sut.Source = sourceDir;
+            _sut.Destination = destDir;
+
+            _sut.Run();
+
+            _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
+        }
+        
+        [TestMethod]
+        public void GivenDestDirectoryWithExistingFileAndNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile()
+        {
+            const string sourceDir = "Data";
+            const string sourceFile = "Data/Sub/MyFile.txt";
+
+            const string destDir = "Copy";
+            const string destFile = "Copy/Sub/MyFile.txt";
+
+            const string expectedContent = "New Content";
+            
+            AddFile(sourceFile, "Old Content", OlderWriteTime);
+            AddFile(destFile, expectedContent, NewerWriteTime);
+
+            _sut.Source = sourceDir;
+            _sut.Destination = destDir;
+
+            _sut.Run();
+            
+            _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
+        }
 
         [TestMethod]
         [ExpectedException(typeof(NoSuchFileSystemObjectException))]
-        public void GivenNonExistantSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException()
+        public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException()
         {
-            _sut.Source = "NonExistantPath";
+            _sut.Source = "NonExistingPath";
             _sut.Run();
         }
 
@@ -175,29 +259,21 @@ namespace EawXBuildTest.Tasks
         {
             return _fileSystem.GetFile(path);
         }
+        
+        private static DateTimeOffset NewerWriteTime => new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+
+        private static DateTimeOffset OlderWriteTime => new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
 
         private void AddFile(string path, string content)
         {
-            _fileSystem.AddFile(path, new MockFileData(content));
+            AddFile(path, content, DateTimeOffset.MinValue);
         }
-        private void AssertFileExist(string expected)
+        
+        private void AddFile(string sourceFile, string content, DateTimeOffset lastWriteTime)
         {
-            Assert.IsTrue(_fileSystem.FileExists(expected), $"File {expected} should exist, but doesn'nt");
+            var sourceFileData = new MockFileData(content);
+            sourceFileData.LastWriteTime = lastWriteTime;
+            _fileSystem.AddFile(sourceFile, sourceFileData);
         }
-        private static void AssertFileContentsAreEqual(MockFileData expected, MockFileData actual)
-        {
-            CollectionAssert.AreEqual(expected.Contents, actual.Contents);
-        }
-
-        private void AssertDirectoryExists(string directory)
-        {
-            Assert.IsTrue(_fileSystem.Directory.Exists(directory), $"Directory {directory} should exist, but doesn't.");
-        }
-
-        private void AssertDirectoryDoesNotExist(string directory)
-        {
-            Assert.IsFalse(_fileSystem.Directory.Exists(directory), $"Directory {directory} should not exist, but does.");
-        }
-
     }
 }

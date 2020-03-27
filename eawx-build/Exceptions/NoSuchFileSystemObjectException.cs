@@ -1,8 +1,13 @@
-namespace EawXBuild
+using System;
+
+namespace EawXBuild.Exceptions
 {
-    [System.Serializable]
-    public class NoSuchFileSystemObjectException : System.Exception
+    [Serializable]
+    public class NoSuchFileSystemObjectException : Exception
     {
-        public NoSuchFileSystemObjectException(string fileSystemObjectName) : base($"No such file or directory: {fileSystemObjectName}") { }
+        public NoSuchFileSystemObjectException(string fileSystemObjectName) : base(
+            $"No such file or directory: {fileSystemObjectName}")
+        {
+        }
     }
 }

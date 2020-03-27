@@ -1,8 +1,12 @@
-namespace EawXBuild.Core.Exceptions
+using System;
+
+namespace EawXBuild.Exceptions
 {
-    [System.Serializable]
-    public class DuplicateJobNameException : System.Exception
+    [Serializable]
+    public class DuplicateJobNameException : Exception
     {
-        public DuplicateJobNameException(string jobName) : base($"Duplicate Job {jobName}") { }
+        public DuplicateJobNameException(string jobName) : base($"Duplicate Job {jobName}")
+        {
+        }
     }
 }

@@ -10,6 +10,5 @@ namespace EawXBuildTest.Core
         {
             WasRun = true;
         }
-
     }
 }

@@ -8,9 +8,9 @@ namespace EawXBuildTest.Core
         [TestMethod]
         public void GivenJobWithTwoTasks__WhenRunningJob__ShouldExecuteAllTasks()
         {
-            EawXBuild.Core.Job sut = new EawXBuild.Core.Job("job");
-            TaskSpy firstTask = new TaskSpy();
-            TaskSpy secondTask = new TaskSpy();
+            var sut = new EawXBuild.Core.Job("job");
+            var firstTask = new TaskSpy();
+            var secondTask = new TaskSpy();
             sut.AddTask(firstTask);
             sut.AddTask(secondTask);
 

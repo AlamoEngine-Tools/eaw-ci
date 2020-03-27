@@ -1,15 +1,16 @@
 using System.IO.Abstractions;
 using EawXBuild.Core;
+using EawXBuild.Exceptions;
 
 namespace EawXBuild.Tasks
 {
     public class CopyTask : ITask
     {
-        private IFileSystem fileSystem;
+        private readonly IFileSystem _fileSystem;
 
         public CopyTask(IFileSystem fileSystem)
         {
-            this.fileSystem = fileSystem;
+            _fileSystem = fileSystem;
             Recursive = true;
         }
 
@@ -19,27 +20,30 @@ namespace EawXBuild.Tasks
 
         public void Run()
         {
-            var directory = fileSystem.DirectoryInfo.FromDirectoryName(Source);
-            var sourceFile = fileSystem.FileInfo.FromFileName(Source);
+            var directory = _fileSystem.DirectoryInfo.FromDirectoryName(Source);
+            var sourceFile = _fileSystem.FileInfo.FromFileName(Source);
 
             if (directory.Exists) CreateDestDirectoryAndCopySourceDirectory(directory);
-            else if (sourceFile.Exists) CopySingleFile(sourceFile);
+            else if (sourceFile.Exists) CopySingleFile(sourceFile, Destination);
             else throw new NoSuchFileSystemObjectException(Source);
         }
 
         private void CreateDestDirectoryAndCopySourceDirectory(IDirectoryInfo directory)
         {
-            IDirectoryInfo destinationDirectory = fileSystem.Directory.CreateDirectory(Destination);
+            var destinationDirectory = _fileSystem.Directory.CreateDirectory(Destination);
             CopyDirectory(directory, destinationDirectory);
         }
 
-        private void CopySingleFile(IFileInfo sourceFile)
+        private void CopySingleFile(IFileInfo sourceFile, string destFilePath)
         {
-            var destFile = fileSystem.FileInfo.FromFileName(Destination);
+            var destFile = _fileSystem.FileInfo.FromFileName(destFilePath);
             if (!destFile.Directory.Exists)
                 destFile.Directory.Create();
 
-            sourceFile.CopyTo(destFile.FullName);
+            if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime)
+                return;
+                
+            sourceFile.CopyTo(destFile.FullName, true);
         }
 
         private void CopyDirectory(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory)
@@ -52,20 +56,20 @@ namespace EawXBuild.Tasks
 
         private void CopyFilesFromDirectory(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory)
         {
-            IFileInfo[] sourceFiles = sourceDirectory.GetFiles();
-            foreach (var file in sourceFiles)
+            var sourceFiles = sourceDirectory.GetFiles();
+            foreach (var sourceFile in sourceFiles)
             {
-                string destFileName = fileSystem.Path.Combine(destinationDirectory.FullName, file.Name);
-                file.CopyTo(destFileName);
+                var destFileName = _fileSystem.Path.Combine(destinationDirectory.FullName, sourceFile.Name);
+                CopySingleFile(sourceFile, destFileName);
             }
         }
 
         private void CopySubDirectories(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory)
         {
-            IDirectoryInfo[] subDirectories = sourceDirectory.GetDirectories();
+            var subDirectories = sourceDirectory.GetDirectories();
             foreach (var subDirectory in subDirectories)
             {
-                IDirectoryInfo destSubDirectory = destinationDirectory.CreateSubdirectory(subDirectory.Name);
+                var destSubDirectory = destinationDirectory.CreateSubdirectory(subDirectory.Name);
                 CopyDirectory(subDirectory, destSubDirectory);
             }
         }

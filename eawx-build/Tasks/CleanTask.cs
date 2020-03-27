@@ -1,11 +1,11 @@
 using System.IO.Abstractions;
 using EawXBuild.Core;
 
-namespace EawXBuild
+namespace EawXBuild.Tasks
 {
     public class CleanTask : ITask
     {
-        private IFileSystem fileSystem;
+        private readonly IFileSystem fileSystem;
 
         public CleanTask(IFileSystem fileSystem)
         {
