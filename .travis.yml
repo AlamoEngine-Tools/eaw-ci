@@ -1,0 +1,30 @@
+language: csharp
+mono: none
+dotnet: 3.1
+
+addons:
+  sonarcloud:
+    organization: $SONAR_ORGANIZATION
+
+solution: eawx-build.sln
+
+install:
+  - dotnet tool install --global dotnet-sonarscanner
+  - dotnet restore eawx-build/eawx-build.csproj
+  - dotnet restore eawx-build-test/eawx-build-test.csproj
+
+before_script:
+  - export PATH="$PATH:$HOME/.dotnet/tools"
+  - git fetch origin master
+
+script:
+  - dotnet sonarscanner begin /k:$SONAR_PROJECT /o:$SONAR_ORGANIZATION /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$SONAR_TOKEN /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.coverage.exclusions="eawx-build-test/**,**/*Test.cs,**/TestUtility.cs" /d:sonar.cs.opencover.reportsPaths="lcov.opencover.xml" || true
+  - dotnet build eawx-build/eawx-build.csproj
+  - dotnet test eawx-build-test/eawx-build-test.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../lcov
+  - dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN || true
+
+cache:
+  directories:
+    - '$HOME/.nuget/packages'
+    - '$HOME/.local/share/NuGet/Cache'
+    - '$HOME/.sonar/cache'
