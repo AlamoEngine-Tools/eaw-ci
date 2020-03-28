@@ -15,6 +15,7 @@ namespace EawXBuildTest.Core
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public async System.Threading.Tasks.Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
         {
             var jobSpy = MakeJobSpy("job");
@@ -26,6 +27,7 @@ namespace EawXBuildTest.Core
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public async System.Threading.Tasks.Task
             GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
         {
@@ -42,6 +44,7 @@ namespace EawXBuildTest.Core
 
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         [ExpectedException(typeof(JobNotFoundException))]
         public void GivenProjectWithNoJobs__WhenCallingRunJob__ShouldThrowJobNotFoundException()
         {
@@ -49,6 +52,7 @@ namespace EawXBuildTest.Core
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         [ExpectedException(typeof(DuplicateJobNameException))]
         public void GivenProjectWithJob__WhenAddingJobWithSameName__ShouldThrowDuplicateJobNameException()
         {
