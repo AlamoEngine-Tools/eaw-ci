@@ -1,6 +1,6 @@
 language: csharp
 mono: none
-dotnet: 3.1
+dotnet: 2.1.502
 
 addons:
   sonarcloud:
@@ -20,6 +20,7 @@ before_script:
 script:
   - dotnet sonarscanner begin /k:$SONAR_PROJECT /o:$SONAR_ORGANIZATION /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$SONAR_TOKEN /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.coverage.exclusions="eawx-build-test/**,**/*Test.cs,**/TestUtility.cs" /d:sonar.cs.opencover.reportsPaths="lcov.opencover.xml" || true
   - dotnet build eawx-build/eawx-build.csproj
+  - dotnet build eawx-build-test/eawx-build-test.csproj
   - dotnet test eawx-build-test/eawx-build-test.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../lcov
   - dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN || true
 
