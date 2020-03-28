@@ -19,16 +19,17 @@ namespace EawXBuildTest.Tasks
             _assertions = new FileSystemAssertions(_fileSystem);
             sut = new CleanTask(_fileSystem);
         }
-        
+
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenPathToFile__WhenCallingRun__ShouldDeleteFile()
         {
             const string dirPath = "Data";
             const string filePath = "Data/MyFile.txt";
-            
+
             _fileSystem.AddDirectory(dirPath);
             _fileSystem.AddFile(filePath, new MockFileData(string.Empty));
-            
+
             sut.Path = filePath;
 
             sut.Run();
@@ -37,13 +38,14 @@ namespace EawXBuildTest.Tasks
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenPathToDirectory__WhenCallingRun__ShouldDeleteDirectory()
         {
             const string dirPath = "Data";
 
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(dirPath);
-            
+
             sut.Path = dirPath;
 
             sut.Run();

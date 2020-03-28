@@ -6,6 +6,7 @@ namespace EawXBuildTest.Core
     public class JobTest
     {
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public void GivenJobWithTwoTasks__WhenRunningJob__ShouldExecuteAllTasks()
         {
             var sut = new EawXBuild.Core.Job("job");
