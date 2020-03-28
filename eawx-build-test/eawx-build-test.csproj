@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>EawXBuildTest</RootNamespace>
 
     <IsPackable>false</IsPackable>
+
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <ProjectGuid>{BE91E638-E07D-4DBC-B0BB-80CA052B455A}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
