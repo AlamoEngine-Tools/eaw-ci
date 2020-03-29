@@ -5,19 +5,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest.Tasks
 {
     [TestClass]
-    internal class CleanTaskTest
+    public class CleanTaskTest
     {
 
         private MockFileSystem _fileSystem;
         private FileSystemAssertions _assertions;
-        private CleanTask sut;
+        private CleanTask _sut;
 
         [TestInitialize]
         public void SetUp()
         {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
-            sut = new CleanTask(_fileSystem);
+            _sut = new CleanTask(_fileSystem);
         }
 
         [TestMethod]
@@ -30,9 +30,9 @@ namespace EawXBuildTest.Tasks
             _fileSystem.AddDirectory(dirPath);
             _fileSystem.AddFile(filePath, new MockFileData(string.Empty));
 
-            sut.Path = filePath;
+            _sut.Path = filePath;
 
-            sut.Run();
+            _sut.Run();
 
             _assertions.AssertFileDoesNotExist(filePath);
         }
@@ -46,9 +46,9 @@ namespace EawXBuildTest.Tasks
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(dirPath);
 
-            sut.Path = dirPath;
+            _sut.Path = dirPath;
 
-            sut.Run();
+            _sut.Run();
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
