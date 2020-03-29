@@ -1,17 +1,22 @@
-using System;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using EawXBuild.Core;
+using JetBrains.Annotations;
 
 namespace EawXBuild.Configuration.v1
 {
     public class BuildConfigParser
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly IBuildComponentFactory _factory;
+        private const string XSD_RESOURCE_ID = "v1.eaw-ci.xsd";
+        [NotNull] private readonly IFileSystem _fileSystem;
+        [NotNull] private readonly IBuildComponentFactory _factory;
 
-        public BuildConfigParser(IFileSystem fileSystem, IBuildComponentFactory factory)
+        public BuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory)
         {
             _fileSystem = fileSystem;
             _factory = factory;
@@ -19,12 +24,35 @@ namespace EawXBuild.Configuration.v1
 
         public IProject[] Parse(string filePath)
         {
-            var serializer = new XmlSerializer(typeof(BuildConfigurationType));
             IProject[] projects;
-            using (var stream = _fileSystem.File.Open(filePath, FileMode.Open))
+            XmlSerializer xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
+            XmlSerializer xmlDataSerializer = new XmlSerializer(typeof(BuildConfigurationType));
+            XmlSchemaSet schemas = new XmlSchemaSet();
+            XmlSchema schema;
+            string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Single(str => str.EndsWith(XSD_RESOURCE_ID));
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
             {
-                var buildConfig = serializer.Deserialize(stream) as BuildConfigurationType;
-                projects = new IProject[buildConfig.Projects.Count];
+                schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
+            }
+
+            schemas.Add(schema);
+            XmlReaderSettings settings = new XmlReaderSettings
+            {
+                Schemas = schemas,
+                ValidationType = ValidationType.Schema,
+                ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |
+                                  XmlSchemaValidationFlags.ReportValidationWarnings |
+                                  XmlSchemaValidationFlags.ProcessInlineSchema |
+                                  XmlSchemaValidationFlags.ProcessSchemaLocation
+            };
+            settings.ValidationEventHandler += (sender, arguments) =>
+                throw new XmlSchemaValidationException(arguments?.Message);
+            using (Stream stream = _fileSystem.File.OpenRead(filePath))
+            {
+                using XmlReader reader = XmlReader.Create(stream, settings);
+                BuildConfigurationType buildConfig = xmlDataSerializer.Deserialize(reader) as BuildConfigurationType;
+                projects = new IProject[buildConfig.Projects.Length];
                 projects[0] = GetProjectFromConfig(buildConfig);
             }
 
@@ -44,7 +72,7 @@ namespace EawXBuild.Configuration.v1
 
         private void AddJobToProject(ProjectType buildConfigProject, IProject project)
         {
-            if (buildConfigProject.Jobs.Count == 0) return;
+            if (buildConfigProject.Jobs.Length == 0) return;
             var buildConfigJob = buildConfigProject.Jobs[0];
             var job = _factory.MakeJob(buildConfigJob.Name);
             project.AddJob(job);

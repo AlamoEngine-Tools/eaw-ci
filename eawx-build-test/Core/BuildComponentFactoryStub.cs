@@ -15,7 +15,7 @@ namespace EawXBuildTest.Core
 
         public IJob MakeJob(string name)
         {
-            Job.Name = name;
+            Job = new JobStub {Name = name};
             return Job;
         }
     }

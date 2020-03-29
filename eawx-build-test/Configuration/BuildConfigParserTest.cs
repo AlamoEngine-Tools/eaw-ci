@@ -26,14 +26,24 @@ namespace EawXBuildTest.Configuration
         public void GivenXmlWithSingleProject__WhenCallingParse__ShouldReturnArrayWithMatchingProject()
         {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-            <BuildConfiguration Version=""1.0"" xmlns=""eaw-ci"">
-                <Projects>
-                    <Project Name=""TestProject"">
-                    </Project>
-                </Projects>
-            </BuildConfiguration>
-            ";
-            
+                               <eaw-ci:BuildConfiguration Version=""1.0.0"" xmlns:eaw-ci=""eaw-ci"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""eaw-ci eaw-ci.xsd "">
+                                 <Projects>
+                                   <Project Name=""TestProject"">
+                                     <Jobs>
+                                       <Job Name=""TestJob"">
+                                         <Tasks>
+                                            <Task Name=""TestTaskReference"">
+                                              <TaskReference>
+              	                                <TaskName>some_id</TaskName>
+                                              </TaskReference>
+                                            </Task>
+                                         </Tasks>
+                                       </Job>
+                                     </Jobs>
+                                   </Project>
+                                 </Projects>
+                               </eaw-ci:BuildConfiguration>";
+
             _mockFileData.TextContents = xml;
 
             const string projectName = "TestProject";
@@ -52,17 +62,23 @@ namespace EawXBuildTest.Configuration
         public void GivenXmlWithSingleProjectAndJob__WhenCallingParse__ProjectShouldHaveMatchingJob()
         {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-            <BuildConfiguration Version=""1.0"" xmlns=""eaw-ci"">
-                <Projects>
-                    <Project Name=""TestProject"">
-                        <Jobs>
-                            <Job Name=""TestJob"">
-                            </Job>
-                        </Jobs>
-                    </Project>
-                </Projects>
-            </BuildConfiguration>
-            ";
+                               <eaw-ci:BuildConfiguration Version=""1.0.0"" xmlns:eaw-ci=""eaw-ci"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""eaw-ci eaw-ci.xsd "">
+                                 <Projects>
+                                   <Project Name=""TestProject"">
+                                     <Jobs>
+                                       <Job Name=""TestJob"">
+                                         <Tasks>
+                                            <Task Name=""TestTaskReference"">
+                                              <TaskReference>
+              	                                <TaskName>some_id</TaskName>
+                                              </TaskReference>
+                                            </Task>
+                                         </Tasks>
+                                       </Job>
+                                     </Jobs>
+                                   </Project>
+                                 </Projects>
+                               </eaw-ci:BuildConfiguration>";
 
             _mockFileData.TextContents = xml;
 
