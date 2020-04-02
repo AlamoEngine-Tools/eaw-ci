@@ -1,92 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="eaw-ci" xmlns:eaw-ci="eaw-ci">
-    <xs:element name="BuildConfiguration" type="eaw-ci:BuildConfigurationType"/>
-    <xs:complexType name="CopyTaskType">
-        <xs:sequence>
-            <xs:element type="eaw-ci:RelativeFilePathType" name="SourcePath" minOccurs="1" maxOccurs="1"/>
-            <xs:element type="eaw-ci:RelativeFilePathType" name="DestPath" minOccurs="1" maxOccurs="1"/>
-            <xs:element type="xs:boolean" name="Recursive" minOccurs="1" maxOccurs="1"/>
-            <xs:element type="eaw-ci:FilePatternType" name="FilePattern" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="TaskDefinitionType">
-        <xs:choice minOccurs="1" maxOccurs="1">
-            <xs:element name="CopyTask" type="eaw-ci:CopyTaskType" minOccurs="1" maxOccurs="1"/>
-        </xs:choice>
-        <xs:attribute type="xs:string" name="Name" use="required"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="eaw-ci" xmlns:eaw-ci="eaw-ci">
+    <xs:element name="BuildConfiguration"
+                type="eaw-ci:BuildConfigurationType" />
+    <xs:complexType name="Copy" abstract="false">
+        <xs:complexContent>
+            <xs:extension base="eaw-ci:AbstractTaskType">
+                <xs:sequence>
+                    <xs:element type="eaw-ci:RelativeFilePathType"
+                                name="CopyFromPath" minOccurs="1" maxOccurs="1" />
+                    <xs:element type="eaw-ci:RelativeFilePathType"
+                                name="CopyToPath" minOccurs="1" maxOccurs="1" />
+                    <xs:element type="xs:boolean" name="CopySubfolders"
+                                minOccurs="1" maxOccurs="1" />
+                    <xs:element type="eaw-ci:FilePatternType"
+                                name="CopyFileByPattern" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="TaskReferenceType">
-        <xs:sequence>
-            <xs:element type="xs:string" name="TaskName"/>
-        </xs:sequence>
+        <xs:complexContent>
+            <xs:extension base="eaw-ci:AbstractReferenceType"/>
+        </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="GlobalTaskDefinitionsType">
         <xs:sequence>
-            <xs:element type="eaw-ci:TaskDefinitionType" name="TaskDefinition" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="eaw-ci:AbstractTaskType" name="TaskDefinition"
+                        maxOccurs="unbounded" minOccurs="0" />
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="TaskType">
-        <xs:choice minOccurs="1" maxOccurs="1">
-            <xs:element name="CopyTask" type="eaw-ci:CopyTaskType"
-                        minOccurs="1" maxOccurs="1">
-            </xs:element>
-            <xs:element name="TaskReference" type="eaw-ci:TaskReferenceType" minOccurs="1" maxOccurs="1"/>
-        </xs:choice>
-        <xs:attribute type="xs:string" name="Name" use="required"/>
     </xs:complexType>
     <xs:complexType name="TasksType">
-        <xs:sequence>
-            <xs:element type="eaw-ci:TaskType" name="Task"/>
-        </xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="Task" type="eaw-ci:AbstractTaskType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="TaskReference" type="eaw-ci:TaskReferenceType" minOccurs="1" maxOccurs="1"/>
+        </xs:choice>
     </xs:complexType>
     <xs:complexType name="JobType">
-        <xs:sequence>
-            <xs:element type="eaw-ci:TasksType" name="Tasks" minOccurs="1" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute type="xs:string" name="Name" use="required"/>
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element type="eaw-ci:TasksType" name="Tasks"
+                        minOccurs="1" maxOccurs="1" />
+            <xs:element name="JobReference"
+                        type="eaw-ci:JobReferenceType" minOccurs="1" maxOccurs="1"/>
+        </xs:choice>
+        <xs:attribute type="xs:Name" name="Name" use="optional" />
+        <xs:attribute name="Id" type="xs:ID" use="required"/>
     </xs:complexType>
     <xs:complexType name="JobsType">
         <xs:sequence>
-            <xs:element type="eaw-ci:JobType" name="Job" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="eaw-ci:JobType" name="Job"
+                        maxOccurs="unbounded" minOccurs="1" />
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="ProjectType" mixed="true">
         <xs:sequence>
-            <xs:element type="eaw-ci:JobsType" name="Jobs" minOccurs="0"/>
+            <xs:element type="eaw-ci:JobsType" name="Jobs"
+                        minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
-        <xs:attribute type="xs:string" name="Name" use="required"/>
+        <xs:attribute type="xs:Name" name="Name" use="optional" />
+        <xs:attribute name="Id" type="xs:ID" use="required"/>
     </xs:complexType>
     <xs:complexType name="ProjectsType">
         <xs:sequence>
-            <xs:element type="eaw-ci:ProjectType" name="Project" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="eaw-ci:ProjectType" name="Project"
+                        maxOccurs="unbounded" minOccurs="1" />
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="BuildConfigurationType">
         <xs:sequence>
             <xs:element type="eaw-ci:GlobalTaskDefinitionsType"
-                        name="GlobalTaskDefinitions" minOccurs="0" maxOccurs="1"/>
+                        name="GlobalTasks" minOccurs="0" maxOccurs="1" />
+            <xs:element name="GlobalJobs" type="eaw-ci:GlobalJobDefinitionsType" minOccurs="0" maxOccurs="1"/>
             <xs:element type="eaw-ci:ProjectsType" name="Projects"
-                        minOccurs="1" maxOccurs="1"/>
+                        minOccurs="1" maxOccurs="1" />
         </xs:sequence>
-        <xs:attribute name="Version" type="eaw-ci:SemVerVersionType"/>
+        <xs:attribute name="ConfigVersion"
+                      type="eaw-ci:SemVerVersionType" fixed="1.0.0"/>
     </xs:complexType>
     <xs:simpleType name="RelativeFilePathType">
         <xs:restriction base="xs:string">
             <xs:pattern
-                    value="^[a-z0-9]([a-z0-9-]*[a-z0-9])?(/[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(/[a-z0-9]([a-z0-9-.]*[a-z0-9])?)?$">
-            </xs:pattern>
+                    value="^[a-z0-9]([a-z0-9-]*[a-z0-9])?(/[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(/[a-z0-9]([a-z0-9-.]*[a-z0-9])?)?$"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="FilePatternType">
         <xs:restriction base="xs:string">
-            <xs:pattern value="((\*[a-zA-Z0-9_-]*)(.)([a-zA-Z]+)|\*)"/>
+            <xs:pattern value="((\*[a-zA-Z0-9_-]*)(.)([a-zA-Z]+)|\*)" />
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="SemVerVersionType">
         <xs:restriction base="xs:string">
             <xs:pattern
-                    value="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$">
-            </xs:pattern>
+                    value="^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:complexType name="AbstractTaskType">
+        <xs:attribute name="Name" type="xs:Name" use="optional"/>
+        <xs:attribute name="Id" type="xs:ID" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="JobReferenceType">
+        <xs:complexContent>
+            <xs:extension base="eaw-ci:AbstractReferenceType"/>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AbstractReferenceType" abstract="true">
+        <xs:attribute name="ReferenceId" type="xs:IDREF" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="GlobalJobDefinitionsType">
+        <xs:sequence>
+            <xs:element name="JobDefinition" type="eaw-ci:JobDefinitionType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="JobDefinitionType">
+        <xs:sequence>
+            <xs:element name="Tasks" type="eaw-ci:TasksType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="Name" type="xs:Name" use="optional"/>
+        <xs:attribute name="Id" type="xs:ID" use="required"/>
+    </xs:complexType>
 </xs:schema>
