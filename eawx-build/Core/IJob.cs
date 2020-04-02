@@ -4,6 +4,8 @@ namespace EawXBuild.Core
     {
         string Name { get; }
 
+        void AddTask(ITask task);
+        
         void Run();
     }
 }

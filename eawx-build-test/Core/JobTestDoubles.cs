@@ -1,13 +1,30 @@
+using System.Collections.Generic;
 using EawXBuild.Core;
 
 namespace EawXBuildTest.Core
 {
-    public class JobStub : IJob
+    public class JobDummy : IJob
     {
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
+
+        public virtual void AddTask(ITask task)
+        {
+        }
 
         public virtual void Run()
         {
+        }
+    }
+
+    public class JobStub : JobDummy
+    {
+        public List<ITask> Tasks { get; } = new List<ITask>();
+
+        public override string Name { get; set; }
+
+        public override void AddTask(ITask task)
+        {
+            Tasks.Add(task);
         }
     }
 

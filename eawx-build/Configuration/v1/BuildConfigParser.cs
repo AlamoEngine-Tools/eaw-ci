@@ -25,29 +25,8 @@ namespace EawXBuild.Configuration.v1
         public IProject[] Parse(string filePath)
         {
             IProject[] projects;
-            XmlSerializer xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
             XmlSerializer xmlDataSerializer = new XmlSerializer(typeof(BuildConfigurationType));
-            XmlSchemaSet schemas = new XmlSchemaSet();
-            XmlSchema schema;
-            string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
-                .Single(str => str.EndsWith(XSD_RESOURCE_ID));
-            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
-            {
-                schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
-            }
-
-            schemas.Add(schema);
-            XmlReaderSettings settings = new XmlReaderSettings
-            {
-                Schemas = schemas,
-                ValidationType = ValidationType.Schema,
-                ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |
-                                  XmlSchemaValidationFlags.ReportValidationWarnings |
-                                  XmlSchemaValidationFlags.ProcessInlineSchema |
-                                  XmlSchemaValidationFlags.ProcessSchemaLocation
-            };
-            settings.ValidationEventHandler += (sender, arguments) =>
-                throw new XmlSchemaValidationException(arguments?.Message);
+            var settings = GetXmlReaderSettings();
             using (Stream stream = _fileSystem.File.OpenRead(filePath))
             {
                 using XmlReader reader = XmlReader.Create(stream, settings);
@@ -75,7 +54,55 @@ namespace EawXBuild.Configuration.v1
             if (buildConfigProject.Jobs.Length == 0) return;
             var buildConfigJob = buildConfigProject.Jobs[0];
             var job = _factory.MakeJob(buildConfigJob.Name);
+
+            AddTaskToJob(job, buildConfigJob);
+
             project.AddJob(job);
+        }
+
+        private void AddTaskToJob(IJob job, JobType buildConfigJob)
+        {
+            var taskList = buildConfigJob.Item as TasksType;
+            var buildConfigTask = taskList.Items[0] as Copy;
+            
+            if (buildConfigTask == null) return;
+            
+            var taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
+
+            var task = taskBuilder.With(nameof(buildConfigTask.Name), buildConfigTask.Name)
+                .With(nameof(buildConfigTask.CopyFromPath), buildConfigTask.CopyFromPath)
+                .With(nameof(buildConfigTask.CopyToPath), buildConfigTask.CopyToPath)
+                .With(nameof(buildConfigTask.CopySubfolders), buildConfigTask.CopySubfolders)
+                .Build();
+            
+            job.AddTask(task);
+        }
+
+        private static XmlReaderSettings GetXmlReaderSettings()
+        {
+            XmlSerializer xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
+            XmlSchemaSet schemas = new XmlSchemaSet();
+            XmlSchema schema;
+            string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Single(str => str.EndsWith(XSD_RESOURCE_ID));
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
+            {
+                schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
+            }
+
+            schemas.Add(schema);
+            XmlReaderSettings settings = new XmlReaderSettings
+            {
+                Schemas = schemas,
+                ValidationType = ValidationType.Schema,
+                ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |
+                                  XmlSchemaValidationFlags.ReportValidationWarnings |
+                                  XmlSchemaValidationFlags.ProcessInlineSchema |
+                                  XmlSchemaValidationFlags.ProcessSchemaLocation
+            };
+            settings.ValidationEventHandler += (sender, arguments) =>
+                throw new XmlSchemaValidationException(arguments?.Message);
+            return settings;
         }
     }
 }

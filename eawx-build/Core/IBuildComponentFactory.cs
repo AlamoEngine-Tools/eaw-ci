@@ -5,5 +5,7 @@ namespace EawXBuild.Core
         IProject MakeProject();
 
         IJob MakeJob(string name);
+
+        ITaskBuilder Task(string taskTypeName);
     }
 }

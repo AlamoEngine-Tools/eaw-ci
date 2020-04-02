@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 using System.Xml.Schema;
 using EawXBuild.Configuration.v1;
@@ -26,9 +27,9 @@ namespace EawXBuildTest.Configuration.v1
 
         [TestMethod]
         public void
-          GivenXmlWithWrongConfigVersion__WhenCallingParse__ShouldThrowException()
+            GivenXmlWithWrongConfigVersion__WhenCallingParse__ShouldThrowException()
         {
-          const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.1"" 
                                   xmlns:eaw-ci=""eaw-ci""
@@ -46,20 +47,21 @@ namespace EawXBuildTest.Configuration.v1
                                   </Projects>
                                 </eaw-ci:BuildConfiguration>";
 
-          _mockFileData.TextContents = xml;
-          const string exceptionMessage = "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
-          var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
-          var sut = new BuildConfigParser(_fileSystem, factoryStub);
-          try
-          {
-            sut.Parse(Path);
-          }
-          catch (Exception e)
-          {
-            Assert.AreEqual(typeof(InvalidOperationException), e.GetType());
-            Assert.AreEqual(typeof(XmlSchemaValidationException), e.InnerException.GetType());
-            Assert.AreEqual(exceptionMessage, e.InnerException.Message);
-          }
+            _mockFileData.TextContents = xml;
+            const string exceptionMessage =
+                "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
+            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
+            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            try
+            {
+                sut.Parse(Path);
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(typeof(InvalidOperationException), e.GetType());
+                Assert.AreEqual(typeof(XmlSchemaValidationException), e.InnerException.GetType());
+                Assert.AreEqual(exceptionMessage, e.InnerException.Message);
+            }
         }
 
         [TestMethod]
@@ -100,7 +102,7 @@ namespace EawXBuildTest.Configuration.v1
         [TestMethod]
         public void GivenXmlWithSingleProjectAndJob__WhenCallingParse__ProjectShouldHaveMatchingJob()
         {
-          const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
                                   xmlns:eaw-ci=""eaw-ci""
@@ -130,6 +132,123 @@ namespace EawXBuildTest.Configuration.v1
             var actualProject = projects[0] as ProjectStub;
             var actualJob = actualProject.Jobs[0];
             AssertJobNameEquals(jobName, actualJob);
+        }
+
+        [TestMethod]
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldRequestTaskBuilderForCorrectType()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""idvalue1"" Name=""TestJob"">
+                                          <Tasks>
+                                            <Task Id=""idvalue2"" Name=""TestTask"" xsi:type=""eaw-ci:Copy"">
+                                              <CopyFromPath>path/to/source</CopyFromPath>
+                                              <CopyToPath>path/to/dest</CopyToPath>
+                                              <CopySubfolders>true</CopySubfolders>
+                                            </Task>
+                                          </Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>";
+
+            _mockFileData.TextContents = xml;
+
+            var factorySpy = new BuildComponentFactorySpy();
+            var sut = new BuildConfigParser(_fileSystem, factorySpy);
+
+            sut.Parse(Path);
+
+            var expected = "Copy";
+            Assert.AreEqual(expected, factorySpy.ActualTaskTypeName,
+                $"Should have requested TaskBuilder for {expected}, but got {factorySpy.ActualTaskTypeName}");
+        }
+
+        [TestMethod]
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldConfigureTaskWithBuilder()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""idvalue1"" Name=""TestJob"">
+                                          <Tasks>
+                                            <Task Id=""idvalue2"" Name=""TestTask"" xsi:type=""eaw-ci:Copy"">
+                                              <CopyFromPath>path/to/source</CopyFromPath>
+                                              <CopyToPath>path/to/dest</CopyToPath>
+                                              <CopySubfolders>true</CopySubfolders>
+                                            </Task>
+                                          </Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>";
+
+            _mockFileData.TextContents = xml;
+
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
+                {"Name", "TestTask"},
+                {"CopyFromPath", "path/to/source"},
+                {"CopyToPath", "path/to/dest"},
+                {"CopySubfolders", true}
+            });
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+
+            sut.Parse(Path);
+
+            taskBuilderMock.Verify();
+        }
+
+        [TestMethod]
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldAddTaskToJob()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""idvalue1"" Name=""TestJob"">
+                                          <Tasks>
+                                            <Task Id=""idvalue2"" Name=""TestTask"" xsi:type=""eaw-ci:Copy"">
+                                              <CopyFromPath>path/to/source</CopyFromPath>
+                                              <CopyToPath>path/to/dest</CopyToPath>
+                                              <CopySubfolders>true</CopySubfolders>
+                                            </Task>
+                                          </Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>";
+
+            _mockFileData.TextContents = xml;
+
+            var jobStub = new JobStub();
+            var taskBuilderStub = new TaskBuilderStub();
+            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
+            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+
+            sut.Parse(Path);
+
+            CollectionAssert.Contains(jobStub.Tasks, taskBuilderStub.Task, "Should Job should have expected task, but does not.");
         }
 
         private static void AssertProjectNameEquals(string projectName, string actualName)
