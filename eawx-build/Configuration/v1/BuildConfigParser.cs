@@ -63,10 +63,11 @@ namespace EawXBuild.Configuration.v1
         private void AddTaskToJob(IJob job, JobType buildConfigJob)
         {
             var taskList = buildConfigJob.Item as TasksType;
+            if (null == taskList.Items || !taskList.Items.Any()) return;
             var buildConfigTask = taskList.Items[0] as Copy;
-            
+
             if (buildConfigTask == null) return;
-            
+
             var taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
 
             var task = taskBuilder.With(nameof(buildConfigTask.Name), buildConfigTask.Name)
@@ -74,7 +75,7 @@ namespace EawXBuild.Configuration.v1
                 .With(nameof(buildConfigTask.CopyToPath), buildConfigTask.CopyToPath)
                 .With(nameof(buildConfigTask.CopySubfolders), buildConfigTask.CopySubfolders)
                 .Build();
-            
+
             job.AddTask(task);
         }
 

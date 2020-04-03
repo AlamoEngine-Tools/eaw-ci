@@ -77,7 +77,6 @@ namespace EawXBuildTest.Configuration.v1
                                       <Jobs>
                                         <Job Id=""idvalue1"">
                                           <Tasks>
-                                            <Task Id=""idvalue2"" xsi:type=""eaw-ci:AbstractTaskType""/>
                                           </Tasks>
                                         </Job>
                                       </Jobs>
@@ -112,7 +111,6 @@ namespace EawXBuildTest.Configuration.v1
                                       <Jobs>
                                         <Job Id=""idvalue1"" Name=""TestJob"">
                                           <Tasks>
-                                            <Task Id=""idvalue2"" xsi:type=""eaw-ci:AbstractTaskType""/>
                                           </Tasks>
                                         </Job>
                                       </Jobs>
@@ -151,6 +149,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyFromPath>path/to/source</CopyFromPath>
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
+                                              <CopyFileByPattern>*</CopyFileByPattern>
                                             </Task>
                                           </Tasks>
                                         </Job>
@@ -188,6 +187,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyFromPath>path/to/source</CopyFromPath>
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
+                                              <CopyFileByPattern>*</CopyFileByPattern>
                                             </Task>
                                           </Tasks>
                                         </Job>
@@ -231,6 +231,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyFromPath>path/to/source</CopyFromPath>
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
+                                              <CopyFileByPattern>*</CopyFileByPattern>
                                             </Task>
                                           </Tasks>
                                         </Job>
