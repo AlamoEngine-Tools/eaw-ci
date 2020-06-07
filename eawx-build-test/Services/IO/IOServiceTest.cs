@@ -64,7 +64,32 @@ namespace EawXBuildTest.Services.IO
             }
             else
             {
-                Assert.Inconclusive("Test only runs on Windows.");
+                Assert.Inconclusive("OS not compatible, required OS is Windows.");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        [DataRow("/mnt/c/data/test/path", ".dat", true)]
+        [DataRow("/mnt/c/data/test/path", ".xml", false)]
+        [DataRow("/mnt/c/data/abba/path", ".xml", false)]
+        [DataRow("/mnt/c/data/path", ".xml", true)]
+        [DataRow("/mnt/c/da/path", ".xml", false)]
+        [DataRow("/mnt/c/data/path", ".dat", false)]
+        public void GivenAbsolutePathToFile__WithRootedPath__IsValidPath__IsExpected__UNX(string absoluteDirectoryPath,
+            string fileExtension, bool expected)
+        {
+            if (TestUtility.IsLinuxOrMacOS())
+            {
+                const string fileName = "test";
+                IOService svc = new IOService(_fileSystem);
+                Assert.AreEqual(expected, svc.IsValidPath(
+                    _fileSystem.Path.Combine(absoluteDirectoryPath, fileName + fileExtension),
+                    string.Empty, fileExtension));
+            }
+            else
+            {
+                Assert.Inconclusive("OS not compatible, required OS is Unix.");
             }
         }
 
@@ -89,7 +114,55 @@ namespace EawXBuildTest.Services.IO
             }
             else
             {
-                Assert.Inconclusive("Test only runs on Windows.");
+                Assert.Inconclusive("OS not compatible, required OS is Windows.");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        [DataRow("data/test/path", ".dat")]
+        [DataRow("/test/path", ".xml")]
+        [DataRow("abba/path", ".xml")]
+        [DataRow("data/path", ".xml")]
+        [DataRow("da/path", ".xml")]
+        [DataRow("data/path", ".dat")]
+        public void GivenRelativePathToFile__WithoutRootedPath__IsValidPath__IsFalse_UNX(string absoluteDirectoryPath,
+            string fileExtension)
+        {
+            if (TestUtility.IsLinuxOrMacOS())
+            {
+                const string fileName = "test";
+                IOService svc = new IOService(_fileSystem);
+                Assert.IsFalse(svc.IsValidPath(
+                    _fileSystem.Path.Combine(absoluteDirectoryPath, fileName + fileExtension),
+                    string.Empty, fileExtension));
+            }
+            else
+            {
+                Assert.Inconclusive("OS not compatible, required OS is Unix.");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        [DataRow("test/path", "/mnt/c/data", ".dat", true)]
+        [DataRow("../../path", "/mnt/c/data/test/path", ".xml", true)]
+        [DataRow("../../path", "/mnt/c/data/test/path", ".dat", false)]
+        [DataRow("../path", "/mnt/c/data/test/path", ".xml", false)]
+        public void GivenRelativePathToFile__IsValidPath__IsExpected_UNX(string relativeDirectoryPath, string basePath,
+            string fileExtension, bool expected)
+        {
+            if (TestUtility.IsLinuxOrMacOS())
+            {
+                const string fileName = "test";
+                IOService svc = new IOService(_fileSystem);
+                Assert.AreEqual(expected, svc.IsValidPath(
+                    _fileSystem.Path.Combine(relativeDirectoryPath, fileName + fileExtension),
+                    basePath, fileExtension));
+            }
+            else
+            {
+                Assert.Inconclusive("OS not compatible, required OS is Unix.");
             }
         }
 
@@ -112,7 +185,7 @@ namespace EawXBuildTest.Services.IO
             }
             else
             {
-                Assert.Inconclusive("Test only runs on Windows.");
+                Assert.Inconclusive("OS not compatible, required OS is Windows.");
             }
         }
     }
