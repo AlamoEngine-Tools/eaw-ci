@@ -184,7 +184,7 @@ namespace EawXBuildTest.Configuration.v1
                                       <Jobs>
                                         <Job Id=""idvalue1"" Name=""TestJob"">
                                           <Tasks>
-                                            <Task Id=""idvalue2"" Name=""TestTask"" xsi:type=""eaw-ci:Copy"">
+                                            <Task Id=""TestTask"" Name=""TestTask"" xsi:type=""eaw-ci:Copy"">
                                               <CopyFromPath>path/to/source</CopyFromPath>
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
@@ -201,10 +201,12 @@ namespace EawXBuildTest.Configuration.v1
 
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
             {
+                {"Id", "TestTask"},
                 {"Name", "TestTask"},
                 {"CopyFromPath", "path/to/source"},
                 {"CopyToPath", "path/to/dest"},
-                {"CopySubfolders", true}
+                {"CopySubfolders", true},
+                {"CopyFileByPattern", "*"},
             });
 
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
@@ -311,7 +313,7 @@ namespace EawXBuildTest.Configuration.v1
                                       <CopyFileByPattern>*</CopyFileByPattern>
                                     </TaskDefinition>
 
-                                    <TaskDefinition Id=""ExpectedTask"" xsi:type=""eaw-ci:Copy"">
+                                    <TaskDefinition Id=""ExpectedTask"" Name=""ExpectedTask"" xsi:type=""eaw-ci:Copy"">
                                       <CopyFromPath>path/to/source</CopyFromPath>
                                       <CopyToPath>path/to/dest</CopyToPath>
                                       <CopySubfolders>true</CopySubfolders>
@@ -337,10 +339,12 @@ namespace EawXBuildTest.Configuration.v1
             var jobStub = new JobStub();
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
             {
+                {"Id", "ExpectedTask" },
                 {"Name", "ExpectedTask"},
                 {"CopyFromPath", "path/to/source"},
                 {"CopyToPath", "path/to/dest"},
-                {"CopySubfolders", true}
+                {"CopySubfolders", true},
+                {"CopyFileByPattern", "*" }
             });
 
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderMock};
@@ -403,68 +407,47 @@ namespace EawXBuildTest.Configuration.v1
             AssertJobHasExpectedTask(jobStub, secondTask);
         }
 
-//         [TestMethod]
-//         public void GivenProjectWithJobAndTwoTasks__WhenCallingParse__ShouldConfigureBothTasksWithBuilder()
-//         {
-//             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-//                                 <eaw-ci:BuildConfiguration
-//                                   ConfigVersion=""1.0.0"" 
-//                                   xmlns:eaw-ci=""eaw-ci""
-//                                   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-//                                   <Projects>
-//                                     <Project Id=""idvalue0"">
-//                                       <Jobs>
-//                                         <Job Id=""idvalue1"" Name=""TestJob"">
-//                                           <Tasks>
-//                                             <Task Id=""idvalue2"" Name=""FirstTask"" xsi:type=""eaw-ci:Copy"">
-//                                               <CopyFromPath>path/to/first/source</CopyFromPath>
-//                                               <CopyToPath>path/to/first/dest</CopyToPath>
-//                                               <CopySubfolders>true</CopySubfolders>
-//                                               <CopyFileByPattern>*</CopyFileByPattern>
-//                                             </Task>
-//
-//                                             <Task Id=""idvalue3"" Name=""SecondTask"" xsi:type=""eaw-ci:Copy"">
-//                                               <CopyFromPath>path/to/second/source</CopyFromPath>
-//                                               <CopyToPath>path/to/second/dest</CopyToPath>
-//                                               <CopySubfolders>true</CopySubfolders>
-//                                               <CopyFileByPattern>*</CopyFileByPattern>
-//                                             </Task>
-//                                           </Tasks>
-//                                         </Job>
-//                                       </Jobs>
-//                                     </Project>
-//                                   </Projects>
-//                                 </eaw-ci:BuildConfiguration>";
-//
-//             _mockFileData.TextContents = xml;
-//
-//             var firstTaskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
-//             {
-//                 {"Name", "FirstTask"},
-//                 {"CopyFromPath", "path/to/first/source"},
-//                 {"CopyToPath", "path/to/first/dest"},
-//                 {"CopySubfolders", true}
-//             });
-//
-//             var secondTaskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
-//             {
-//               {"Name", "SecondTask"},
-//               {"CopyFromPath", "path/to/second/source"},
-//               {"CopyToPath", "path/to/second/dest"},
-//               {"CopySubfolders", true}
-//             });
-//             
-//             var factoryStub = new TaskBuilderIteratingComponentFactoryStub();
-//             factoryStub.TaskBuilders.Add(firstTaskBuilderMock);
-//             factoryStub.TaskBuilders.Add(secondTaskBuilderMock);
-//
-//             var sut = new BuildConfigParser(_fileSystem, factoryStub);
-//
-//             sut.Parse(Path);
-//
-//             firstTaskBuilderMock.Verify();
-//             secondTaskBuilderMock.Verify();
-//         }
+
+        [TestMethod]
+        public void GivenProjectWithTwoJobs__WhenCallingParse__ShouldAddBothJobsToProject()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""FirstJob"" Name=""FirstJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+
+                                        <Job Id=""SecondJob"" Name=""SecondJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>";
+
+            _mockFileData.TextContents = xml;
+
+            var expectedJobs = new List<IJob> { new JobStub(), new JobStub() };
+            var projectStub = new ProjectStub();
+            var factoryStub = new JobIteratingBuildComponentFactoryStub
+            {
+                Project = projectStub,
+                Jobs = expectedJobs
+            };
+
+            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+
+            sut.Parse(Path);
+
+            CollectionAssert.AreEqual(expectedJobs, projectStub.Jobs);
+        }
+
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using EawXBuild.Core;
-using EawXBuild.Exceptions;
 using JetBrains.Annotations;
 
 namespace EawXBuild.Configuration.v1
@@ -46,57 +44,66 @@ namespace EawXBuild.Configuration.v1
             var project = _factory.MakeProject();
             project.Name = buildConfigProject.Name;
 
-            AddJobToProject(buildConfig, buildConfigProject, project);
+            AddJobsToProject(buildConfig, buildConfigProject, project);
 
             return project;
         }
 
-        private void AddJobToProject(BuildConfigurationType buildConfig, ProjectType buildConfigProject,
+        private void AddJobsToProject(BuildConfigurationType buildConfig, ProjectType buildConfigProject,
             IProject project)
         {
             if (buildConfigProject.Jobs.Length == 0) return;
-            var buildConfigJob = buildConfigProject.Jobs[0];
-            var job = _factory.MakeJob(buildConfigJob.Name);
-
-            AddTaskToJob(buildConfig, job, buildConfigJob);
-
-            project.AddJob(job);
+            foreach (JobType buildConfigJob in buildConfigProject.Jobs)
+            {
+                IJob job = _factory.MakeJob(buildConfigJob.Name);
+                AddTasksToJob(buildConfig, job, buildConfigJob);
+                project.AddJob(job);
+            }
         }
 
-        private void AddTaskToJob(BuildConfigurationType buildConfig, IJob job, JobType buildConfigJob)
+        private void AddTasksToJob(BuildConfigurationType buildConfig, IJob job, JobType buildConfigJob)
         {
-            var taskList = (TasksType) buildConfigJob.Item;
+            var taskList = (TasksType)buildConfigJob.Item;
             if (taskList.Items == null) return;
 
             foreach (var taskListItem in taskList.Items)
             {
-                Copy buildConfigTask = null;
-                string taskName;
-                if (taskListItem is TaskReferenceType taskRef)
-                {
-                    if (buildConfig.GlobalTasks == null) return;
-                    foreach (var globalTask in buildConfig.GlobalTasks)
-                        if (globalTask.Id.Equals(taskRef.ReferenceId))
-                            buildConfigTask = (Copy) globalTask;
+                object buildConfigTask = GetBuildConfigTaskFromTaskListItem(buildConfig, taskListItem);
 
-                    taskName = buildConfigTask.Id;
-                }
-                else
-                {
-                    buildConfigTask = (Copy) taskListItem;
-                    taskName = buildConfigTask.Name;
-                }
-
-                var taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
-
-                var task = taskBuilder.With(nameof(buildConfigTask.Name), taskName)
-                    .With(nameof(buildConfigTask.CopyFromPath), buildConfigTask.CopyFromPath)
-                    .With(nameof(buildConfigTask.CopyToPath), buildConfigTask.CopyToPath)
-                    .With(nameof(buildConfigTask.CopySubfolders), buildConfigTask.CopySubfolders)
-                    .Build();
-
+                ITask task = MakeTask(buildConfigTask);
                 job.AddTask(task);
             }
+        }
+
+        private static object GetBuildConfigTaskFromTaskListItem(BuildConfigurationType buildConfig, object taskListItem)
+        {
+            object buildConfigTask = taskListItem;
+            if (taskListItem is TaskReferenceType taskRef)
+                buildConfigTask = GetMatchingGlobalTask(buildConfig, taskRef);
+
+            return buildConfigTask;
+        }
+
+        private static object GetMatchingGlobalTask(BuildConfigurationType buildConfig, TaskReferenceType taskRef)
+        {
+            object buildConfigTask = null;
+            foreach (var globalTask in buildConfig.GlobalTasks)
+            {
+                if (!globalTask.Id.Equals(taskRef.ReferenceId)) continue;
+                buildConfigTask = globalTask;
+            }
+
+            return buildConfigTask;
+        }
+
+        private ITask MakeTask(object buildConfigTask)
+        {
+            var taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
+            foreach (var prop in buildConfigTask.GetType().GetProperties())
+                taskBuilder.With(prop.Name, prop.GetValue(buildConfigTask));
+
+            ITask task = taskBuilder.Build();
+            return task;
         }
 
         private static XmlReaderSettings GetXmlReaderSettings()

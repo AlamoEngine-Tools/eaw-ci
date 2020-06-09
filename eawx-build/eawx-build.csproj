@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>EawXBuild</RootNamespace>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
-    <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,4 +16,7 @@
     <EmbeddedResource Include="Configuration\v1\eaw-ci.xsd" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\.editorconfig" />
+  </ItemGroup>
 </Project>
