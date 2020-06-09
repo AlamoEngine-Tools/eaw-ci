@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using EawXBuild.Core;
 
 namespace EawXBuildTest.Core
@@ -24,6 +25,35 @@ namespace EawXBuildTest.Core
         public virtual ITaskBuilder Task(string taskTypeName)
         {
             return TaskBuilder;
+        }
+    }
+
+    public class TaskBuilderIteratingComponentFactoryStub : IBuildComponentFactory
+    {
+        private IEnumerator<ITaskBuilder> _enumerator;
+
+        public IProject Project { get; set; } = new ProjectDummy();
+
+        public JobDummy Job { get; set; } = new JobDummy();
+
+        public List<ITaskBuilder> TaskBuilders { get; } = new List<ITaskBuilder>();
+
+        public virtual IProject MakeProject()
+        {
+            return Project;
+        }
+
+        public virtual IJob MakeJob(string name)
+        {
+            Job.Name = name;
+            return Job;
+        }
+
+        public virtual ITaskBuilder Task(string taskTypeName)
+        {
+            if (_enumerator == null) _enumerator = TaskBuilders.GetEnumerator();
+            _enumerator.MoveNext();
+            return _enumerator.Current;
         }
     }
 

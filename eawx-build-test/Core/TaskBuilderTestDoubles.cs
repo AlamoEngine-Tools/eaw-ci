@@ -26,7 +26,32 @@ namespace EawXBuildTest.Core
             return Task;
         }
     }
-    
+
+    public class IteratingTaskBuilderStub : TaskBuilderDummy
+    {
+        private IEnumerator<ITask> _enumerator;
+        private List<ITask> _tasks = new List<ITask>();
+
+        public List<ITask> Tasks
+        {
+            get => _tasks;
+            set
+            {
+                _tasks = value;
+                _enumerator = _tasks.GetEnumerator();
+            }
+        }
+
+        public override ITask Build()
+        {
+            if(_enumerator == null)
+                _enumerator = Tasks.GetEnumerator();
+
+            _enumerator.MoveNext();
+            return _enumerator.Current;
+        }
+    }
+
     public class TaskBuilderMock : TaskBuilderStub
     {
         private readonly Dictionary<string, object> _expectedEntries;
