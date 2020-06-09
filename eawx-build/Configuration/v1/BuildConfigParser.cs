@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace EawXBuild.Configuration.v1
             _factory = factory;
         }
 
-        public IProject[] Parse(string filePath)
+        public IEnumerable<IProject> Parse(string filePath)
         {
             IProject[] projects;
             XmlSerializer xmlDataSerializer = new XmlSerializer(typeof(BuildConfigurationType));
@@ -32,18 +33,20 @@ namespace EawXBuild.Configuration.v1
                 using XmlReader reader = XmlReader.Create(stream, settings);
                 BuildConfigurationType buildConfig = xmlDataSerializer.Deserialize(reader) as BuildConfigurationType;
                 projects = new IProject[buildConfig.Projects.Length];
-                projects[0] = GetProjectFromConfig(buildConfig);
+                for (int i = 0; i < buildConfig.Projects.Length; i++)
+                {
+                    var buildConfigProject = buildConfig.Projects[i];
+                    projects[i] = GetProjectFromConfig(buildConfig, buildConfigProject);
+                }
             }
 
             return projects;
         }
 
-        private IProject GetProjectFromConfig(BuildConfigurationType buildConfig)
+        private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject)
         {
-            var buildConfigProject = buildConfig?.Projects[0];
             var project = _factory.MakeProject();
             project.Name = buildConfigProject.Name;
-
             AddJobsToProject(buildConfig, buildConfigProject, project);
 
             return project;

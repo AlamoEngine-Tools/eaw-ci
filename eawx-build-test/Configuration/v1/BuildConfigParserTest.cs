@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
 using System.Xml.Schema;
 using EawXBuild.Configuration.v1;
 using EawXBuild.Core;
@@ -51,7 +52,7 @@ namespace EawXBuildTest.Configuration.v1
             _mockFileData.TextContents = xml;
             const string exceptionMessage =
                 "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
-            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
+            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub() };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
             try
             {
@@ -89,12 +90,12 @@ namespace EawXBuildTest.Configuration.v1
 
             const string projectName = "TestProject";
 
-            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
+            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub() };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
 
-            var actual = projects[0] as ProjectStub;
+            var actual = projects.ToList()[0] as ProjectStub;
             var actualName = actual?.Name;
             AssertProjectNameEquals(projectName, actualName);
         }
@@ -123,12 +124,12 @@ namespace EawXBuildTest.Configuration.v1
 
             const string jobName = "TestJob";
 
-            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub(), Job = new JobStub()};
+            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub(), Job = new JobStub() };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
 
-            var actualProject = projects[0] as ProjectStub;
+            var actualProject = projects.ToList()[0] as ProjectStub;
             var actualJob = actualProject.Jobs[0];
             AssertJobNameEquals(jobName, actualJob);
         }
@@ -209,7 +210,7 @@ namespace EawXBuildTest.Configuration.v1
                 {"CopyFileByPattern", "*"},
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            var factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -247,7 +248,7 @@ namespace EawXBuildTest.Configuration.v1
 
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
-            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
+            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -289,7 +290,7 @@ namespace EawXBuildTest.Configuration.v1
 
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
-            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
+            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -347,7 +348,7 @@ namespace EawXBuildTest.Configuration.v1
                 {"CopyFileByPattern", "*" }
             });
 
-            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderMock};
+            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderMock };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -398,7 +399,7 @@ namespace EawXBuildTest.Configuration.v1
             taskBuilderStub.Tasks.Add(firstTask);
             taskBuilderStub.Tasks.Add(secondTask);
 
-            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
+            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -446,6 +447,47 @@ namespace EawXBuildTest.Configuration.v1
             sut.Parse(Path);
 
             CollectionAssert.AreEqual(expectedJobs, projectStub.Jobs);
+        }
+
+        [TestMethod]
+        public void GivenBuildConfigWithTwoProjects__WhenCallingParse__ShouldReturnBothProjects()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""FirstProject"">
+                                        <Jobs>
+                                            <Job Id=""Dummy"">
+                                                <Tasks></Tasks>
+                                            </Job>
+                                        </Jobs>
+                                    </Project>
+                                    <Project Id=""SecondProject"">
+                                        <Jobs>
+                                            <Job Id=""Dummy2"">
+                                                <Tasks></Tasks>
+                                            </Job>
+                                        </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>";
+
+            _mockFileData.TextContents = xml;
+
+            var expectedProjects = new List<IProject> { new ProjectDummy(), new ProjectDummy() };
+            var factoryStub = new ProjectIteratingBuildComponentFactoryStub()
+            {
+                Projects = expectedProjects
+            };
+
+            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+
+            var projects = sut.Parse(Path);
+
+            CollectionAssert.AreEqual(expectedProjects, projects.ToList());
         }
 
 

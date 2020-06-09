@@ -54,32 +54,31 @@ namespace EawXBuildTest.Core
         }
     }
 
-    public class TaskBuilderIteratingComponentFactoryStub : IBuildComponentFactory
+    public class ProjectIteratingBuildComponentFactoryStub : IBuildComponentFactory
     {
-        private IEnumerator<ITaskBuilder> _enumerator;
+        private IEnumerator<IProject> _enumerator;
 
-        public IProject Project { get; set; } = new ProjectDummy();
+        public IEnumerable<IProject> Projects { get; set; }
 
         public JobDummy Job { get; set; } = new JobDummy();
 
-        public List<ITaskBuilder> TaskBuilders { get; } = new List<ITaskBuilder>();
+        public ITaskBuilder TaskBuilder { get; set; } = new TaskBuilderDummy();
 
-        public virtual IProject MakeProject()
+        public IJob MakeJob(string name)
         {
-            return Project;
-        }
-
-        public virtual IJob MakeJob(string name)
-        {
-            Job.Name = name;
             return Job;
         }
 
-        public virtual ITaskBuilder Task(string taskTypeName)
+        public IProject MakeProject()
         {
-            if (_enumerator == null) _enumerator = TaskBuilders.GetEnumerator();
+            if (_enumerator == null) _enumerator = Projects.GetEnumerator();
             _enumerator.MoveNext();
             return _enumerator.Current;
+        }
+
+        public ITaskBuilder Task(string taskTypeName)
+        {
+            return TaskBuilder;
         }
     }
 
