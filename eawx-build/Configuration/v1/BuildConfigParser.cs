@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -7,7 +8,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using EawXBuild.Core;
-using JetBrains.Annotations;
 
 namespace EawXBuild.Configuration.v1
 {
