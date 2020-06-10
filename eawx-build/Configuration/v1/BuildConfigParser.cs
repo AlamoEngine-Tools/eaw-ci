@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -7,7 +8,6 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using EawXBuild.Core;
-using JetBrains.Annotations;
 
 namespace EawXBuild.Configuration.v1
 {
@@ -25,19 +25,17 @@ namespace EawXBuild.Configuration.v1
 
         public IEnumerable<IProject> Parse(string filePath)
         {
-            IProject[] projects;
             XmlSerializer xmlDataSerializer = new XmlSerializer(typeof(BuildConfigurationType));
             var settings = GetXmlReaderSettings();
-            using (Stream stream = _fileSystem.File.OpenRead(filePath))
+            using Stream stream = _fileSystem.File.OpenRead(filePath);
+            using XmlReader reader = XmlReader.Create(stream, settings);
+            BuildConfigurationType buildConfig = (BuildConfigurationType) xmlDataSerializer.Deserialize(reader);
+            
+            var projects = new IProject[buildConfig.Projects.Length];
+            for (var i = 0; i < buildConfig.Projects.Length; i++)
             {
-                using XmlReader reader = XmlReader.Create(stream, settings);
-                BuildConfigurationType buildConfig = xmlDataSerializer.Deserialize(reader) as BuildConfigurationType;
-                projects = new IProject[buildConfig.Projects.Length];
-                for (int i = 0; i < buildConfig.Projects.Length; i++)
-                {
-                    var buildConfigProject = buildConfig.Projects[i];
-                    projects[i] = GetProjectFromConfig(buildConfig, buildConfigProject);
-                }
+                var buildConfigProject = buildConfig.Projects[i];
+                projects[i] = GetProjectFromConfig(buildConfig, buildConfigProject);
             }
 
             return projects;
@@ -46,7 +44,7 @@ namespace EawXBuild.Configuration.v1
         private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject)
         {
             var project = _factory.MakeProject();
-            project.Name = buildConfigProject.Name;
+            project.Name = buildConfigProject.Id;
             AddJobsToProject(buildConfig, buildConfigProject, project);
 
             return project;

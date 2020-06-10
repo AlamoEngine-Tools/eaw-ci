@@ -75,7 +75,7 @@ namespace EawXBuildTest.Configuration.v1
                                   xmlns:eaw-ci=""eaw-ci""
                                   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
                                   <Projects>
-                                    <Project Id=""idvalue0"" Name=""TestProject"">
+                                    <Project Id=""TestProject"">
                                       <Jobs>
                                         <Job Id=""idvalue1"">
                                           <Tasks>
@@ -129,7 +129,7 @@ namespace EawXBuildTest.Configuration.v1
 
             var projects = sut.Parse(Path);
 
-            var actualProject = projects.ToList()[0] as ProjectStub;
+            var actualProject = (ProjectStub) projects.ToList()[0];
             var actualJob = actualProject.Jobs[0];
             AssertJobNameEquals(jobName, actualJob);
         }
