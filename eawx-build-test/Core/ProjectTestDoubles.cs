@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using EawXBuild.Core;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Task = System.Threading.Tasks.Task;
 
 namespace EawXBuildTest.Core
