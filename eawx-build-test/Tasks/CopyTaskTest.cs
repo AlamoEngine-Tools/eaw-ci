@@ -277,6 +277,26 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        [ExpectedException(typeof(NoRelativePathException))]
+        public void GivenAbsolutePathAsSourceDir__WhenCallingRun__ShouldThrowNoRelativePathException() {
+            const string sourceDir = "/absolute/path";
+            _sut.Source = sourceDir;
+
+            _sut.Run();
+        }
+        
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        [ExpectedException(typeof(NoRelativePathException))]
+        public void GivenAbsolutePathAsDestDir__WhenCallingRun__ShouldThrowNoRelativePathException() {
+            const string destDir = "/absolute/path";
+            _sut.Destination = destDir;
+
+            _sut.Run();
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoSuchFileSystemObjectException))]
         public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException() {
             _sut.Source = "NonExistingPath";
