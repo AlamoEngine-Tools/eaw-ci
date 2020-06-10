@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>EawXBuild</RootNamespace>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
     <Title>EaWX Build</Title>
     <Authors>Sven Marcus &amp; Lukas Grünwald</Authors>
     <Copyright>Sven Marcus &amp; Lukas Grünwald</Copyright>
