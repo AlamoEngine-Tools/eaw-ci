@@ -1,3 +1,4 @@
+using System;
 using EawXBuild.Core;
 
 namespace EawXBuildTest.Core
@@ -16,6 +17,18 @@ namespace EawXBuildTest.Core
         public override void Run()
         {
             WasRun = true;
+        }
+    }
+    
+    public class ExceptionThrowingTask : ITask {
+        private readonly string _message;
+
+        public ExceptionThrowingTask(string message = null) {
+            _message = message;
+        }
+        
+        public void Run() {
+            throw new Exception(_message);
         }
     }
 }

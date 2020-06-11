@@ -25,7 +25,7 @@ namespace EawXBuild.Services.Process {
             };
 
             _process.Start();
-            Console.WriteLine(_process.StandardOutput.ReadToEnd());
+            Console.Out.WriteLine(_process.StandardOutput.ReadToEnd());
         }
 
         public void WaitForExit() {
