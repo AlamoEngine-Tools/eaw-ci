@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using EawXBuild.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

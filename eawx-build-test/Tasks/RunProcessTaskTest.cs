@@ -1,9 +1,5 @@
-using System;
-using System.Diagnostics;
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
-using EawXBuild.Services.Process;
 using EawXBuild.Tasks;
 using EawXBuildTest.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

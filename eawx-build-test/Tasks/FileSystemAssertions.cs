@@ -25,7 +25,7 @@ namespace EawXBuildTest.Tasks
         
         public void AssertFileExists(string expected)
         {
-            Assert.IsTrue(_fileSystem.FileExists(expected), $"File {expected} should exist, but doesn'nt");
+            Assert.IsTrue(_fileSystem.FileExists(expected), $"File {expected} should exist, but doesn't");
         }
 
         public void AssertFileDoesNotExist(string filePath)
