@@ -1,6 +1,9 @@
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
+using EawXBuild.Services.Process;
 using EawXBuild.Tasks;
 using EawXBuildTest.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -36,7 +39,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Arguments = arguments;
 
             _sut.Run();
-            
+
             Assert.AreEqual(arguments, _runner.Arguments);
         }
 
@@ -44,13 +47,14 @@ namespace EawXBuildTest.Tasks {
         [ExpectedException(typeof(ProcessFailedException))]
         public void GivenExecutableThatExitsWithCodeOne__WhenCallingRun__ShouldThrowProcessFailedException() {
             var runner = new ProcessRunnerStub {ExitCode = 1};
-            var sut = new RunProcessTask(runner, _filesystem) { ExecutablePath = _executablePath };
+            var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = _executablePath};
 
             sut.Run();
         }
-        
+
         [TestMethod]
-        public void GivenPathToExecutable__WhenCallingRun__ShouldCallStartFirst_Then_BlockUntilFinished_Then_CheckExitCode() {
+        public void
+            GivenPathToExecutable__WhenCallingRun__ShouldCallStartFirst_Then_BlockUntilFinished_Then_CheckExitCode() {
             var runner = new CallOrderVerifyingProcessRunnerMock();
 
             const string executablePath = "myProgram.exe";
@@ -59,16 +63,6 @@ namespace EawXBuildTest.Tasks {
             sut.Run();
 
             runner.Verify();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
-        public void GivenPathToNonExistingExecutable__WhenCallingRun__ShouldThrowFileNotFoundException() {
-            var sut = new RunProcessTask(new ProcessRunnerDummy(), _filesystem) {
-                ExecutablePath = "NonExistingProgram.exe"
-            };
-
-            sut.Run();
         }
 
         private static void AssertProcessWasStartedWithExecutable(ProcessRunnerSpy runner, string executablePath) {

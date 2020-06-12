@@ -15,9 +15,6 @@ namespace EawXBuild.Tasks {
         }
 
         public void Run() {
-            if (!_filesystem.File.Exists(ExecutablePath))
-                throw new FileNotFoundException();
-
             _runner.Start(ExecutablePath, Arguments);
             _runner.WaitForExit();
             if(_runner.ExitCode != 0) throw new ProcessFailedException();
