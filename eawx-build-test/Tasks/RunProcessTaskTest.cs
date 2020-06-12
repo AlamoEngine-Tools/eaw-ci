@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
+using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
 using EawXBuildTest.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,8 +29,28 @@ namespace EawXBuildTest.Tasks {
             AssertProcessWasStartedWithExecutable(_runner, _executablePath);
         }
 
+
         [TestMethod]
-        public void GivenPathToExecutable__WhenCallingRun__ShouldCallStartFirst_Then_BlockUntilFinished() {
+        public void GivenExecutablePathAndArguments__WhenCallingRun__ShouldStartProcessWithArguments() {
+            const string arguments = "--first --second --third";
+            _sut.Arguments = arguments;
+
+            _sut.Run();
+            
+            Assert.AreEqual(arguments, _runner.Arguments);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ProcessFailedException))]
+        public void GivenExecutableThatExitsWithCodeOne__WhenCallingRun__ShouldThrowProcessFailedException() {
+            var runner = new ProcessRunnerStub {ExitCode = 1};
+            var sut = new RunProcessTask(runner, _filesystem) { ExecutablePath = _executablePath };
+
+            sut.Run();
+        }
+        
+        [TestMethod]
+        public void GivenPathToExecutable__WhenCallingRun__ShouldCallStartFirst_Then_BlockUntilFinished_Then_CheckExitCode() {
             var runner = new CallOrderVerifyingProcessRunnerMock();
 
             const string executablePath = "myProgram.exe";
@@ -39,16 +59,6 @@ namespace EawXBuildTest.Tasks {
             sut.Run();
 
             runner.Verify();
-        }
-
-        [TestMethod]
-        public void GivenExecutablePathAndArguments__WhenCallingRun__ShouldStartProcessWithArguments() {
-            var arguments = "--first --second --third";
-            _sut.Arguments = arguments;
-
-            _sut.Run();
-            
-            Assert.AreEqual(arguments, _runner.Arguments);
         }
 
         [TestMethod]

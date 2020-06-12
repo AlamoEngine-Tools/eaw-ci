@@ -31,5 +31,7 @@ namespace EawXBuild.Services.Process {
         public void WaitForExit() {
             _process.WaitForExit();
         }
+
+        public int ExitCode => _process.ExitCode;
     }
 }

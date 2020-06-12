@@ -1,6 +1,7 @@
 using System.IO;
 using System.IO.Abstractions;
 using EawXBuild.Core;
+using EawXBuild.Exceptions;
 using EawXBuild.Services.Process;
 
 namespace EawXBuild.Tasks {
@@ -19,6 +20,7 @@ namespace EawXBuild.Tasks {
 
             _runner.Start(ExecutablePath, Arguments);
             _runner.WaitForExit();
+            if(_runner.ExitCode != 0) throw new ProcessFailedException();
         }
 
         public string ExecutablePath { get; set; }

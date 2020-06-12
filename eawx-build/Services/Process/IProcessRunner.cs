@@ -6,5 +6,7 @@ namespace EawXBuild.Services.Process {
         void Start(string executablePath, string arguments);
 
         void WaitForExit();
+
+        int ExitCode { get; }
     }
 }

@@ -12,6 +12,13 @@ namespace EawXBuildTest.Services.Process {
 
         public virtual void WaitForExit() {
         }
+
+        public virtual int ExitCode { get; set; }
+    }
+
+    public class ProcessRunnerStub : ProcessRunnerDummy {
+
+        public override int ExitCode { get; set; }
     }
 
     public class ProcessRunnerSpy : ProcessRunnerDummy {
@@ -48,8 +55,16 @@ namespace EawXBuildTest.Services.Process {
             base.WaitForExit();
         }
 
+        public override int ExitCode {
+            get {
+                _callOrder += "e";
+                return 0;
+            }
+            set {}
+        }
+
         public void Verify() {
-            const string expected = "sw";
+            const string expected = "swe";
             Assert.AreEqual(expected, _callOrder);
         }
     }

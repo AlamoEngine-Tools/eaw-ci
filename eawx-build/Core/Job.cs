@@ -13,8 +13,7 @@ namespace EawXBuild.Core {
 
         public void Run() {
             try {
-                foreach (var task in _tasks)
-                    task.Run();
+                foreach (var task in _tasks) task.Run();
             } catch (Exception ex) {
                 Console.Out.WriteLine(ex.Message);
             }
