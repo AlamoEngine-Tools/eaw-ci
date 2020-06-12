@@ -65,6 +65,21 @@ namespace EawXBuildTest.Tasks {
             runner.Verify();
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(NoRelativePathException))]
+        public void GivenAbsolutePath__WhenCallingRun__ShouldThrowNoRelativePathException() {
+            _sut.ExecutablePath = "/absolute/path";
+
+            _sut.Run();
+        }
+        
+        [TestMethod]
+        public void GivenAbsolutePath__WhenCallingRun__ShouldNotStartProcess() {
+            _sut.ExecutablePath = "/absolute/path";
+            Assert.ThrowsException<NoRelativePathException>(() => _sut.Run());
+            Assert.IsFalse(_runner.WasStarted);
+        }
+
         private static void AssertProcessWasStartedWithExecutable(ProcessRunnerSpy runner, string executablePath) {
             Assert.IsTrue(runner.WasStarted, "Should have called Start(), but didn't");
             Assert.AreEqual(executablePath, runner.ExecutablePath,

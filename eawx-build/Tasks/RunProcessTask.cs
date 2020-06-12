@@ -15,6 +15,7 @@ namespace EawXBuild.Tasks {
         }
 
         public void Run() {
+            if (_filesystem.Path.IsPathRooted(ExecutablePath)) throw new NoRelativePathException(ExecutablePath);
             _runner.Start(ExecutablePath, Arguments);
             _runner.WaitForExit();
             if(_runner.ExitCode != 0) throw new ProcessFailedException();
