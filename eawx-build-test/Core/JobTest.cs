@@ -26,41 +26,8 @@ namespace EawXBuildTest.Core {
             AssertTaskWasRun(secondTask);
         }
 
-        [TestMethod]
-        public void GivenJobWithTaskThatThrowsException__WhenRunningJob__ShouldPrintExceptionMessageToStdOut() {
-            var stringBuilder = new StringBuilder();
-            var stringWriter = new StringWriter(stringBuilder, CultureInfo.InvariantCulture);
-            Console.SetOut(stringWriter);
-
-            var sut = new Job("job");
-            const string exceptionMessage = "exception message";
-            sut.AddTask(new ExceptionThrowingTask(exceptionMessage));
-
-            sut.Run();
-
-            const string expectedOutput = "exception message\n";
-            Assert.AreEqual(expectedOutput, stringBuilder.ToString());
-        }
-
-        [TestMethod]
-        public void GivenJobWithTaskThatThrowsException_AndSecondTask__WhenRunningJob__ShouldNotRunSecondTask() {
-            var taskSpy = new TaskSpy();
-
-            var sut = new Job("job");
-            sut.AddTask(new ExceptionThrowingTask());
-            sut.AddTask(taskSpy);
-
-            sut.Run();
-
-            AssertTaskWasNotRun(taskSpy);
-        }
-
         private static void AssertTaskWasRun(TaskSpy firstTask) {
             Assert.IsTrue(firstTask.WasRun, "Task should have been run, but wasn't.");
-        }
-
-        private static void AssertTaskWasNotRun(TaskSpy taskSpy) {
-            Assert.IsFalse(taskSpy.WasRun, "Should not have run task, but did");
         }
     }
 }
