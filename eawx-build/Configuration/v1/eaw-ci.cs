@@ -26,28 +26,49 @@ namespace EawXBuild.Configuration.v1
     public partial class BuildConfigurationType : object, System.ComponentModel.INotifyPropertyChanged
     {
 
-        private TaskDefinitionType[] globalTaskDefinitionsField;
+        private AbstractTaskType[] globalTasksField;
+
+        private JobDefinitionType[] globalJobsField;
 
         private ProjectType[] projectsField;
 
-        private string versionField;
+        private string configVersionField;
+
+        public BuildConfigurationType()
+        {
+            this.configVersionField = "1.0.0";
+        }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("TaskDefinition",
             Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
-        public TaskDefinitionType[] GlobalTaskDefinitions
+        public AbstractTaskType[] GlobalTasks
         {
-            get { return this.globalTaskDefinitionsField; }
+            get { return this.globalTasksField; }
             set
             {
-                this.globalTaskDefinitionsField = value;
-                this.RaisePropertyChanged("GlobalTaskDefinitions");
+                this.globalTasksField = value;
+                this.RaisePropertyChanged("GlobalTasks");
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 1)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("JobDefinition",
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
+        public JobDefinitionType[] GlobalJobs
+        {
+            get { return this.globalJobsField; }
+            set
+            {
+                this.globalJobsField = value;
+                this.RaisePropertyChanged("GlobalJobs");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 2)]
         [System.Xml.Serialization.XmlArrayItemAttribute("Project", Form = System.Xml.Schema.XmlSchemaForm.Unqualified,
             IsNullable = false)]
         public ProjectType[] Projects
@@ -62,13 +83,13 @@ namespace EawXBuild.Configuration.v1
 
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Version
+        public string ConfigVersion
         {
-            get { return this.versionField; }
+            get { return this.configVersionField; }
             set
             {
-                this.versionField = value;
-                this.RaisePropertyChanged("Version");
+                this.configVersionField = value;
+                this.RaisePropertyChanged("ConfigVersion");
             }
         }
 
@@ -85,32 +106,21 @@ namespace EawXBuild.Configuration.v1
     }
 
     /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Copy))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
-    public partial class TaskDefinitionType : object, System.ComponentModel.INotifyPropertyChanged
+    public abstract partial class AbstractTaskType : object, System.ComponentModel.INotifyPropertyChanged
     {
-
-        private CopyTaskType itemField;
 
         private string nameField;
 
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CopyTask", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public CopyTaskType Item
-        {
-            get { return this.itemField; }
-            set
-            {
-                this.itemField = value;
-                this.RaisePropertyChanged("Item");
-            }
-        }
+        private string idField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "Name")]
         public string Name
         {
             get { return this.nameField; }
@@ -121,202 +131,15 @@ namespace EawXBuild.Configuration.v1
             }
         }
 
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null))
-            {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
-    public partial class CopyTaskType : object, System.ComponentModel.INotifyPropertyChanged
-    {
-
-        private string sourcePathField;
-
-        private string destPathField;
-
-        private bool recursiveField;
-
-        private string filePatternField;
-
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string SourcePath
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string Id
         {
-            get { return this.sourcePathField; }
+            get { return this.idField; }
             set
             {
-                this.sourcePathField = value;
-                this.RaisePropertyChanged("SourcePath");
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string DestPath
-        {
-            get { return this.destPathField; }
-            set
-            {
-                this.destPathField = value;
-                this.RaisePropertyChanged("DestPath");
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public bool Recursive
-        {
-            get { return this.recursiveField; }
-            set
-            {
-                this.recursiveField = value;
-                this.RaisePropertyChanged("Recursive");
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string FilePattern
-        {
-            get { return this.filePatternField; }
-            set
-            {
-                this.filePatternField = value;
-                this.RaisePropertyChanged("FilePattern");
-            }
-        }
-
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null))
-            {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
-    public partial class TaskReferenceType : object, System.ComponentModel.INotifyPropertyChanged
-    {
-
-        private string taskNameField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string TaskName
-        {
-            get { return this.taskNameField; }
-            set
-            {
-                this.taskNameField = value;
-                this.RaisePropertyChanged("TaskName");
-            }
-        }
-
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null))
-            {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
-    public partial class TaskType : object, System.ComponentModel.INotifyPropertyChanged
-    {
-
-        private object itemField;
-
-        private string nameField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CopyTask", typeof(CopyTaskType),
-            Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        [System.Xml.Serialization.XmlElementAttribute("TaskReference", typeof(TaskReferenceType),
-            Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public object Item
-        {
-            get { return this.itemField; }
-            set
-            {
-                this.itemField = value;
-                this.RaisePropertyChanged("Item");
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Name
-        {
-            get { return this.nameField; }
-            set
-            {
-                this.nameField = value;
-                this.RaisePropertyChanged("Name");
-            }
-        }
-
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-
-        protected void RaisePropertyChanged(string propertyName)
-        {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null))
-            {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
-    public partial class TasksType : object, System.ComponentModel.INotifyPropertyChanged
-    {
-
-        private TaskType taskField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public TaskType Task
-        {
-            get { return this.taskField; }
-            set
-            {
-                this.taskField = value;
-                this.RaisePropertyChanged("Task");
+                this.idField = value;
+                this.RaisePropertyChanged("Id");
             }
         }
 
@@ -341,24 +164,29 @@ namespace EawXBuild.Configuration.v1
     public partial class JobType : object, System.ComponentModel.INotifyPropertyChanged
     {
 
-        private TasksType[] tasksField;
+        private object itemField;
 
         private string nameField;
 
+        private string idField;
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Tasks", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public TasksType[] Tasks
+        [System.Xml.Serialization.XmlElementAttribute("JobReference", typeof(JobReferenceType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        [System.Xml.Serialization.XmlElementAttribute("Tasks", typeof(TasksType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        public object Item
         {
-            get { return this.tasksField; }
+            get { return this.itemField; }
             set
             {
-                this.tasksField = value;
-                this.RaisePropertyChanged("Tasks");
+                this.itemField = value;
+                this.RaisePropertyChanged("Item");
             }
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "Name")]
         public string Name
         {
             get { return this.nameField; }
@@ -366,6 +194,113 @@ namespace EawXBuild.Configuration.v1
             {
                 this.nameField = value;
                 this.RaisePropertyChanged("Name");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string Id
+        {
+            get { return this.idField; }
+            set
+            {
+                this.idField = value;
+                this.RaisePropertyChanged("Id");
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null))
+            {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public partial class JobReferenceType : AbstractReferenceType
+    {
+    }
+
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(JobReferenceType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(TaskReferenceType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public abstract partial class AbstractReferenceType : object, System.ComponentModel.INotifyPropertyChanged
+    {
+
+        private string referenceIdField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "IDREF")]
+        public string ReferenceId
+        {
+            get { return this.referenceIdField; }
+            set
+            {
+                this.referenceIdField = value;
+                this.RaisePropertyChanged("ReferenceId");
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null))
+            {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public partial class TaskReferenceType : AbstractReferenceType
+    {
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public partial class TasksType : object, System.ComponentModel.INotifyPropertyChanged
+    {
+
+        private object[] itemsField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Task", typeof(AbstractTaskType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        [System.Xml.Serialization.XmlElementAttribute("TaskReference", typeof(TaskReferenceType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        public object[] Items
+        {
+            get { return this.itemsField; }
+            set
+            {
+                this.itemsField = value;
+                this.RaisePropertyChanged("Items");
             }
         }
 
@@ -396,8 +331,10 @@ namespace EawXBuild.Configuration.v1
 
         private string nameField;
 
+        private string idField;
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("Job", Form = System.Xml.Schema.XmlSchemaForm.Unqualified,
             IsNullable = false)]
         public JobType[] Jobs
@@ -423,7 +360,7 @@ namespace EawXBuild.Configuration.v1
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "Name")]
         public string Name
         {
             get { return this.nameField; }
@@ -431,6 +368,18 @@ namespace EawXBuild.Configuration.v1
             {
                 this.nameField = value;
                 this.RaisePropertyChanged("Name");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string Id
+        {
+            get { return this.idField; }
+            set
+            {
+                this.idField = value;
+                this.RaisePropertyChanged("Id");
             }
         }
 
@@ -442,6 +391,139 @@ namespace EawXBuild.Configuration.v1
             if ((propertyChanged != null))
             {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public partial class JobDefinitionType : object, System.ComponentModel.INotifyPropertyChanged
+    {
+
+        private object[] tasksField;
+
+        private string nameField;
+
+        private string idField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Task", typeof(AbstractTaskType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("TaskReference", typeof(TaskReferenceType),
+            Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
+        public object[] Tasks
+        {
+            get { return this.tasksField; }
+            set
+            {
+                this.tasksField = value;
+                this.RaisePropertyChanged("Tasks");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "Name")]
+        public string Name
+        {
+            get { return this.nameField; }
+            set
+            {
+                this.nameField = value;
+                this.RaisePropertyChanged("Name");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string Id
+        {
+            get { return this.idField; }
+            set
+            {
+                this.idField = value;
+                this.RaisePropertyChanged("Id");
+            }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null))
+            {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "eaw-ci")]
+    public partial class Copy : AbstractTaskType
+    {
+
+        private string copyFromPathField;
+
+        private string copyToPathField;
+
+        private bool copySubfoldersField;
+
+        private string copyFileByPatternField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        public string CopyFromPath
+        {
+            get { return this.copyFromPathField; }
+            set
+            {
+                this.copyFromPathField = value;
+                this.RaisePropertyChanged("CopyFromPath");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 1)]
+        public string CopyToPath
+        {
+            get { return this.copyToPathField; }
+            set
+            {
+                this.copyToPathField = value;
+                this.RaisePropertyChanged("CopyToPath");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 2)]
+        public bool CopySubfolders
+        {
+            get { return this.copySubfoldersField; }
+            set
+            {
+                this.copySubfoldersField = value;
+                this.RaisePropertyChanged("CopySubfolders");
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 3)]
+        public string CopyFileByPattern
+        {
+            get { return this.copyFileByPatternField; }
+            set
+            {
+                this.copyFileByPatternField = value;
+                this.RaisePropertyChanged("CopyFileByPattern");
             }
         }
     }

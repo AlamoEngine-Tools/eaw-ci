@@ -3,9 +3,12 @@ using EawXBuild.Exceptions;
 
 namespace EawXBuild.Core
 {
-    public class Project
+    public class Project : IProject
+
     {
         private readonly List<IJob> jobs = new List<IJob>();
+
+        public string Name { get; set; }
 
         public void AddJob(IJob job)
         {

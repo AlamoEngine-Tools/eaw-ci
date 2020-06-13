@@ -1,13 +1,10 @@
 using System;
 
-namespace EawXBuild.Exceptions
-{
+namespace EawXBuild.Exceptions {
     [Serializable]
-    public class NoSuchFileSystemObjectException : Exception
-    {
+    public class NoSuchFileSystemObjectException : Exception {
         public NoSuchFileSystemObjectException(string fileSystemObjectName) : base(
-            $"No such file or directory: {fileSystemObjectName}")
-        {
+            $"No such file or directory: {fileSystemObjectName}") {
         }
     }
 }
