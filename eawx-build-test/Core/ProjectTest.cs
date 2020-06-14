@@ -61,22 +61,6 @@ namespace EawXBuildTest.Core {
             _sut.AddJob(MakeJobSpy("job"));
         }
 
-        [TestMethod]
-        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
-        public async System.Threading.Tasks.Task GivenProjectWithJobThatThrowsException__WhenRunningJob__ShouldPrintException() {
-            var stringBuilder = new StringBuilder();
-            var stringWriter = new StringWriter(stringBuilder, CultureInfo.InvariantCulture);
-            Console.SetOut(stringWriter);
-
-
-            const string exceptionMessage = "exception message";
-            _sut.AddJob(new ExceptionThrowingJob(exceptionMessage) {Name = "job"});
-            await _sut.RunJobAsync("job");
-
-            const string expectedOutput = "exception message\n";
-            Assert.AreEqual(expectedOutput, stringBuilder.ToString());
-        }
-
         private static JobSpy MakeJobSpy(string name) {
             var jobSpy = new JobSpy {Name = name};
 
