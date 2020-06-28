@@ -5,8 +5,8 @@
         <xs:complexContent>
             <xs:extension base="eaw-ci:AbstractTaskType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" name="CopyFromPath" type="eaw-ci:RelativeFilePathType"/>
-                    <xs:element maxOccurs="1" minOccurs="1" name="CopyToPath" type="eaw-ci:RelativeFilePathType"/>
+                    <xs:element maxOccurs="1" minOccurs="1" name="CopyFromPath" type="eaw-ci:FilePathType"/>
+                    <xs:element maxOccurs="1" minOccurs="1" name="CopyToPath" type="eaw-ci:FilePathType"/>
                     <xs:element maxOccurs="1" minOccurs="1" name="CopySubfolders" type="xs:boolean"/>
                     <xs:element maxOccurs="1" minOccurs="1" name="CopyFileByPattern" type="eaw-ci:FilePatternType"/>
                 </xs:sequence>
@@ -31,11 +31,14 @@
     </xs:complexType>
     <xs:complexType name="JobType">
         <xs:choice maxOccurs="1" minOccurs="1">
-            <xs:element maxOccurs="1" minOccurs="1" name="Tasks" type="eaw-ci:TasksType"/>
-            <xs:element maxOccurs="1" minOccurs="1" name="JobReference" type="eaw-ci:JobReferenceType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="Tasks"
+                type="eaw-ci:TasksType" />
+            <xs:element maxOccurs="1" minOccurs="1" name="JobReference"
+                type="eaw-ci:JobReferenceType" />
         </xs:choice>
-        <xs:attribute name="Name" type="xs:Name" use="optional"/>
-        <xs:attribute name="Id" type="xs:ID" use="required"/>
+        <xs:attribute name="Name" type="xs:Name" use="optional" />
+
+        <xs:attribute name="Id" type="xs:ID" use="required"></xs:attribute>
     </xs:complexType>
     <xs:complexType name="JobsType">
         <xs:sequence>
@@ -62,14 +65,14 @@
         </xs:sequence>
         <xs:attribute fixed="1.0.0" name="ConfigVersion" type="eaw-ci:SemVerVersionType" use="required"/>
     </xs:complexType>
-    <xs:simpleType name="RelativeFilePathType">
+    <xs:simpleType name="FilePathType">
         <xs:restriction base="xs:string">
             <xs:pattern value="^[a-z0-9]([a-z0-9-]*[a-z0-9])?(/[a-z0-9]([a-z0-9-]*[a-z0-9])?)*(/[a-z0-9]([a-z0-9-.]*[a-z0-9])?)?$"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="FilePatternType">
         <xs:restriction base="xs:string">
-            <xs:pattern value="((\*[a-zA-Z0-9_-]*)(.)([a-zA-Z]+)|\*)"/>
+
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="SemVerVersionType">
@@ -100,5 +103,32 @@
         </xs:sequence>
         <xs:attribute name="Name" type="xs:Name" use="optional"/>
         <xs:attribute name="Id" type="xs:ID" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="RunProgram">
+        <xs:complexContent>
+            <xs:extension base="eaw-ci:AbstractTaskType">
+                <xs:sequence>
+                    <xs:element name="ExecutablePath"
+                        type="eaw-ci:FilePathType" maxOccurs="1" minOccurs="1">
+                    </xs:element>
+                    <xs:element name="Arguments" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="DirectoryPathType">
+        <xs:restriction base="xs:string"></xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Clean">
+        <xs:complexContent>
+            <xs:extension base="eaw-ci:AbstractTaskType">
+                <xs:sequence>
+                    <xs:element name="Path" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 </xs:schema>
