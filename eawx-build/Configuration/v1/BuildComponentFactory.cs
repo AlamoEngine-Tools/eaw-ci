@@ -1,3 +1,4 @@
+using System;
 using EawXBuild.Core;
 
 namespace EawXBuild.Configuration.v1 {
@@ -11,7 +12,12 @@ namespace EawXBuild.Configuration.v1 {
         }
 
         public ITaskBuilder Task(string taskTypeName) {
-            return new CopyTaskBuilder();
+            return taskTypeName switch {
+                "RunProgram" => new RunProcessTaskBuilder(),
+                "Clean" => new CleanTaskBuilder(),
+                "Copy" => new CopyTaskBuilder(),
+                _ => throw new InvalidOperationException($"Unknown Task type: {taskTypeName}")
+            };
         }
     }
 }

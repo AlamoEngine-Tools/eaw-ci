@@ -1,3 +1,4 @@
+using System;
 using EawXBuild.Configuration.v1;
 using EawXBuild.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,6 +32,32 @@ namespace EawXBuildTest.Configuration.v1 {
             var taskBuilder = sut.Task("Copy");
             
             Assert.IsInstanceOfType(taskBuilder, typeof(CopyTaskBuilder));
+        }
+        
+        [TestMethod]
+        public void BuildComponentFactory__WhenCallingTaskWith_RunProgram__ShouldReturnRunProcessTaskBuilder() {
+            var sut = new BuildComponentFactory();
+
+            var taskBuilder = sut.Task("RunProgram");
+            
+            Assert.IsInstanceOfType(taskBuilder, typeof(RunProcessTaskBuilder));
+        }
+        
+        [TestMethod]
+        public void BuildComponentFactory__WhenCallingTaskWith_Clean__ShouldReturnCleanTaskBuilder() {
+            var sut = new BuildComponentFactory();
+
+            var taskBuilder = sut.Task("Clean");
+            
+            Assert.IsInstanceOfType(taskBuilder, typeof(CleanTaskBuilder));
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void BuildComponentFactory__WhenCallingTaskWithUnknownTaskType__ShouldThrowInvalidOperationException() {
+            var sut = new BuildComponentFactory();
+
+            sut.Task("Unknown");
         }
         
     }
