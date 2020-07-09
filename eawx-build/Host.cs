@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using CommandLine;
-using EawXBuild.Configuration.CI;
+using EawXBuild.Configuration.CLI;
 using EawXBuild.Environment;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
+using Microsoft.Extensions.Options;
 
 namespace EawXBuild
 {
@@ -16,12 +16,13 @@ namespace EawXBuild
     {
         private static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(ExecInternal)
+            Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
+                .WithParsed<RunOptions>(ExecInternal)
+                .WithParsed<ValidateOptions>(ExecInternal)
                 .WithNotParsed(HandleParseErrorsInternal);
         }
 
-        private static void ExecInternal(Options opts)
+        private static void ExecInternal(IOptions opts)
         {
             IServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection, opts.Verbose);

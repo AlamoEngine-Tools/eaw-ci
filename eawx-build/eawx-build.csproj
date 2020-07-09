@@ -5,12 +5,23 @@
     <RootNamespace>EawXBuild</RootNamespace>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
-    <Title>EaWX Build</Title>
+    <Title>EaW CI</Title>
     <Authors>Sven Marcus &amp; Lukas Grünwald</Authors>
     <Copyright>Sven Marcus &amp; Lukas Grünwald</Copyright>
     <PackageVersion>0.1.0</PackageVersion>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <AssemblyVersion>0.1.0.*</AssemblyVersion>
     <FileVersion>0.1.0</FileVersion>
+    <AssemblyName>eaw-ci</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <PackageId>eaw-ci</PackageId>
+    <Product>eaw-ci</Product>
+    <Version>0.1.0</Version>
+    <RepositoryUrl>https://github.com/AlamoEngine-Tools/eaw-ci</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/AlamoEngine-Tools/eaw-ci</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <StartupObject>EawXBuild.Host</StartupObject>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +36,10 @@
   <ItemGroup>
     <None Remove="Configuration\v1\eaw-ci.xsd" />
     <EmbeddedResource Include="Configuration\v1\eaw-ci.xsd" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

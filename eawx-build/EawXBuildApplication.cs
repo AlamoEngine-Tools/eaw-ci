@@ -1,5 +1,5 @@
 using System;
-using EawXBuild.Configuration.CI;
+using EawXBuild.Configuration.CLI;
 using EawXBuild.Environment;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,9 +12,9 @@ namespace EawXBuild
         public IServiceProvider Services { get; }
         private readonly ILogger<EawXBuildApplication> _logger;
 
-        private Options Opts { get; }
+        private IOptions Opts { get; }
 
-        public EawXBuildApplication(IServiceProvider services, Options opts)
+        public EawXBuildApplication(IServiceProvider services, IOptions opts)
         {
             Services = services;
             Opts = opts;
