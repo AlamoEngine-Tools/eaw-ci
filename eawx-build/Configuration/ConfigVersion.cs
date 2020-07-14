@@ -1,6 +1,6 @@
 namespace EawXBuild.Configuration
 {
-    internal enum ConfigVersion
+    public enum ConfigVersion
     {
         Invalid,
         V1,

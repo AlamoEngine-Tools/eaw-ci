@@ -6,7 +6,9 @@ using System.IO.Abstractions;
 using System.Runtime.CompilerServices;
 using EawXBuild.Environment;
 using Microsoft.Extensions.Logging;
+
 [assembly: InternalsVisibleTo("eawx-build-test")]
+
 namespace EawXBuild.Services.IO
 {
     internal class IOService : IIOService
@@ -18,7 +20,7 @@ namespace EawXBuild.Services.IO
         {
             _logger = logger;
             FileSystem = fileSystem ?? new FileSystem();
-            _logger?.LogInformation($"{nameof(IOService)} initialised successfully.");
+            _logger?.LogTrace($"{nameof(IOService)} initialised successfully.");
         }
 
         public ExitCode ValidatePath([NotNull] string path, [NotNull] string relativePath = "",
@@ -29,32 +31,8 @@ namespace EawXBuild.Services.IO
             {
                 try
                 {
-                    if (!FileSystem.Path.IsPathRooted(path))
-                    {
-                        path = string.IsNullOrEmpty(relativePath)
-                            ? FileSystem.Path.GetFullPath(relativePath)
-                            : FileSystem.Path.Combine(relativePath, path);
-                    }
-                    IFileInfo fileInfo = FileSystem.FileInfo.FromFileName(path);
-                    bool throwEx = fileInfo.Length == -1;
-                    throwEx = fileInfo.IsReadOnly;
-                    if (!string.IsNullOrEmpty(fileExtension))
-                    {
-                        if (FileSystem.Path.GetExtension(path)
-                            .Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            path = path.Trim();
-                            return ExitCode.Success;
-                        }
-                        else
-                        {
-                            return ExitCode.GenericError;
-                        }
-                    }
-                    else
-                    {
-                        return ExitCode.Success;
-                    }
+                    string p = ResolvePath(path, relativePath, fileExtension);
+                    return ExitCode.Success;
                 }
                 catch (ArgumentNullException e)
                 {
@@ -106,6 +84,35 @@ namespace EawXBuild.Services.IO
             _logger?.LogError($"The provided path {path} contains unsupported characters.");
             return ExitCode.ExOserr;
         }
+
+        public string ResolvePath(string path, string relativePath = "", string fileExtension = "")
+        {
+            string fullyQualifiedPath = "";
+            if (!FileSystem.Path.IsPathRooted(path))
+            {
+                fullyQualifiedPath = string.IsNullOrEmpty(relativePath)
+                    ? FileSystem.Path.GetFullPath(relativePath)
+                    : FileSystem.Path.GetFullPath(FileSystem.Path.Combine(relativePath, path));
+            }
+            else
+            {
+                fullyQualifiedPath = FileSystem.Path.GetFullPath(path);
+            }
+
+            IFileInfo fileInfo = FileSystem.FileInfo.FromFileName(fullyQualifiedPath);
+            bool throwEx = fileInfo.Length == -1;
+            throwEx = fileInfo.IsReadOnly;
+            if (string.IsNullOrEmpty(fileExtension)) return fullyQualifiedPath;
+            if (!FileSystem.Path.GetExtension(fullyQualifiedPath)
+                .Equals(fileExtension, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new IOException("An error occurred!");
+            }
+
+            fullyQualifiedPath = fullyQualifiedPath.Trim();
+            return fullyQualifiedPath;
+        }
+
 
         public bool IsValidPath(string path, string relativePath = "", string fileExtension = "")
         {

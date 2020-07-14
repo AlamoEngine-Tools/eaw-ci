@@ -16,7 +16,7 @@ namespace EawXBuild.Environment
      *   </item>
      * </list>
      */
-    internal enum ExitCode
+    public enum ExitCode
     {
         /**
          * The program ran successfully.

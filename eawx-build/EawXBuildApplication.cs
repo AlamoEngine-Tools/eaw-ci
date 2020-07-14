@@ -1,5 +1,8 @@
 using System;
+using EawXBuild.Configuration;
 using EawXBuild.Configuration.CLI;
+using EawXBuild.Configuration.v1;
+using EawXBuild.Core;
 using EawXBuild.Environment;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,19 +22,37 @@ namespace EawXBuild
             Services = services;
             Opts = opts;
             _logger = Services.GetRequiredService<ILoggerFactory>().CreateLogger<EawXBuildApplication>();
-            _logger?.LogInformation("Application initialised successfully.");
+            _logger?.LogTrace("Application initialised successfully.");
         }
 
         internal ExitCode Run()
         {
-            IIOService svc = Services.GetService<IIOService>();
-            if (!svc.IsValidPath(Opts.ConfigPath, svc.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+            switch (Opts)
             {
-                return svc.ValidatePath(Opts.ConfigPath, svc.FileSystem.Directory.GetCurrentDirectory(), ".xml");
-            }
-            // Do actual work.
-            return ExitCode.Success;
+                case RunOptions opts:
+                    _logger?.LogInformation("Running application in RUN mode.");
+                    return ExitCode.Success;
+                case ValidateOptions validateOptions:
+                {
+                    _logger?.LogInformation("Running application in VALIDATION mode.");
+                    IIOService ioService = Services.GetService<IIOService>();
+                    if (!ioService.IsValidPath(validateOptions.ConfigPath,
+                        ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+                    {
+                        return ioService.ValidatePath(validateOptions.ConfigPath,
+                            ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                    }
 
+                    string path = ioService.ResolvePath(validateOptions.ConfigPath,
+                        ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                    IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
+                        Services.GetService<IBuildComponentFactory>(),
+                        Services.GetRequiredService<ILoggerFactory>().CreateLogger<BuildConfigParser>());
+                    return buildConfigParser.TestIsValidConfiguration(path) ? ExitCode.Success : ExitCode.ExConfig;
+                }
+            }
+
+            return ExitCode.ExConfig;
         }
     }
 }

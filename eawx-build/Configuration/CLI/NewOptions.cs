@@ -2,11 +2,11 @@ using CommandLine;
 
 namespace EawXBuild.Configuration.CLI
 {
-    [Verb("validate", false, HelpText = "Validates a given configuration file.")]
-    public class ValidateOptions : IOptions
+    [Verb("new", false, HelpText = "Create a new default eaw-ci project.")]
+    public class NewOptions : IOptions
     {
-        [Option('c', "config", Required = true, HelpText = "The relative or absolute path to the configuration file.")]
-        public string ConfigPath { get; set; }
+        [Option('f', "file",Required = true, Default = ".eaw-ci.xml", HelpText = "The file name of the to-be-created eaw-ci project. You may provide a relative or fully qualified file path.")]
+        public string File { get; set; }
 
         [Option('r', "parser", Required = false, Default = ConfigVersion.V1,
             HelpText = "The parser to use for the configuration file.", Hidden = true)]

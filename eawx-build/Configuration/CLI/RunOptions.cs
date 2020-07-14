@@ -9,6 +9,10 @@ namespace EawXBuild.Configuration.CLI
             Default = ".eaw-ci.xml")]
         public string ConfigPath { get; set; }
 
+        [Option('r', "parser", Required = false, Default = ConfigVersion.V1,
+            HelpText = "The parser to use for the configuration file.", Hidden = true)]
+        public ConfigVersion Version { get; set; }
+
         [Option('p', "project", Required = true, HelpText = "Name of the CI project to run.")]
         public string ProjectName { get; set; }
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eaw-ci:BuildConfiguration ConfigVersion="1.0.0" xmlns:eaw-ci="eaw-ci" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eaw-ci eaw-ci.xsd ">
+  <Projects>
+    <Project Id="idvalue3" Name="Name">
+      <Jobs>
+        <Job Id="idvalue4" Name="Name">
+          <Tasks>
+          </Tasks>
+        </Job>
+      </Jobs>
+    </Project>
+  </Projects>
+</eaw-ci:BuildConfiguration>

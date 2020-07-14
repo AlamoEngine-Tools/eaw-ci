@@ -3,9 +3,11 @@ using EawXBuild.Core;
 
 namespace EawXBuild.Configuration
 {
-    internal interface IConfigParser
+    public interface IBuildConfigParser
     {
         IEnumerable<IProject> Parse(string filePath);
+        bool TestIsValidConfiguration(string filePath);
         ConfigVersion Version { get; }
+        string DefaultXml { get; }
     }
 }
