@@ -84,7 +84,10 @@ namespace EawXBuild.Configuration.v1
             catch (Exception e)
             {
                 StringBuilder builder = new StringBuilder();
-                _logger?.LogWarning(BuildErrorMessage(builder, e));
+                string msg = BuildErrorMessage(builder, e);
+                // [gruenwaldlu, 2020-07-27-13:45:55+2]: Required for user feedback. Depending on the configuration, the logger may not print to the console out.
+                Console.Out.Write(msg);
+                _logger?.LogWarning(msg);
                 return false;
             }
         }
