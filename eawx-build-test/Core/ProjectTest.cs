@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -40,6 +41,20 @@ namespace EawXBuildTest.Core {
 
             AssertJobWasRun(expected);
             AssertJobWasNotRun(otherJob);
+        }
+        
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public void GivenProjectWithMultipleJobs__WhenCallingRunAll__AllJobsRan() {
+            var job1 = MakeJobSpy("job1");
+            _sut.AddJob(job1);
+            var job2 = MakeJobSpy("job2");
+            _sut.AddJob(job2);
+
+            Task.WaitAll(_sut.RunAllJobsAsync().ToArray());
+
+            AssertJobWasRun(job1);
+            AssertJobWasRun(job2);
         }
 
 

@@ -48,7 +48,6 @@ namespace EawXBuild
                 return ioService.ValidatePath(runOptions.ConfigPath,
                     ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             }
-
             string path = ioService.ResolvePath(runOptions.ConfigPath,
                 ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
