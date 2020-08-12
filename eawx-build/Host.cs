@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using CommandLine;
-using EawXBuild.Configuration.CI;
+using EawXBuild.Configuration.CLI;
+using EawXBuild.Configuration.v1;
+using EawXBuild.Core;
 using EawXBuild.Environment;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,12 +18,13 @@ namespace EawXBuild
     {
         private static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(ExecInternal)
+            Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
+                .WithParsed<RunOptions>(ExecInternal)
+                .WithParsed<ValidateOptions>(ExecInternal)
                 .WithNotParsed(HandleParseErrorsInternal);
         }
 
-        private static void ExecInternal(Options opts)
+        private static void ExecInternal(IOptions opts)
         {
             IServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection, opts.Verbose);
@@ -33,21 +36,33 @@ namespace EawXBuild
         {
             serviceCollection.AddLogging(config =>
                 {
+#if DEBUG
                     config.AddDebug();
+#endif
                     config.AddConsole();
                 })
                 .Configure<LoggerFilterOptions>(options =>
                 {
+#if DEBUG
                     options.AddFilter<DebugLoggerProvider>(null, LogLevel.Trace);
-                    options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Information : LogLevel.Warning);
+#endif
+                    options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Trace : LogLevel.Warning);
                 });
             ServiceProvider lsp = serviceCollection.BuildServiceProvider();
             serviceCollection.AddTransient<IIOService, IOService>(s =>
                 new IOService(new FileSystem(), lsp.GetRequiredService<ILoggerFactory>().CreateLogger<IOService>()));
+            serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
+                new BuildComponentFactory(lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
         }
 
         private static void HandleParseErrorsInternal(IEnumerable<Error> errs)
         {
+            IEnumerable<Error> errors = errs as Error[] ?? errs.ToArray();
+            if (errors.OfType<HelpVerbRequestedError>().Any() || errors.OfType<HelpRequestedError>().Any())
+            {
+                System.Environment.ExitCode = (int) ExitCode.Success;
+                return;
+            }
             System.Environment.ExitCode = (int) ExitCode.ExUsage;
         }
     }

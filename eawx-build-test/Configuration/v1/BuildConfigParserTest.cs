@@ -52,7 +52,7 @@ namespace EawXBuildTest.Configuration.v1
             _mockFileData.TextContents = xml;
             const string exceptionMessage =
                 "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
-            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub() };
+            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
             try
             {
@@ -90,7 +90,7 @@ namespace EawXBuildTest.Configuration.v1
 
             const string projectName = "TestProject";
 
-            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub() };
+            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
@@ -124,7 +124,7 @@ namespace EawXBuildTest.Configuration.v1
 
             const string jobName = "TestJob";
 
-            var factoryStub = new BuildComponentFactoryStub { Project = new ProjectStub(), Job = new JobStub() };
+            var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub(), Job = new JobStub()};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
@@ -210,7 +210,7 @@ namespace EawXBuildTest.Configuration.v1
                 {"CopyFileByPattern", "*"},
             });
 
-            var factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -248,7 +248,7 @@ namespace EawXBuildTest.Configuration.v1
 
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
-            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
+            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -290,7 +290,7 @@ namespace EawXBuildTest.Configuration.v1
 
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
-            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
+            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -340,15 +340,15 @@ namespace EawXBuildTest.Configuration.v1
             var jobStub = new JobStub();
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
             {
-                {"Id", "ExpectedTask" },
+                {"Id", "ExpectedTask"},
                 {"Name", "ExpectedTask"},
                 {"CopyFromPath", "path/to/source"},
                 {"CopyToPath", "path/to/dest"},
                 {"CopySubfolders", true},
-                {"CopyFileByPattern", "*" }
+                {"CopyFileByPattern", "*"}
             });
 
-            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderMock };
+            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderMock};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -399,7 +399,7 @@ namespace EawXBuildTest.Configuration.v1
             taskBuilderStub.Tasks.Add(firstTask);
             taskBuilderStub.Tasks.Add(secondTask);
 
-            var factoryStub = new BuildComponentFactoryStub { Job = jobStub, TaskBuilder = taskBuilderStub };
+            var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
@@ -434,7 +434,7 @@ namespace EawXBuildTest.Configuration.v1
 
             _mockFileData.TextContents = xml;
 
-            var expectedJobs = new List<IJob> { new JobStub(), new JobStub() };
+            var expectedJobs = new List<IJob> {new JobStub(), new JobStub()};
             var projectStub = new ProjectStub();
             var factoryStub = new JobIteratingBuildComponentFactoryStub
             {
@@ -477,7 +477,7 @@ namespace EawXBuildTest.Configuration.v1
 
             _mockFileData.TextContents = xml;
 
-            var expectedProjects = new List<IProject> { new ProjectDummy(), new ProjectDummy() };
+            var expectedProjects = new List<IProject> {new ProjectDummy(), new ProjectDummy()};
             var factoryStub = new ProjectIteratingBuildComponentFactoryStub()
             {
                 Projects = expectedProjects
@@ -490,6 +490,70 @@ namespace EawXBuildTest.Configuration.v1
             CollectionAssert.AreEqual(expectedProjects, projects.ToList());
         }
 
+        [TestMethod]
+        [DataRow(@"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""1.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""FirstJob"" Name=""FirstJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+
+                                        <Job Id=""SecondJob"" Name=""SecondJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>", true)]
+        [DataRow(@"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                <eaw-ci:BuildConfiguration
+                                  ConfigVersion=""3.0.0"" 
+                                  xmlns:eaw-ci=""eaw-ci""
+                                  xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+                                  <Projects>
+                                    <Project Id=""idvalue0"">
+                                      <Jobs>
+                                        <Job Id=""FirstJob"" Name=""FirstJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+
+                                        <Job Id=""SecondJob"" Name=""SecondJob"">
+                                          <Tasks></Tasks>
+                                        </Job>
+                                      </Jobs>
+                                    </Project>
+                                  </Projects>
+                                </eaw-ci:BuildConfiguration>", false)]
+        public void GivenConfig__TestIsValidConfiguration__IsExpected(string xmlContent, bool expected)
+        {
+            _mockFileData.TextContents = xmlContent;
+            var sut = new BuildConfigParser(_fileSystem, null);
+            var actual = sut.TestIsValidConfiguration(Path);
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse()
+        {
+            var sut = new BuildConfigParser(_fileSystem, null);
+            var actual = sut.TestIsValidConfiguration(null);
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void GivenEmptyConfig__TestIsValidConfiguration__ReturnsFalse()
+        {
+            const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>";
+            _mockFileData.TextContents = xml;
+            var sut = new BuildConfigParser(_fileSystem, null);
+            var actual = sut.TestIsValidConfiguration(Path);
+            Assert.IsFalse(actual);
+        }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
