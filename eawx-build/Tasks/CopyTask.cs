@@ -5,9 +5,11 @@ using EawXBuild.Exceptions;
 namespace EawXBuild.Tasks {
     public class CopyTask : ITask {
         private readonly IFileSystem _fileSystem;
+        private readonly ICopyPolicy _copyPolicy;
 
-        public CopyTask(IFileSystem fileSystem) {
+        public CopyTask(IFileSystem fileSystem, ICopyPolicy copyPolicy) {
             _fileSystem = fileSystem;
+            _copyPolicy = copyPolicy;
             Recursive = true;
         }
 
@@ -47,8 +49,8 @@ namespace EawXBuild.Tasks {
 
             if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime)
                 return;
-
-            sourceFile.CopyTo(destFile.FullName, true);
+            
+            _copyPolicy.CopyTo(sourceFile, destFile, true);
         }
 
         private void CopyDirectory(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory) {

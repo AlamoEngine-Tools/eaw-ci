@@ -5,7 +5,11 @@ using EawXBuild.Tasks;
 
 namespace EawXBuild.Configuration.v1 {
     public class CopyTaskBuilder : ITaskBuilder {
-        private readonly CopyTask _copyTask = new CopyTask(new FileSystem());
+        private readonly CopyTask _copyTask;
+
+        public CopyTaskBuilder(IFileSystem fileSystem, ICopyPolicy copyPolicy) {
+            _copyTask = new CopyTask(fileSystem, copyPolicy);
+        }
 
         public ITaskBuilder With(string name, object value) {
             switch (name) {
@@ -24,6 +28,7 @@ namespace EawXBuild.Configuration.v1 {
                 default:
                     throw new InvalidOperationException($"Invalid configuration option: {name}");
             }
+
             return this;
         }
 

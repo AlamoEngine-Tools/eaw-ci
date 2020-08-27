@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
+using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Tasks {
@@ -14,7 +16,7 @@ namespace EawXBuildTest.Tasks {
         public void SetUp() {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
-            _sut = new EawXBuild.Tasks.CopyTask(_fileSystem);
+            _sut = new EawXBuild.Tasks.CopyTask(_fileSystem, new CopyPolicyFake());
         }
 
         [TestMethod]
@@ -284,7 +286,7 @@ namespace EawXBuildTest.Tasks {
 
             _sut.Run();
         }
-        
+
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoRelativePathException))]
@@ -301,6 +303,25 @@ namespace EawXBuildTest.Tasks {
         public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException() {
             _sut.Source = "NonExistingPath";
             _sut.Run();
+        }
+
+        [TestMethod]
+        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy() {
+            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
+            var copyPolicySpy = new CopyPolicySpy();
+            fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
+
+            const string destination = "Copy/MyFile.txt";
+
+            _sut = new CopyTask(fileSystem, copyPolicySpy) {
+                Source = "Data/MyFile.txt",
+                Destination = destination
+            };
+
+            _sut.Run();
+
+            Assert.IsTrue(copyPolicySpy.CopyCalled);
+            Assert.IsFalse(((FileInfoCopySpy) fileSystem.FileInfo.FromFileName("Data/MyFile.txt")).FileWasCopied);
         }
 
         private MockFileData GetFile(string path) {

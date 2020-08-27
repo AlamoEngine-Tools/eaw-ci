@@ -53,6 +53,15 @@ namespace EawXBuildTest.Configuration.v1 {
         }
         
         [TestMethod]
+        public void BuildComponentFactory__WhenCallingTaskWith_SoftCopy__ShouldReturnCopyTaskBuilder() {
+            var sut = new BuildComponentFactory();
+
+            var taskBuilder = sut.Task("SoftCopy");
+            
+            Assert.IsInstanceOfType(taskBuilder, typeof(CopyTaskBuilder));
+        }
+        
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void BuildComponentFactory__WhenCallingTaskWithUnknownTaskType__ShouldThrowInvalidOperationException() {
             var sut = new BuildComponentFactory();

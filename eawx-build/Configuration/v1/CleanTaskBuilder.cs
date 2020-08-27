@@ -5,7 +5,11 @@ using EawXBuild.Tasks;
 
 namespace EawXBuild.Configuration.v1 {
     public class CleanTaskBuilder : ITaskBuilder {
-        private readonly CleanTask _cleanTask = new CleanTask(new FileSystem());
+        private readonly CleanTask _cleanTask;
+
+        public CleanTaskBuilder(IFileSystem fileSystem) {
+            _cleanTask = new CleanTask(fileSystem);
+        }
 
         public ITaskBuilder With(string name, object value) {
             if (!name.Equals("Path")) throw new InvalidOperationException($"Invalid configuration option: {name}");

@@ -6,7 +6,11 @@ using EawXBuild.Tasks;
 
 namespace EawXBuild.Configuration.v1 {
     public class RunProcessTaskBuilder : ITaskBuilder {
-        private readonly RunProcessTask _runProcessTask = new RunProcessTask(new ProcessRunner(), new FileSystem());
+        private readonly RunProcessTask _runProcessTask;
+
+        public RunProcessTaskBuilder(IFileSystem fileSystem) {
+            _runProcessTask = new RunProcessTask(new ProcessRunner(), fileSystem);
+        }
 
         public ITaskBuilder With(string name, object value) {
             switch (name) {
