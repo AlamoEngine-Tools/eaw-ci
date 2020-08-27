@@ -51,6 +51,25 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
+        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy() {
+            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
+            var copyPolicySpy = new CopyPolicySpy();
+            fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
+
+            const string destination = "Copy/MyFile.txt";
+
+            _sut = new CopyTask(fileSystem, copyPolicySpy) {
+                Source = "Data/MyFile.txt",
+                Destination = destination
+            };
+
+            _sut.Run();
+
+            Assert.IsTrue(copyPolicySpy.CopyCalled);
+            Assert.IsFalse(((FileInfoCopySpy) fileSystem.FileInfo.FromFileName("Data/MyFile.txt")).FileWasCopied);
+        }
+
+        [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenPathToDirectory__WhenCallingRun__ShouldCreateDirectoryAtDestination() {
             const string sourceDirectory = "Data/SourceXML";
@@ -248,6 +267,29 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
+        public void
+            GivenDestDirectoryAndNewerWriteTimeThanSourceFile_WithAlwaysOverwrite__WhenCallingRun__ShouldOverwriteDestFile() {
+            const string sourceDir = "Data";
+            const string sourceFile = "Data/Sub/MyFile.txt";
+
+            const string destDir = "Copy";
+            const string destFile = "Copy/Sub/MyFile.txt";
+
+            const string expectedContent = "Old Content";
+
+            AddFile(sourceFile, expectedContent, OlderWriteTime);
+            AddFile(destFile, "New Content", NewerWriteTime);
+
+            _sut.Source = sourceDir;
+            _sut.Destination = destDir;
+            _sut.AlwaysOverwrite = true;
+
+            _sut.Run();
+
+            _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
+        }
+
+        [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenFilePattern__WhenCallingRun__ShouldOnlyCopyFilesMatchingPattern() {
             const string sourceDir = "Data";
@@ -305,24 +347,6 @@ namespace EawXBuildTest.Tasks {
             _sut.Run();
         }
 
-        [TestMethod]
-        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy() {
-            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
-            var copyPolicySpy = new CopyPolicySpy();
-            fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
-
-            const string destination = "Copy/MyFile.txt";
-
-            _sut = new CopyTask(fileSystem, copyPolicySpy) {
-                Source = "Data/MyFile.txt",
-                Destination = destination
-            };
-
-            _sut.Run();
-
-            Assert.IsTrue(copyPolicySpy.CopyCalled);
-            Assert.IsFalse(((FileInfoCopySpy) fileSystem.FileInfo.FromFileName("Data/MyFile.txt")).FileWasCopied);
-        }
 
         private MockFileData GetFile(string path) {
             return _fileSystem.GetFile(path);

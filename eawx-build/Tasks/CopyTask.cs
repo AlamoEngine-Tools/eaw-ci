@@ -19,6 +19,7 @@ namespace EawXBuild.Tasks {
         public bool Recursive { get; set; }
 
         public string FilePattern { get; set; }
+        public bool AlwaysOverwrite { get; set; }
 
         public void Run() {
             CheckRelativePaths();
@@ -47,9 +48,9 @@ namespace EawXBuild.Tasks {
             if (!destFile.Directory.Exists)
                 destFile.Directory.Create();
 
-            if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime)
+            if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime && !AlwaysOverwrite)
                 return;
-            
+
             _copyPolicy.CopyTo(sourceFile, destFile, true);
         }
 
