@@ -11,7 +11,7 @@ namespace EawXBuild.Native {
                 return new WinFileLinker();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                throw new NotImplementedException();
+                return new LinuxFileLinker();
 
             throw new InvalidOperationException();
         }
