@@ -14,7 +14,7 @@
                     <xs:element maxOccurs="1" minOccurs="1"
                                 name="CopyFileByPattern"
                                 type="eaw-ci:FilePatternType" />
-                    <xs:element name="AlwaysOverwrite" type="xs:boolean" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element name="AlwaysOverwrite" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

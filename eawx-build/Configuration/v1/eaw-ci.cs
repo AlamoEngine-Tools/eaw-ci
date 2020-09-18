@@ -509,8 +509,6 @@ namespace EawXBuild.Configuration.v1 {
         
         private bool alwaysOverwriteField;
         
-        private bool alwaysOverwriteFieldSpecified;
-        
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
         public string CopyFromPath {
@@ -568,18 +566,6 @@ namespace EawXBuild.Configuration.v1 {
             set {
                 this.alwaysOverwriteField = value;
                 this.RaisePropertyChanged("AlwaysOverwrite");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool AlwaysOverwriteSpecified {
-            get {
-                return this.alwaysOverwriteFieldSpecified;
-            }
-            set {
-                this.alwaysOverwriteFieldSpecified = value;
-                this.RaisePropertyChanged("AlwaysOverwriteSpecified");
             }
         }
     }
