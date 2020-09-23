@@ -6,6 +6,13 @@ using EawXBuild.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace EawXBuild.Configuration.v1 {
+    internal enum Tasks {
+        Clean,
+        Copy,
+        RunProgram,
+        SoftCopy
+    }
+
     public class BuildComponentFactory : IBuildComponentFactory {
         private readonly ILogger _logger;
         private readonly FileLinkerFactory _fileLinkerFactory = new FileLinkerFactory();
@@ -23,13 +30,23 @@ namespace EawXBuild.Configuration.v1 {
         }
 
         public ITaskBuilder Task(string taskTypeName) {
-            return taskTypeName switch {
-                "RunProgram" => new RunProcessTaskBuilder(),
-                "Clean" => new CleanTaskBuilder(),
-                "Copy" => new CopyTaskBuilder(new CopyPolicy()),
-                "SoftCopy" => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
-                _ => throw new InvalidOperationException($"Unknown Task type: {taskTypeName}")
+            var taskType = ParseTaskTypeName(taskTypeName);
+            return taskType switch {
+                Tasks.RunProgram => new RunProcessTaskBuilder(),
+                Tasks.Clean => new CleanTaskBuilder(),
+                Tasks.Copy => new CopyTaskBuilder(new CopyPolicy()),
+                Tasks.SoftCopy => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
+                _ => null
             };
+        }
+
+        private static Tasks ParseTaskTypeName(string taskTypeName) {
+            try {
+                return Enum.Parse<Tasks>(taskTypeName);
+            }
+            catch (ArgumentException) {
+                throw new InvalidOperationException($"Unknown Task type: {taskTypeName}");
+            }
         }
     }
 }

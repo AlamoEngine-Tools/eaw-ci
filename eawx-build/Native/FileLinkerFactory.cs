@@ -13,7 +13,7 @@ namespace EawXBuild.Native {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 return new LinuxFileLinker();
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("This Operating System is not supported");
         }
     }
 }
