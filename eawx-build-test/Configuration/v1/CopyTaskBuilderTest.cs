@@ -17,7 +17,7 @@ namespace EawXBuildTest.Configuration.v1 {
         [TestMethod]
         public void
             GivenSourcePathDestPathRecursiveAndFilePattern__WhenCallingBuild__ShouldReturnCopyTaskWithMatchingConfig() {
-            var sut = new CopyTaskBuilder(new MockFileSystem(), new CopyPolicyDummy());
+            var sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
 
             ConfigureTask(sut);
 
@@ -36,7 +36,7 @@ namespace EawXBuildTest.Configuration.v1 {
             });
             var copyPolicySpy = new CopyPolicySpy();
 
-            var sut = new CopyTaskBuilder(fileSystem, copyPolicySpy);
+            var sut = new CopyTaskBuilder(copyPolicySpy, fileSystem);
 
             ConfigureTask(sut);
             CopyTask task = (CopyTask) sut.Build();
@@ -56,7 +56,7 @@ namespace EawXBuildTest.Configuration.v1 {
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void WhenCallingWith_WithInvalidConfigOption__ShouldThrowInvalidOperationException() {
-            var sut = new CopyTaskBuilder(new MockFileSystem(), new CopyPolicyDummy());
+            var sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
 
             sut.With("InvalidOption", string.Empty);
         }

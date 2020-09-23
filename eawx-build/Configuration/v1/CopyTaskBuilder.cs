@@ -7,8 +7,8 @@ namespace EawXBuild.Configuration.v1 {
     public class CopyTaskBuilder : ITaskBuilder {
         private readonly CopyTask _copyTask;
 
-        public CopyTaskBuilder(IFileSystem fileSystem, ICopyPolicy copyPolicy) {
-            _copyTask = new CopyTask(fileSystem, copyPolicy);
+        public CopyTaskBuilder(ICopyPolicy copyPolicy, IFileSystem fileSystem = null) {
+            _copyTask = new CopyTask(copyPolicy, fileSystem ?? new FileSystem());
         }
 
         public ITaskBuilder With(string name, object value) {

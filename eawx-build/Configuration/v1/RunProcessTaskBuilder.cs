@@ -8,8 +8,8 @@ namespace EawXBuild.Configuration.v1 {
     public class RunProcessTaskBuilder : ITaskBuilder {
         private readonly RunProcessTask _runProcessTask;
 
-        public RunProcessTaskBuilder(IFileSystem fileSystem) {
-            _runProcessTask = new RunProcessTask(new ProcessRunner(), fileSystem);
+        public RunProcessTaskBuilder(IFileSystem fileSystem = null) {
+            _runProcessTask = new RunProcessTask(new ProcessRunner(), fileSystem ?? new FileSystem());
         }
 
         public ITaskBuilder With(string name, object value) {

@@ -7,8 +7,8 @@ namespace EawXBuild.Configuration.v1 {
     public class CleanTaskBuilder : ITaskBuilder {
         private readonly CleanTask _cleanTask;
 
-        public CleanTaskBuilder(IFileSystem fileSystem) {
-            _cleanTask = new CleanTask(fileSystem);
+        public CleanTaskBuilder(IFileSystem fileSystem = null) {
+            _cleanTask = new CleanTask(fileSystem ?? new FileSystem());
         }
 
         public ITaskBuilder With(string name, object value) {

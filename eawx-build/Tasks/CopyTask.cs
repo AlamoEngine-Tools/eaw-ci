@@ -7,8 +7,8 @@ namespace EawXBuild.Tasks {
         private readonly IFileSystem _fileSystem;
         private readonly ICopyPolicy _copyPolicy;
 
-        public CopyTask(IFileSystem fileSystem, ICopyPolicy copyPolicy) {
-            _fileSystem = fileSystem;
+        public CopyTask(ICopyPolicy copyPolicy, IFileSystem fileSystem = null) {
+            _fileSystem = fileSystem ?? new FileSystem();
             _copyPolicy = copyPolicy;
             Recursive = true;
         }

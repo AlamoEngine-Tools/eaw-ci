@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 namespace EawXBuild.Configuration.v1 {
     public class BuildComponentFactory : IBuildComponentFactory {
         private readonly ILogger _logger;
-        private readonly FileSystem _fileSystem = new FileSystem();
         private readonly FileLinkerFactory _fileLinkerFactory = new FileLinkerFactory();
 
         public BuildComponentFactory(ILogger logger = null) {
@@ -25,10 +24,10 @@ namespace EawXBuild.Configuration.v1 {
 
         public ITaskBuilder Task(string taskTypeName) {
             return taskTypeName switch {
-                "RunProgram" => new RunProcessTaskBuilder(_fileSystem),
-                "Clean" => new CleanTaskBuilder(_fileSystem),
-                "Copy" => new CopyTaskBuilder(_fileSystem, new CopyPolicy()),
-                "SoftCopy" => new CopyTaskBuilder(_fileSystem, new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
+                "RunProgram" => new RunProcessTaskBuilder(),
+                "Clean" => new CleanTaskBuilder(),
+                "Copy" => new CopyTaskBuilder(new CopyPolicy()),
+                "SoftCopy" => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
                 _ => throw new InvalidOperationException($"Unknown Task type: {taskTypeName}")
             };
         }

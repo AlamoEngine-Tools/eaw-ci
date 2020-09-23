@@ -16,7 +16,7 @@ namespace EawXBuildTest.Tasks {
         public void SetUp() {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
-            _sut = new EawXBuild.Tasks.CopyTask(_fileSystem, new CopyPolicyFake());
+            _sut = new EawXBuild.Tasks.CopyTask(new CopyPolicyFake(), _fileSystem);
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace EawXBuildTest.Tasks {
 
             const string destination = "Copy/MyFile.txt";
 
-            _sut = new CopyTask(fileSystem, copyPolicySpy) {
+            _sut = new CopyTask(copyPolicySpy, fileSystem) {
                 Source = "Data/MyFile.txt",
                 Destination = destination
             };
