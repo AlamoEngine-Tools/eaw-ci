@@ -9,9 +9,9 @@ namespace EawXBuild.Tasks {
         private readonly IProcessRunner _runner;
         private readonly IFileSystem _filesystem;
 
-        public RunProcessTask(IProcessRunner runner, IFileSystem filesystem) {
+        public RunProcessTask(IProcessRunner runner, IFileSystem filesystem = null) {
             _runner = runner;
-            _filesystem = filesystem;
+            _filesystem = filesystem ?? new FileSystem();
         }
 
         public void Run() {

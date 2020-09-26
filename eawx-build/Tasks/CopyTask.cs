@@ -5,9 +5,11 @@ using EawXBuild.Exceptions;
 namespace EawXBuild.Tasks {
     public class CopyTask : ITask {
         private readonly IFileSystem _fileSystem;
+        private readonly ICopyPolicy _copyPolicy;
 
-        public CopyTask(IFileSystem fileSystem) {
-            _fileSystem = fileSystem;
+        public CopyTask(ICopyPolicy copyPolicy, IFileSystem fileSystem = null) {
+            _fileSystem = fileSystem ?? new FileSystem();
+            _copyPolicy = copyPolicy;
             Recursive = true;
         }
 
@@ -17,6 +19,7 @@ namespace EawXBuild.Tasks {
         public bool Recursive { get; set; }
 
         public string FilePattern { get; set; }
+        public bool AlwaysOverwrite { get; set; }
 
         public void Run() {
             CheckRelativePaths();
@@ -45,10 +48,10 @@ namespace EawXBuild.Tasks {
             if (!destFile.Directory.Exists)
                 destFile.Directory.Create();
 
-            if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime)
+            if (destFile.Exists && destFile.LastWriteTime > sourceFile.LastWriteTime && !AlwaysOverwrite)
                 return;
 
-            sourceFile.CopyTo(destFile.FullName, true);
+            _copyPolicy.CopyTo(sourceFile, destFile, true);
         }
 
         private void CopyDirectory(IDirectoryInfo sourceDirectory, IDirectoryInfo destinationDirectory) {
