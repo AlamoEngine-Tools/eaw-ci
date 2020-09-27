@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using EawXBuild.Core;
+using EawXBuild.Exceptions;
 
 namespace EawXBuild.Tasks {
     public class CleanTask : ITask {
@@ -12,6 +13,7 @@ namespace EawXBuild.Tasks {
         public string Path { get; set; }
 
         public void Run() {
+            if (fileSystem.Path.IsPathRooted(Path)) throw new NoRelativePathException(Path);
             if (fileSystem.Directory.Exists(Path)) fileSystem.Directory.Delete(Path, true);
             else fileSystem.File.Delete(Path);
         }
