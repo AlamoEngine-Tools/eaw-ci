@@ -1,18 +1,26 @@
 using System;
+using System.IO.Abstractions;
 using EawXBuild.Core;
+using EawXBuild.Native;
+using EawXBuild.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace EawXBuild.Configuration.v1 {
-    public class BuildComponentFactory : IBuildComponentFactory
-    {
+    internal enum Tasks {
+        Clean,
+        Copy,
+        RunProgram,
+        SoftCopy
+    }
 
+    public class BuildComponentFactory : IBuildComponentFactory {
         private readonly ILogger _logger;
+        private readonly FileLinkerFactory _fileLinkerFactory = new FileLinkerFactory();
 
-        public BuildComponentFactory(ILogger logger = null)
-        {
+        public BuildComponentFactory(ILogger logger = null) {
             _logger = logger;
         }
-        
+
         public IProject MakeProject() {
             return new Project();
         }
@@ -22,12 +30,23 @@ namespace EawXBuild.Configuration.v1 {
         }
 
         public ITaskBuilder Task(string taskTypeName) {
-            return taskTypeName switch {
-                "RunProgram" => new RunProcessTaskBuilder(),
-                "Clean" => new CleanTaskBuilder(),
-                "Copy" => new CopyTaskBuilder(),
-                _ => throw new InvalidOperationException($"Unknown Task type: {taskTypeName}")
+            var taskType = ParseTaskTypeName(taskTypeName);
+            return taskType switch {
+                Tasks.RunProgram => new RunProcessTaskBuilder(),
+                Tasks.Clean => new CleanTaskBuilder(),
+                Tasks.Copy => new CopyTaskBuilder(new CopyPolicy()),
+                Tasks.SoftCopy => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
+                _ => null
             };
+        }
+
+        private static Tasks ParseTaskTypeName(string taskTypeName) {
+            try {
+                return Enum.Parse<Tasks>(taskTypeName);
+            }
+            catch (ArgumentException) {
+                throw new InvalidOperationException($"Unknown Task type: {taskTypeName}");
+            }
         }
     }
 }

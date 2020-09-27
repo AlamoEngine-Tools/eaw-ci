@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
+using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Tasks {
@@ -14,7 +16,7 @@ namespace EawXBuildTest.Tasks {
         public void SetUp() {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
-            _sut = new EawXBuild.Tasks.CopyTask(_fileSystem);
+            _sut = new EawXBuild.Tasks.CopyTask(new CopyPolicyFake(), _fileSystem);
         }
 
         [TestMethod]
@@ -46,6 +48,25 @@ namespace EawXBuildTest.Tasks {
             _sut.Run();
 
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
+        }
+
+        [TestMethod]
+        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy() {
+            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
+            var copyPolicySpy = new CopyPolicySpy();
+            fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
+
+            const string destination = "Copy/MyFile.txt";
+
+            _sut = new CopyTask(copyPolicySpy, fileSystem) {
+                Source = "Data/MyFile.txt",
+                Destination = destination
+            };
+
+            _sut.Run();
+
+            Assert.IsTrue(copyPolicySpy.CopyCalled);
+            Assert.IsFalse(((FileInfoCopySpy) fileSystem.FileInfo.FromFileName("Data/MyFile.txt")).FileWasCopied);
         }
 
         [TestMethod]
@@ -246,6 +267,29 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
+        public void
+            GivenDestDirectoryAndNewerWriteTimeThanSourceFile_WithAlwaysOverwrite__WhenCallingRun__ShouldOverwriteDestFile() {
+            const string sourceDir = "Data";
+            const string sourceFile = "Data/Sub/MyFile.txt";
+
+            const string destDir = "Copy";
+            const string destFile = "Copy/Sub/MyFile.txt";
+
+            const string expectedContent = "Old Content";
+
+            AddFile(sourceFile, expectedContent, OlderWriteTime);
+            AddFile(destFile, "New Content", NewerWriteTime);
+
+            _sut.Source = sourceDir;
+            _sut.Destination = destDir;
+            _sut.AlwaysOverwrite = true;
+
+            _sut.Run();
+
+            _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
+        }
+
+        [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenFilePattern__WhenCallingRun__ShouldOnlyCopyFilesMatchingPattern() {
             const string sourceDir = "Data";
@@ -284,7 +328,7 @@ namespace EawXBuildTest.Tasks {
 
             _sut.Run();
         }
-        
+
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoRelativePathException))]
@@ -302,6 +346,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = "NonExistingPath";
             _sut.Run();
         }
+
 
         private MockFileData GetFile(string path) {
             return _fileSystem.GetFile(path);

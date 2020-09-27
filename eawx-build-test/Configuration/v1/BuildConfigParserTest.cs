@@ -152,6 +152,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
                                               <CopyFileByPattern>*</CopyFileByPattern>
+                                              <AlwaysOverwrite>true</AlwaysOverwrite>
                                             </Task>
                                           </Tasks>
                                         </Job>
@@ -190,6 +191,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
                                               <CopyFileByPattern>*</CopyFileByPattern>
+                                              <AlwaysOverwrite>false</AlwaysOverwrite>
                                             </Task>
                                           </Tasks>
                                         </Job>
@@ -208,6 +210,7 @@ namespace EawXBuildTest.Configuration.v1
                 {"CopyToPath", "path/to/dest"},
                 {"CopySubfolders", true},
                 {"CopyFileByPattern", "*"},
+                {"AlwaysOverwrite", false}
             });
 
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
@@ -236,6 +239,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyToPath>path/to/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
                                               <CopyFileByPattern>*</CopyFileByPattern>
+                                              <AlwaysOverwrite>false</AlwaysOverwrite>
                                             </Task>
                                           </Tasks>
                                         </Job>
@@ -270,6 +274,7 @@ namespace EawXBuildTest.Configuration.v1
                                       <CopyToPath>path/to/dest</CopyToPath>
                                       <CopySubfolders>true</CopySubfolders>
                                       <CopyFileByPattern>*</CopyFileByPattern>
+                                      <AlwaysOverwrite>false</AlwaysOverwrite>
                                     </TaskDefinition>
                                   </GlobalTasks>
 
@@ -312,6 +317,7 @@ namespace EawXBuildTest.Configuration.v1
                                       <CopyToPath>invalid</CopyToPath>
                                       <CopySubfolders>false</CopySubfolders>
                                       <CopyFileByPattern>*</CopyFileByPattern>
+                                      <AlwaysOverwrite>false</AlwaysOverwrite>
                                     </TaskDefinition>
 
                                     <TaskDefinition Id=""ExpectedTask"" Name=""ExpectedTask"" xsi:type=""eaw-ci:Copy"">
@@ -319,6 +325,7 @@ namespace EawXBuildTest.Configuration.v1
                                       <CopyToPath>path/to/dest</CopyToPath>
                                       <CopySubfolders>true</CopySubfolders>
                                       <CopyFileByPattern>*</CopyFileByPattern>
+                                      <AlwaysOverwrite>false</AlwaysOverwrite>
                                     </TaskDefinition>
                                   </GlobalTasks>
 
@@ -345,7 +352,8 @@ namespace EawXBuildTest.Configuration.v1
                 {"CopyFromPath", "path/to/source"},
                 {"CopyToPath", "path/to/dest"},
                 {"CopySubfolders", true},
-                {"CopyFileByPattern", "*"}
+                {"CopyFileByPattern", "*"},
+                {"AlwaysOverwrite", false}
             });
 
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderMock};
@@ -374,6 +382,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyToPath>path/to/first/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
                                               <CopyFileByPattern>*</CopyFileByPattern>
+                                              <AlwaysOverwrite>false</AlwaysOverwrite>
                                             </Task>
 
                                             <Task Id=""idvalue3"" Name=""SecondTask"" xsi:type=""eaw-ci:Copy"">
@@ -381,6 +390,7 @@ namespace EawXBuildTest.Configuration.v1
                                               <CopyToPath>path/to/second/dest</CopyToPath>
                                               <CopySubfolders>true</CopySubfolders>
                                               <CopyFileByPattern>*</CopyFileByPattern>
+                                              <AlwaysOverwrite>false</AlwaysOverwrite>
                                             </Task>
                                           </Tasks>
                                         </Job>
