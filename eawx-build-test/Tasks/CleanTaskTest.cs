@@ -1,4 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
+using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -67,6 +68,14 @@ namespace EawXBuildTest.Tasks
             _sut.Run();
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(NoRelativePathException))]
+        public void GivenAbsolutePath__WhenCallingRun__ShouldThrowNoRelativePathException() {
+            _sut.Path = "/absolute/path";
+
+            _sut.Run();
         }
     }
 }
