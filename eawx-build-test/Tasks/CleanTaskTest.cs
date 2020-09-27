@@ -52,5 +52,21 @@ namespace EawXBuildTest.Tasks
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
+        
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        public void GivenPathToDirectoryWithFiles__WhenCallingRun__ShouldDeleteDirectory() {
+            const string dirPath = "Data";
+            const string filePath = "Data/MyFile.txt";
+
+            _fileSystem.AddDirectory(dirPath);
+            _fileSystem.AddFile(filePath, new MockFileData(string.Empty));
+
+            _sut.Path = dirPath;
+
+            _sut.Run();
+
+            _assertions.AssertDirectoryDoesNotExist(dirPath);
+        }
     }
 }

@@ -12,7 +12,8 @@ namespace EawXBuild.Tasks {
         public string Path { get; set; }
 
         public void Run() {
-            fileSystem.File.Delete(Path);
+            if (fileSystem.Directory.Exists(Path)) fileSystem.Directory.Delete(Path, true);
+            else fileSystem.File.Delete(Path);
         }
     }
 }
