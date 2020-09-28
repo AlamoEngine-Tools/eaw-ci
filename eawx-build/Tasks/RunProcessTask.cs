@@ -1,4 +1,4 @@
-using System.IO;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
@@ -16,12 +16,19 @@ namespace EawXBuild.Tasks {
 
         public void Run() {
             if (_filesystem.Path.IsPathRooted(ExecutablePath)) throw new NoRelativePathException(ExecutablePath);
-            _runner.Start(ExecutablePath, Arguments);
+            _runner.Start(new ProcessStartInfo {
+                FileName = ExecutablePath,
+                Arguments = Arguments,
+                WorkingDirectory = WorkingDirectory
+            });
+
             _runner.WaitForExit();
-            if(_runner.ExitCode != 0) throw new ProcessFailedException();
+            if (!AllowedToFail && _runner.ExitCode != 0) throw new ProcessFailedException();
         }
 
         public string ExecutablePath { get; set; }
         public string Arguments { get; set; }
+        public string WorkingDirectory { get; set; } = System.Environment.CurrentDirectory;
+        public bool AllowedToFail { get; set; }
     }
 }

@@ -1,22 +1,21 @@
+using System.Diagnostics;
 using EawXBuild.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Services.Process {
     public class ProcessRunnerDummy : IProcessRunner {
-        public virtual void Start(string executablePath) {
-        }
+        public virtual void Start(string executablePath) { }
 
-        public virtual void Start(string executablePath, string arguments) {
-        }
+        public virtual void Start(string executablePath, string arguments) { }
 
-        public virtual void WaitForExit() {
-        }
+        public virtual void Start(ProcessStartInfo startInfo) { }
+
+        public virtual void WaitForExit() { }
 
         public virtual int ExitCode { get; set; }
     }
 
     public class ProcessRunnerStub : ProcessRunnerDummy {
-
         public override int ExitCode { get; set; }
     }
 
@@ -24,21 +23,26 @@ namespace EawXBuildTest.Services.Process {
         public bool WasStarted { get; private set; }
 
         public string ExecutablePath { get; private set; }
-        
+
         public string Arguments { get; private set; }
+        public string WorkingDirectory { get; private set; }
 
         public override void Start(string executablePath) {
             WasStarted = true;
             ExecutablePath = executablePath;
         }
-        
+
         public override void Start(string executablePath, string arguments) {
             Start(executablePath);
             Arguments = arguments;
         }
 
-        public override void WaitForExit() {
+        public override void Start(ProcessStartInfo startInfo) {
+            WorkingDirectory = startInfo.WorkingDirectory;
+            Start(startInfo.FileName, startInfo.Arguments);
         }
+
+        public override void WaitForExit() { }
     }
 
     public class CallOrderVerifyingProcessRunnerMock : ProcessRunnerSpy {
@@ -59,7 +63,7 @@ namespace EawXBuildTest.Services.Process {
                 _callOrder += "e";
                 return 0;
             }
-            set {}
+            set { }
         }
 
         public void Verify() {

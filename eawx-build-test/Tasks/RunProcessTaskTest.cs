@@ -40,6 +40,27 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
+        public void GivenNoWorkingDirectory__WhenCallingRun__ShouldStartProcessInCurrentWorkingDirectory() {
+            _sut.Run();
+            Assert.AreEqual(System.Environment.CurrentDirectory, _runner.WorkingDirectory);
+        }
+
+        [TestMethod]
+        public void
+            GivenPathToExecutable_Arguments_And_WorkingDirectory__WhenCallingRun__ShouldStartProcessWithGivenConfig() {
+            const string arguments = "--first --second --third";
+            const string workingDir = "working/directory";
+            _sut.Arguments = arguments;
+            _sut.WorkingDirectory = workingDir;
+
+            _sut.Run();
+
+            AssertProcessWasStartedWithExecutable(_runner, _executablePath);
+            Assert.AreEqual(arguments, _runner.Arguments);
+            Assert.AreEqual(workingDir, _runner.WorkingDirectory);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ProcessFailedException))]
         public void GivenExecutableThatExitsWithCodeOne__WhenCallingRun__ShouldThrowProcessFailedException() {
             var runner = new ProcessRunnerStub {ExitCode = 1};
@@ -54,11 +75,19 @@ namespace EawXBuildTest.Tasks {
             var runner = new CallOrderVerifyingProcessRunnerMock();
 
             const string executablePath = "myProgram.exe";
-            RunProcessTask sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = executablePath};
+            var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = executablePath};
 
             sut.Run();
 
             runner.Verify();
+        }
+
+        [TestMethod]
+        public void GivenFailingProcessButAllowedToFail__WhenCallingRun__ShouldNotThrowProcessFailedException() {
+            var runner = new ProcessRunnerStub {ExitCode = 1};
+            var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = _executablePath, AllowedToFail = true};
+
+            sut.Run();
         }
 
         [TestMethod]
@@ -68,7 +97,7 @@ namespace EawXBuildTest.Tasks {
 
             _sut.Run();
         }
-        
+
         [TestMethod]
         public void GivenAbsolutePath__WhenCallingRun__ShouldNotStartProcess() {
             _sut.ExecutablePath = "/absolute/path";
