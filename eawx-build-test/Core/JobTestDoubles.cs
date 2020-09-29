@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using EawXBuild.Core;
 
 namespace EawXBuildTest.Core {
@@ -9,7 +11,17 @@ namespace EawXBuildTest.Core {
         public virtual void AddTask(ITask task) {
         }
 
-        public virtual void Run() {
+        public virtual void Run(CancellationToken token) {
+        }
+
+        public IEnumerator<ITask> GetEnumerator()
+        {
+            yield break;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
@@ -26,7 +38,7 @@ namespace EawXBuildTest.Core {
     public class JobSpy : JobStub {
         public bool WasRun { get; private set; }
 
-        public override void Run() {
+        public override void Run(CancellationToken token) {
             WasRun = true;
         }
     }
@@ -38,7 +50,7 @@ namespace EawXBuildTest.Core {
             _exceptionMessage = exceptionMessage;
         }
 
-        public override void Run() {
+        public override void Run(CancellationToken token) {
             throw new Exception(_exceptionMessage);
         }
     }

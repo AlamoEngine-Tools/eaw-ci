@@ -68,7 +68,7 @@ namespace EawXBuild
             {
                 try
                 {
-                    tasks.AddRange(project.RunAllJobsAsync());
+                    tasks.AddRange(project.RunAllJobsAsync(default));
                 }
                 catch (Exception e)
                 {
@@ -79,7 +79,7 @@ namespace EawXBuild
             {
                 try
                 {
-                    tasks.Add(project.RunJobAsync(runOptions.JobName));
+                    tasks.Add(project.RunJobAsync(runOptions.JobName, default));
                 }
                 catch (Exception e)
                 {

@@ -1,11 +1,12 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Threading;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
 using EawXBuild.Services.Process;
 
 namespace EawXBuild.Tasks {
-    public class RunProcessTask : ITask {
+    public class RunProcessTask : TaskBase {
         private readonly IProcessRunner _runner;
         private readonly IFileSystem _filesystem;
 
@@ -14,9 +15,16 @@ namespace EawXBuild.Tasks {
             _filesystem = filesystem ?? new FileSystem();
         }
 
-        public void Run() {
+        public string ExecutablePath { get; set; }
+        public string Arguments { get; set; }
+        public string WorkingDirectory { get; set; } = System.Environment.CurrentDirectory;
+        public bool AllowedToFail { get; set; }
+
+        protected override void RunCore(CancellationToken token)
+        {
             if (_filesystem.Path.IsPathRooted(ExecutablePath)) throw new NoRelativePathException(ExecutablePath);
-            _runner.Start(new ProcessStartInfo {
+            _runner.Start(new ProcessStartInfo
+            {
                 FileName = ExecutablePath,
                 Arguments = Arguments,
                 WorkingDirectory = WorkingDirectory
@@ -25,10 +33,5 @@ namespace EawXBuild.Tasks {
             _runner.WaitForExit();
             if (!AllowedToFail && _runner.ExitCode != 0) throw new ProcessFailedException();
         }
-
-        public string ExecutablePath { get; set; }
-        public string Arguments { get; set; }
-        public string WorkingDirectory { get; set; } = System.Environment.CurrentDirectory;
-        public bool AllowedToFail { get; set; }
     }
 }

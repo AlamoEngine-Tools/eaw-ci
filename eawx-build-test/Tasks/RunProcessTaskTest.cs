@@ -23,7 +23,7 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         public void GivenPathToExecutable__WhenCallingRun__ShouldStartProcess() {
-            _sut.Run();
+            _sut.Run(default);
 
             AssertProcessWasStartedWithExecutable(_runner, _executablePath);
         }
@@ -34,14 +34,14 @@ namespace EawXBuildTest.Tasks {
             const string arguments = "--first --second --third";
             _sut.Arguments = arguments;
 
-            _sut.Run();
+            _sut.Run(default);
 
             Assert.AreEqual(arguments, _runner.Arguments);
         }
 
         [TestMethod]
         public void GivenNoWorkingDirectory__WhenCallingRun__ShouldStartProcessInCurrentWorkingDirectory() {
-            _sut.Run();
+            _sut.Run(default);
             Assert.AreEqual(System.Environment.CurrentDirectory, _runner.WorkingDirectory);
         }
 
@@ -53,7 +53,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Arguments = arguments;
             _sut.WorkingDirectory = workingDir;
 
-            _sut.Run();
+            _sut.Run(default);
 
             AssertProcessWasStartedWithExecutable(_runner, _executablePath);
             Assert.AreEqual(arguments, _runner.Arguments);
@@ -66,7 +66,7 @@ namespace EawXBuildTest.Tasks {
             var runner = new ProcessRunnerStub {ExitCode = 1};
             var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = _executablePath};
 
-            sut.Run();
+            sut.Run(default);
         }
 
         [TestMethod]
@@ -77,7 +77,7 @@ namespace EawXBuildTest.Tasks {
             const string executablePath = "myProgram.exe";
             var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = executablePath};
 
-            sut.Run();
+            sut.Run(default);
 
             runner.Verify();
         }
@@ -87,7 +87,7 @@ namespace EawXBuildTest.Tasks {
             var runner = new ProcessRunnerStub {ExitCode = 1};
             var sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = _executablePath, AllowedToFail = true};
 
-            sut.Run();
+            sut.Run(default);
         }
 
         [TestMethod]
@@ -95,13 +95,13 @@ namespace EawXBuildTest.Tasks {
         public void GivenAbsolutePath__WhenCallingRun__ShouldThrowNoRelativePathException() {
             _sut.ExecutablePath = "/absolute/path";
 
-            _sut.Run();
+            _sut.Run(default);
         }
 
         [TestMethod]
         public void GivenAbsolutePath__WhenCallingRun__ShouldNotStartProcess() {
             _sut.ExecutablePath = "/absolute/path";
-            Assert.ThrowsException<NoRelativePathException>(() => _sut.Run());
+            Assert.ThrowsException<NoRelativePathException>(() => _sut.Run(default));
             Assert.IsFalse(_runner.WasStarted);
         }
 

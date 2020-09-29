@@ -23,7 +23,7 @@ namespace EawXBuildTest.Core {
             var jobSpy = MakeJobSpy("job");
             _sut.AddJob(jobSpy);
 
-            await _sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job", default);
 
             AssertJobWasRun(jobSpy);
         }
@@ -37,7 +37,7 @@ namespace EawXBuildTest.Core {
             var expected = MakeJobSpy("job");
             _sut.AddJob(expected);
 
-            await _sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job", default);
 
             AssertJobWasRun(expected);
             AssertJobWasNotRun(otherJob);
@@ -51,7 +51,7 @@ namespace EawXBuildTest.Core {
             var job2 = MakeJobSpy("job2");
             _sut.AddJob(job2);
 
-            Task.WaitAll(_sut.RunAllJobsAsync().ToArray());
+            Task.WaitAll(_sut.RunAllJobsAsync(default).ToArray());
 
             AssertJobWasRun(job1);
             AssertJobWasRun(job2);
@@ -62,7 +62,7 @@ namespace EawXBuildTest.Core {
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         [ExpectedException(typeof(JobNotFoundException))]
         public void GivenProjectWithNoJobs__WhenCallingRunJob__ShouldThrowJobNotFoundException() {
-            _sut.RunJobAsync("job");
+            _sut.RunJobAsync("job", default);
         }
 
         [TestMethod]

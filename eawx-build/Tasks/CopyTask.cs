@@ -1,9 +1,11 @@
 using System.IO.Abstractions;
+using System.Threading;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
 
 namespace EawXBuild.Tasks {
-    public class CopyTask : ITask {
+    public class CopyTask : TaskBase
+    {
         private readonly IFileSystem _fileSystem;
         private readonly ICopyPolicy _copyPolicy;
 
@@ -21,7 +23,8 @@ namespace EawXBuild.Tasks {
         public string FilePattern { get; set; }
         public bool AlwaysOverwrite { get; set; }
 
-        public void Run() {
+        protected override void RunCore(CancellationToken token)
+        {
             CheckRelativePaths();
 
             var directory = _fileSystem.DirectoryInfo.FromDirectoryName(Source);
@@ -31,6 +34,7 @@ namespace EawXBuild.Tasks {
             else if (sourceFile.Exists) CopySingleFile(sourceFile, Destination);
             else throw new NoSuchFileSystemObjectException(Source);
         }
+
 
         private void CheckRelativePaths() {
             var path = _fileSystem.Path;

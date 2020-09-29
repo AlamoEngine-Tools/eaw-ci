@@ -33,7 +33,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Path = filePath;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileDoesNotExist(filePath);
         }
@@ -49,7 +49,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Path = dirPath;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
@@ -65,7 +65,7 @@ namespace EawXBuildTest.Tasks
 
             _sut.Path = dirPath;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
@@ -75,7 +75,7 @@ namespace EawXBuildTest.Tasks
         public void GivenAbsolutePath__WhenCallingRun__ShouldThrowNoRelativePathException() {
             _sut.Path = "/absolute/path";
 
-            _sut.Run();
+            _sut.Run(default);
         }
     }
 }

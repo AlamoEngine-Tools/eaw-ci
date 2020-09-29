@@ -1,11 +1,4 @@
-using System;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions.TestingHelpers;
-using System.Text;
 using EawXBuild.Core;
-using EawXBuildTest.Tasks;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core {
@@ -20,7 +13,7 @@ namespace EawXBuildTest.Core {
             sut.AddTask(firstTask);
             sut.AddTask(secondTask);
 
-            sut.Run();
+            sut.Run(default);
 
             AssertTaskWasRun(firstTask);
             AssertTaskWasRun(secondTask);

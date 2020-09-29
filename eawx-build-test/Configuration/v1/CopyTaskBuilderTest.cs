@@ -41,7 +41,7 @@ namespace EawXBuildTest.Configuration.v1 {
             ConfigureTask(sut);
             CopyTask task = (CopyTask) sut.Build();
 
-            task.Run();
+            task.Run(default);
 
             Assert.IsTrue(copyPolicySpy.CopyCalled);
         }

@@ -29,7 +29,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = "Data/MyFile.txt";
             _sut.Destination = destination;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileExists(destination);
         }
@@ -45,7 +45,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceFile;
             _sut.Destination = destFile;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
         }
@@ -63,7 +63,7 @@ namespace EawXBuildTest.Tasks {
                 Destination = destination
             };
 
-            _sut.Run();
+            _sut.Run(default);
 
             Assert.IsTrue(copyPolicySpy.CopyCalled);
             Assert.IsFalse(((FileInfoCopySpy) fileSystem.FileInfo.FromFileName("Data/MyFile.txt")).FileWasCopied);
@@ -80,7 +80,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceDirectory;
             _sut.Destination = destDirectory;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertDirectoryExists(destDirectory);
         }
@@ -100,7 +100,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceDirectory;
             _sut.Destination = destDirectory;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileExists(destFileName);
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFileName), GetFile(destFileName));
@@ -121,7 +121,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceDirectory;
             _sut.Destination = destDirectory;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertDirectoryExists(destSubDirectory);
         }
@@ -136,7 +136,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = "Data/SourceXML";
             _sut.Destination = "Copy/XML";
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertDirectoryExists("Copy/XML/SubDirectory/SubDirectory2");
         }
@@ -152,7 +152,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = "Data/SourceXML";
             _sut.Destination = "Copy/XML";
 
-            _sut.Run();
+            _sut.Run(default);
 
             const string expected = "Data/SourceXML/SubDirectory/MyFile.xml";
             const string actual = "Copy/XML/SubDirectory/MyFile.xml";
@@ -175,7 +175,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Destination = destDirectory;
             _sut.Recursive = false;
 
-            _sut.Run();
+            _sut.Run(default);
 
             const string destSubDirectory = "Copy/XML/SubDirectory";
             _assertions.AssertDirectoryDoesNotExist(destSubDirectory);
@@ -195,7 +195,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceFile;
             _sut.Destination = destFile;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
         }
@@ -217,7 +217,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceFile;
             _sut.Destination = destFile;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
         }
@@ -238,7 +238,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceDir;
             _sut.Destination = destDir;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFile), GetFile(destFile));
         }
@@ -261,7 +261,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Source = sourceDir;
             _sut.Destination = destDir;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
         }
@@ -284,7 +284,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Destination = destDir;
             _sut.AlwaysOverwrite = true;
 
-            _sut.Run();
+            _sut.Run(default);
 
             _assertions.AssertFileContentEquals(expectedContent, GetFile(destFile));
         }
@@ -310,7 +310,7 @@ namespace EawXBuildTest.Tasks {
             _sut.Destination = destDir;
             _sut.FilePattern = "*.txt";
 
-            _sut.Run();
+            _sut.Run(default);
 
 
             _assertions.AssertFileExists(firstDestFile);
@@ -326,7 +326,7 @@ namespace EawXBuildTest.Tasks {
             const string sourceDir = "/absolute/path";
             _sut.Source = sourceDir;
 
-            _sut.Run();
+            _sut.Run(default);
         }
 
         [TestMethod]
@@ -336,7 +336,7 @@ namespace EawXBuildTest.Tasks {
             const string destDir = "/absolute/path";
             _sut.Destination = destDir;
 
-            _sut.Run();
+            _sut.Run(default);
         }
 
         [TestMethod]
@@ -344,7 +344,7 @@ namespace EawXBuildTest.Tasks {
         [ExpectedException(typeof(NoSuchFileSystemObjectException))]
         public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException() {
             _sut.Source = "NonExistingPath";
-            _sut.Run();
+            _sut.Run(default);
         }
 
 

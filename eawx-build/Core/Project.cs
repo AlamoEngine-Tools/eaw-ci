@@ -1,40 +1,41 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using EawXBuild.Exceptions;
 
 namespace EawXBuild.Core {
-    public class Project : IProject {
-        private readonly List<IJob> jobs = new List<IJob>();
+    public class Project : IProject 
+    {
+        private readonly List<IJob> _jobs = new List<IJob>();
 
         public string Name { get; set; }
 
         public void AddJob(IJob job) {
             if (HasJobWithName(job.Name))
                 throw new DuplicateJobNameException(job.Name);
-
-            jobs.Add(job);
+            _jobs.Add(job);
         }
 
-        public Task RunJobAsync(string jobName) {
+        public System.Threading.Tasks.Task RunJobAsync(string jobName, CancellationToken token) {
             var job = FindJobWithName(jobName);
             if (job == null)
                 throw new JobNotFoundException(jobName);
-
-            return Task.Run(() => job.Run());
+            // Do not pass token to this task, as we want the job impl. to handle cancellation.
+            return System.Threading.Tasks.Task.Run(() => job.Run(token));
         }
 
-        public List<Task> RunAllJobsAsync()
+        public List<System.Threading.Tasks.Task> RunAllJobsAsync(CancellationToken token)
         {
-            return jobs.Select(job => Task.Run(job.Run)).ToList();
+            // Do not pass token to this task, as we want the job impl. to handle cancellation.
+            return _jobs.Select(job => System.Threading.Tasks.Task.Run(() => job.Run(token))).ToList();
         }
 
         private IJob FindJobWithName(string jobName) {
-            return jobs.Find(job => job.Name.Equals(jobName));
+            return _jobs.Find(job => job.Name.Equals(jobName));
         }
 
         private bool HasJobWithName(string jobName) {
-            return jobs.Exists(j => j.Name.Equals(jobName));
+            return _jobs.Exists(j => j.Name.Equals(jobName));
         }
     }
 }

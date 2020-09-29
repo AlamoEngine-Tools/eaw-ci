@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using EawXBuild.Core;
 using Task = System.Threading.Tasks.Task;
 
@@ -12,12 +13,12 @@ namespace EawXBuildTest.Core
         {
         }
 
-        public virtual Task RunJobAsync(string jobName)
+        public virtual Task RunJobAsync(string jobName, CancellationToken token)
         {
             return null;
         }
 
-        public List<Task> RunAllJobsAsync()
+        public List<Task> RunAllJobsAsync(CancellationToken token)
         {
             throw new System.NotImplementedException();
         }
@@ -34,7 +35,7 @@ namespace EawXBuildTest.Core
             Jobs.Add(job);
         }
 
-        public override Task RunJobAsync(string jobName)
+        public override Task RunJobAsync(string jobName, CancellationToken token)
         {
             return Task.CompletedTask;
         }

@@ -1,7 +1,12 @@
+using System;
+using System.Threading;
+
 namespace EawXBuild.Core
 {
     public interface ITask
     {
-        void Run();
+        Exception Error { get; }
+
+        void Run(CancellationToken token);
     }
 }
