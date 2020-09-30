@@ -18,10 +18,10 @@ before_script:
   - git fetch origin master
 
 script:
-  - dotnet sonarscanner begin /k:$SONAR_PROJECT /o:$SONAR_ORGANIZATION /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$SONAR_TOKEN /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.coverage.exclusions="eawx-build-test/**,**/*Test.cs,**/TestUtility.cs" /d:sonar.cs.opencover.reportsPaths="lcov.opencover.xml" || true
+  - dotnet sonarscanner begin /k:$SONAR_PROJECT /o:$SONAR_ORGANIZATION /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$SONAR_TOKEN /d:sonar.language="cs" /d:sonar.exclusions="**/bin/**/*,**/obj/**/*" /d:sonar.coverage.exclusions="eawx-build-test/**,**/*Test.cs,**/TestUtility.cs" /d:sonar.cs.opencover.reportsPaths="/home/travis/build/AlamoEngine-Tools/eaw-ci/coverage.netcoreapp3.1.opencover.xml" || true
   - dotnet build eawx-build/eawx-build.csproj
   - dotnet build eawx-build-test/eawx-build-test.csproj
-  - dotnet test eawx-build-test/eawx-build-test.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../lcov
+  - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../
   - dotnet sonarscanner end /d:sonar.login=$SONAR_TOKEN || true
 
 cache:
