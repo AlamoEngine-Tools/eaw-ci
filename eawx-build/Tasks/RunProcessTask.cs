@@ -22,6 +22,9 @@ namespace EawXBuild.Tasks {
 
         protected override void RunCore(CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+                return;
+
             if (_filesystem.Path.IsPathRooted(ExecutablePath)) throw new NoRelativePathException(ExecutablePath);
             _runner.Start(new ProcessStartInfo
             {
@@ -30,6 +33,7 @@ namespace EawXBuild.Tasks {
                 WorkingDirectory = WorkingDirectory
             });
 
+            // This makes the task sync already, thus no need to derive from SynchronizedTask
             _runner.WaitForExit();
             if (!AllowedToFail && _runner.ExitCode != 0) throw new ProcessFailedException();
         }

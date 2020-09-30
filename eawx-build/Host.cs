@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading;
 using CommandLine;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.v1;
@@ -16,20 +18,33 @@ namespace EawXBuild
 {
     internal class Host
     {
+        private static readonly CancellationTokenSource Cts = new CancellationTokenSource();
+        private static readonly ManualResetEvent WaitHandle = new ManualResetEvent(false);
+
         private static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
-                .WithParsed<RunOptions>(ExecInternal)
-                .WithParsed<ValidateOptions>(ExecInternal)
-                .WithNotParsed(HandleParseErrorsInternal);
-        }
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnProcessExit;
+            Console.CancelKeyPress += ConsoleOnCancelKeyPress;
 
+            try
+            {
+                Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
+                    .WithParsed<RunOptions>(ExecInternal)
+                    .WithParsed<ValidateOptions>(ExecInternal)
+                    .WithNotParsed(HandleParseErrorsInternal);
+            }
+            finally
+            {
+                WaitHandle.Set();
+            }
+        }
+        
         private static void ExecInternal(IOptions opts)
         {
             IServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection, opts.Verbose);
             EawXBuildApplication application = new EawXBuildApplication(serviceCollection.BuildServiceProvider(), opts);
-            System.Environment.ExitCode = (int) application.Run();
+            System.Environment.ExitCode = (int) application.Run(Cts.Token);
         }
 
         private static void ConfigureServices(IServiceCollection serviceCollection, bool verbose)
@@ -64,6 +79,22 @@ namespace EawXBuild
                 return;
             }
             System.Environment.ExitCode = (int) ExitCode.ExUsage;
+        }
+
+        private static void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            CancelApplication();
+        }
+
+        private static void CurrentDomainOnProcessExit(object? sender, EventArgs e)
+        {
+            CancelApplication();
+        }
+
+        private static void CancelApplication()
+        {
+            Cts.Cancel();
+            WaitHandle.WaitOne();
         }
     }
 }

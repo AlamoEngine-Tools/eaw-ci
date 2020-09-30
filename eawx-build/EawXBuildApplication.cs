@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EawXBuild.Configuration;
 using EawXBuild.Configuration.CLI;
@@ -28,17 +29,17 @@ namespace EawXBuild
             _logger?.LogTrace("Application initialised successfully.");
         }
 
-        internal ExitCode Run()
+        internal ExitCode Run(CancellationToken token = default)
         {
             return Opts switch
             {
-                RunOptions runOptions => RunInternal(runOptions),
+                RunOptions runOptions => RunInternal(runOptions, token),
                 ValidateOptions validateOptions => RunValidateInternal(validateOptions),
                 _ => ExitCode.ExConfig
             };
         }
 
-        private ExitCode RunInternal(RunOptions runOptions)
+        private ExitCode RunInternal(RunOptions runOptions, CancellationToken token)
         {
             _logger?.LogInformation("Running application in RUN mode.");
             IIOService ioService = Services.GetService<IIOService>();
@@ -64,11 +65,13 @@ namespace EawXBuild
             }
 
             List<Task> tasks = new List<Task>();
+            var localCts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
             if (string.IsNullOrEmpty(runOptions.JobName) || string.IsNullOrWhiteSpace(runOptions.JobName))
             {
                 try
                 {
-                    tasks.AddRange(project.RunAllJobsAsync(default));
+                    tasks.AddRange(project.RunAllJobsAsync(localCts.Token));
                 }
                 catch (Exception e)
                 {
@@ -79,15 +82,16 @@ namespace EawXBuild
             {
                 try
                 {
-                    tasks.Add(project.RunJobAsync(runOptions.JobName, default));
+                    tasks.Add(project.RunJobAsync(runOptions.JobName, localCts.Token));
                 }
                 catch (Exception e)
                 {
                     _logger?.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ", e);
                 }
             }
-
             Task.WaitAll(tasks.ToArray());
+            localCts.Dispose();
+
             int errCount = 0;
             foreach (Task task in tasks.Where(task => null != task.Exception))
             {
@@ -105,6 +109,12 @@ namespace EawXBuild
             {
                 _logger?.LogInformation($"{project.Name} could not be run. All tasks failed.");
                 return ExitCode.RunFailed;
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                _logger?.LogError($"{project.Name} Was cancelled.");
+                return ExitCode.UserAbortedError;
             }
 
             _logger?.LogInformation($"{project.Name} could not complete: {errCount} of {tasks.Count} tasks failed.");

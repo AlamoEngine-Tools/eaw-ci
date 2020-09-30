@@ -4,7 +4,7 @@ using EawXBuild.Core;
 using EawXBuild.Exceptions;
 
 namespace EawXBuild.Tasks {
-    public class CopyTask : TaskBase
+    public class CopyTask : SynchronizedTask
     {
         private readonly IFileSystem _fileSystem;
         private readonly ICopyPolicy _copyPolicy;
@@ -23,8 +23,11 @@ namespace EawXBuild.Tasks {
         public string FilePattern { get; set; }
         public bool AlwaysOverwrite { get; set; }
 
-        protected override void RunCore(CancellationToken token)
+        protected override void RunSynchronized(CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+                return;
+
             CheckRelativePaths();
 
             var directory = _fileSystem.DirectoryInfo.FromDirectoryName(Source);
