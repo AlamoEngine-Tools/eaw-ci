@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace EawXBuild.Services.Process {
@@ -16,7 +15,6 @@ namespace EawXBuild.Services.Process {
                 WorkingDirectory = System.Environment.CurrentDirectory,
                 Arguments = arguments
             };
-            RedirectIOForProcessStartInfo(startInfo);
 
             Start(startInfo);
         }
