@@ -14,17 +14,15 @@ namespace EawXBuild.Services.Process {
             var startInfo = new ProcessStartInfo {
                 FileName = executablePath,
                 WorkingDirectory = System.Environment.CurrentDirectory,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
                 Arguments = arguments
             };
+            RedirectIOForProcessStartInfo(startInfo);
 
             Start(startInfo);
         }
 
         public void Start(ProcessStartInfo startInfo) {
+            RedirectIOForProcessStartInfo(startInfo);
             _process = new System.Diagnostics.Process {
                 StartInfo = startInfo
             };
@@ -33,8 +31,16 @@ namespace EawXBuild.Services.Process {
             Console.Out.WriteLine(_process.StandardOutput.ReadToEnd());
         }
 
+
         public void WaitForExit() {
             _process.WaitForExit();
+        }
+
+        private static void RedirectIOForProcessStartInfo(ProcessStartInfo startInfo) {
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardInput = true;
         }
 
         public int ExitCode => _process.ExitCode;
