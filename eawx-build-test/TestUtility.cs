@@ -14,7 +14,15 @@ namespace EawXBuildTest
 
         public static bool IsLinuxOrMacOS()
         {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            return IsLinux() || IsMacOS();
+        }
+
+        public static bool IsLinux() {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        }
+
+        public static bool IsMacOS() {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         }
     }
 }
