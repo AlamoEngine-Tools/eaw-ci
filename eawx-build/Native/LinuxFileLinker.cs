@@ -9,7 +9,7 @@ namespace EawXBuild.Native {
             link(sourceBytes, targetBytes);
         }
 
-        [DllImport("libc.so")]
+        [DllImport("libc")]
         private static extern int link(byte[] oldpath, byte[] newpath);
     }
 }
