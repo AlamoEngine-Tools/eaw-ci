@@ -14,7 +14,7 @@ namespace EawXBuild.Native {
         public void CreateLink(string source, string target) {
             var platformSpecificSourcePath = source.Replace("/", "\\");
             var platformSpecificTargetPath = target.Replace("/", "\\");
-            CreateHardLink(platformSpecificSourcePath, platformSpecificTargetPath, IntPtr.Zero);
+            CreateHardLink(platformSpecificTargetPath, platformSpecificSourcePath, IntPtr.Zero);
         }
     }
 }
