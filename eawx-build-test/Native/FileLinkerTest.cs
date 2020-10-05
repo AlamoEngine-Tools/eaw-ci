@@ -30,8 +30,8 @@ namespace EawXBuildTest.Native {
             _sourceFileInfo.Delete();
             _targetFileInfo.Delete();
             _directoryInfo.Delete();
-            Assert.IsFalse(_fileSystem.File.Exists(UnixFilePath));
-            Assert.IsFalse(_fileSystem.File.Exists(UnixLinkedFilePath));
+            Assert.IsFalse(_fileSystem.File.Exists(GetPlatformSourcePath()));
+            Assert.IsFalse(_fileSystem.File.Exists(GetPlatformTargetPath()));
         }
 
         [TestMethod]
