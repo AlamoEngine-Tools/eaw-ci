@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -6,8 +7,8 @@ namespace EawXBuild.Native {
         public void CreateLink(string source, string target) {
             var platformSourcePath = source.Replace("\\", "/");
             var platformTargetPath = target.Replace("\\", "/");
-            byte[] sourceBytes = Encoding.UTF8.GetBytes(platformSourcePath);
-            byte[] targetBytes = Encoding.UTF8.GetBytes(platformTargetPath);
+            var sourceBytes = Encoding.UTF8.GetBytes(platformSourcePath);
+            var targetBytes = Encoding.UTF8.GetBytes(platformTargetPath);
             link(sourceBytes, targetBytes);
         }
         
