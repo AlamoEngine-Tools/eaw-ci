@@ -12,7 +12,9 @@ namespace EawXBuild.Native {
 
 
         public void CreateLink(string source, string target) {
-            CreateHardLink(source, target, IntPtr.Zero);
+            var platformSpecificSourcePath = source.Replace("/", "\\");
+            var platformSpecificTargetPath = target.Replace("/", "\\");
+            CreateHardLink(platformSpecificSourcePath, platformSpecificTargetPath, IntPtr.Zero);
         }
     }
 }

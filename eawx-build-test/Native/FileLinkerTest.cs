@@ -14,7 +14,7 @@ namespace EawXBuildTest.Native {
 
         [TestInitialize]
         public void SetUp() {
-            _fileSystem.File.Create(UnixFilePath);
+            using var stream = _fileSystem.File.Create(UnixFilePath);
         }
 
         [TestCleanup]
