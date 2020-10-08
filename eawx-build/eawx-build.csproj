@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.8" />
     <PackageReference Include="semver" Version="2.0.6" />
-    <PackageReference Include="System.IO.Abstractions" Version="12.2.1" />
+    <PackageReference Include="System.IO.Abstractions" Version="12.2.2" />
   </ItemGroup>
 
   <ItemGroup>
