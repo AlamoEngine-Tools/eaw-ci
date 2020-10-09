@@ -9,10 +9,12 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using EawXBuild.Configuration.FrontendAgnostic;
+using EawXBuild.Configuration.v1;
 using EawXBuild.Core;
 using Microsoft.Extensions.Logging;
 
-namespace EawXBuild.Configuration.v1
+namespace EawXBuild.Configuration.Xml.v1
 {
     internal class BuildConfigParser : IBuildConfigParser
     {

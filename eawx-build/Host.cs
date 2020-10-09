@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using CommandLine;
 using EawXBuild.Configuration.CLI;
+using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Configuration.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;

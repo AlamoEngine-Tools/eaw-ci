@@ -4,7 +4,7 @@ using EawXBuild.Core;
 using EawXBuild.Services.Process;
 using EawXBuild.Tasks;
 
-namespace EawXBuild.Configuration.v1 {
+namespace EawXBuild.Configuration.FrontendAgnostic {
     public class RunProcessTaskBuilder : ITaskBuilder {
         private readonly RunProcessTask _runProcessTask;
 
@@ -19,6 +19,12 @@ namespace EawXBuild.Configuration.v1 {
                     break;
                 case "Arguments":
                     _runProcessTask.Arguments = (string) value;
+                    break;
+                case "WorkingDirectory":
+                    _runProcessTask.WorkingDirectory = (string) value;
+                    break;
+                case "AllowedToFail":
+                    _runProcessTask.AllowedToFail = (bool) value;
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid configuration option: {name}");
