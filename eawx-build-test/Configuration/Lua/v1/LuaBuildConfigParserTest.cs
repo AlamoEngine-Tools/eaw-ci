@@ -131,7 +131,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectWithJobAndLinkTask__WhenParsing__JobShouldHaveTask() {
             const string lua = @"
@@ -150,7 +150,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectWithJobAndCleanTask__WhenParsing__JobShouldHaveTask() {
             const string lua = @"
@@ -169,7 +169,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
-        
+
         [TestMethod]
         public void GivenConfigWithCleanTask__WhenParsing__TaskShouldBeConfiguredCorrectly() {
             const string lua = @"
@@ -188,7 +188,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectWithJobAndRunProcessTask__WhenParsing__JobShouldHaveTask() {
             const string lua = @"
@@ -207,7 +207,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectRunProcessTaskWithSettings__WhenParsing__TaskShouldBeConfiguredCorrectly() {
             const string lua = @"
@@ -232,6 +232,30 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
+        }
+
+        [TestMethod]
+        public void GivenJobWithMultipleTasks__WhenCallingParse__JobShouldHaveAllTasks() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_tasks { run_process('echo'), copy('a', 'b') }  
+            ";
+            _mockFileData.TextContents = lua;
+
+            var jobStub = new JobStub();
+            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()}; 
+            var factoryStub = new BuildComponentFactoryStub {
+                Job = jobStub,
+                TaskBuilder = new IteratingTaskBuilderStub {
+                    Tasks = expectedTasks.ToList()
+                }
+            };
+
+            MakeSutAndParse(factoryStub);
+
+            var actualTasks = jobStub.Tasks;
+            CollectionAssert.AreEqual(expectedTasks, actualTasks);
         }
 
         private static BuildComponentFactoryStub MakeBuildComponentFactoryStub(JobDummy job, TaskDummy task = null) {
