@@ -62,6 +62,10 @@ namespace EawXBuildTest.Core
             _expectedEntries = expectedEntries;
         }
 
+        public void AddExpectedEntry(string key, object value) {
+            _expectedEntries.Add(key, value);
+        }
+
         public override ITaskBuilder With(string name, object value)
         {
             _actualEntries.Add(name, value);

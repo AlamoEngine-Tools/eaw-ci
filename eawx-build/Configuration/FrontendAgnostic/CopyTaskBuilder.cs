@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Tasks;
 
-namespace EawXBuild.Configuration.v1 {
+namespace EawXBuild.Configuration.FrontendAgnostic {
     public class CopyTaskBuilder : ITaskBuilder {
         private readonly CopyTask _copyTask;
 
@@ -24,6 +24,9 @@ namespace EawXBuild.Configuration.v1 {
                     break;
                 case "CopyFileByPattern":
                     _copyTask.FilePattern = (string) value;
+                    break;
+                case "AlwaysOverwrite":
+                    _copyTask.AlwaysOverwrite = (bool) value;
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid configuration option: {name}");

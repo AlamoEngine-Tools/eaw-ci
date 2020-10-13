@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Tasks;
 
-namespace EawXBuild.Configuration.v1 {
+namespace EawXBuild.Configuration.FrontendAgnostic {
     public class CleanTaskBuilder : ITaskBuilder {
         private readonly CleanTask _cleanTask;
 

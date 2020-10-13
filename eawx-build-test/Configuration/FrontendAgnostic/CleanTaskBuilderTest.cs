@@ -1,10 +1,10 @@
 using System;
 using System.IO.Abstractions.TestingHelpers;
-using EawXBuild.Configuration.v1;
+using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.v1 {
+namespace EawXBuildTest.Configuration.FrontendAgnostic {
     [TestClass]
     public class CleanTaskBuilderTest {
         [TestMethod]

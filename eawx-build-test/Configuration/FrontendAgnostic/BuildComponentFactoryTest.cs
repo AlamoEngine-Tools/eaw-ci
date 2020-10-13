@@ -1,9 +1,9 @@
 using System;
-using EawXBuild.Configuration.v1;
+using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.v1 {
+namespace EawXBuildTest.Configuration.FrontendAgnostic {
     [TestClass]
     public class BuildComponentFactoryTest {
         [TestMethod]

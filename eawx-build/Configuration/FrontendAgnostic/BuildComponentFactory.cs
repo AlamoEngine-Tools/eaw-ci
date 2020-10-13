@@ -1,11 +1,10 @@
 using System;
-using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Native;
 using EawXBuild.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace EawXBuild.Configuration.v1 {
+namespace EawXBuild.Configuration.FrontendAgnostic {
     internal enum Tasks {
         Clean,
         Copy,

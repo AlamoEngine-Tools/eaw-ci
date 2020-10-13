@@ -30,13 +30,13 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.8" />
+    <PackageReference Include="NLua" Version="1.5.1" />
     <PackageReference Include="semver" Version="2.0.6" />
     <PackageReference Include="System.IO.Abstractions" Version="12.2.5" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Configuration\v1\eaw-ci.xsd" />
-    <EmbeddedResource Include="Configuration\v1\eaw-ci.xsd" />
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -45,5 +45,9 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd" />
   </ItemGroup>
 </Project>
