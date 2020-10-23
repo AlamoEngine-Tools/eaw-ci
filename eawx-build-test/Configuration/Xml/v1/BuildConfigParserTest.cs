@@ -49,8 +49,9 @@ namespace EawXBuildTest.Configuration.Xml.v1
             const string exceptionMessage =
                 "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
             var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
-            try {
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
+            try
+            {
                 sut.Parse(Path);
             }
             catch (Exception e) {
@@ -84,7 +85,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             const string projectName = "TestProject";
 
             var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
 
@@ -117,7 +118,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             const string jobName = "TestJob";
 
             var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub(), Job = new JobStub()};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
 
@@ -155,7 +156,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             _mockFileData.TextContents = xml;
 
             var factorySpy = new BuildComponentFactorySpy();
-            var sut = new BuildConfigParser(_fileSystem, factorySpy);
+            var sut = new XmlBuildConfigParser(_fileSystem, factorySpy);
 
             sut.Parse(Path);
 
@@ -203,7 +204,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             });
 
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -241,7 +242,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -283,7 +284,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             var jobStub = new JobStub();
             var taskBuilderStub = new TaskBuilderStub();
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -343,7 +344,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             });
 
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderMock};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -395,7 +396,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             taskBuilderStub.Tasks.Add(secondTask);
 
             var factoryStub = new BuildComponentFactoryStub {Job = jobStub, TaskBuilder = taskBuilderStub};
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -435,7 +436,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
                 Jobs = expectedJobs
             };
 
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
 
@@ -474,7 +475,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
                 Projects = expectedProjects
             };
 
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             var projects = sut.Parse(Path);
 
@@ -522,14 +523,15 @@ namespace EawXBuildTest.Configuration.Xml.v1
                                 </eaw-ci:BuildConfiguration>", false)]
         public void GivenConfig__TestIsValidConfiguration__IsExpected(string xmlContent, bool expected) {
             _mockFileData.TextContents = xmlContent;
-            var sut = new BuildConfigParser(_fileSystem, null);
+            var sut = new XmlBuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(Path);
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse() {
-            var sut = new BuildConfigParser(_fileSystem, null);
+        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse()
+        {
+            var sut = new XmlBuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(null);
             Assert.IsFalse(actual);
         }
@@ -538,7 +540,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         public void GivenEmptyConfig__TestIsValidConfiguration__ReturnsFalse() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>";
             _mockFileData.TextContents = xml;
-            var sut = new BuildConfigParser(_fileSystem, null);
+            var sut = new XmlBuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(Path);
             Assert.IsFalse(actual);
         }
@@ -571,7 +573,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             _mockFileData.TextContents = xml;
 
             var factoryStub = new BuildComponentFactoryStub();
-            var sut = new BuildConfigParser(_fileSystem, factoryStub);
+            var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
 
             sut.Parse(Path);
         }

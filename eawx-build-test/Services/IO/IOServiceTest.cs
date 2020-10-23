@@ -15,32 +15,7 @@ namespace EawXBuildTest.Services.IO
         [TestInitialize]
         public void SetUp()
         {
-            if (TestUtility.IsWindows())
-            {
-                _fileSystem = new MockFileSystem();
-                _fileSystem.AddDirectory("C:/data/test/path");
-                _fileSystem.AddDirectory("C:/data/path");
-                _fileSystem.AddFile("C:/data/test/path/test.dat", new MockFileData(string.Empty));
-                _fileSystem.AddFile("C:/data/path/test.xml", new MockFileData(string.Empty));
-                _assertions = new FileSystemAssertions(_fileSystem);
-                _assertions.AssertDirectoryExists("C:/data/test/path");
-                _assertions.AssertDirectoryExists("C:/data/path");
-                _assertions.AssertFileExists("C:/data/test/path/test.dat");
-                _assertions.AssertFileExists("C:/data/path/test.xml");
-            }
-            else if (TestUtility.IsLinuxOrMacOS())
-            {
-                _fileSystem = new MockFileSystem();
-                _fileSystem.AddDirectory("/mnt/c/data/test/path");
-                _fileSystem.AddDirectory("/mnt/c/data/path");
-                _fileSystem.AddFile("/mnt/c/data/test/path/test.dat", new MockFileData(string.Empty));
-                _fileSystem.AddFile("/mnt/c/data/path/test.xml", new MockFileData(string.Empty));
-                _assertions = new FileSystemAssertions(_fileSystem);
-                _assertions.AssertDirectoryExists("/mnt/c/data/test/path");
-                _assertions.AssertDirectoryExists("/mnt/c/data/path");
-                _assertions.AssertFileExists("/mnt/c/data/test/path/test.dat");
-                _assertions.AssertFileExists("/mnt/c/data/path/test.xml");
-            }
+            TestUtility.GetConfiguredMockfileSystem(out _fileSystem, out _assertions);
         }
 
         [TestMethod]
