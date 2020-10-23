@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EawXBuild.Configuration.Xml.v1
 {
-    internal class BuildConfigParser : IBuildConfigParser
+    internal class XmlBuildConfigParser : IBuildConfigParser
     {
         private const string XSD_RESOURCE_ID = "v1.eaw-ci.xsd";
 
@@ -37,10 +37,10 @@ namespace EawXBuild.Configuration.Xml.v1
         private const ConfigVersion CONFIG_VERSION = ConfigVersion.V1;
         [NotNull] private readonly IFileSystem _fileSystem;
         [NotNull] private readonly IBuildComponentFactory _factory;
-        private readonly ILogger<BuildConfigParser> _logger;
+        private readonly ILogger<XmlBuildConfigParser> _logger;
 
-        public BuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
-            ILogger<BuildConfigParser> logger = null)
+        public XmlBuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
+            ILogger<XmlBuildConfigParser> logger = null)
         {
             _fileSystem = fileSystem;
             _factory = factory;

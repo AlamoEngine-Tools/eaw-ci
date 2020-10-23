@@ -4,6 +4,7 @@ using System.Linq;
 using CommandLine;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
+using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Configuration.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
@@ -53,7 +54,9 @@ namespace EawXBuild
             serviceCollection.AddTransient<IIOService, IOService>(s =>
                 new IOService(new FileSystem(), lsp.GetRequiredService<ILoggerFactory>().CreateLogger<IOService>()));
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
-                new BuildComponentFactory(lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
+                new BuildComponentFactory(
+                    lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
+            serviceCollection.AddTransient<ILuaParser, NLuaParser>(s => new NLuaParser());
         }
 
         private static void HandleParseErrorsInternal(IEnumerable<Error> errs)
@@ -64,6 +67,7 @@ namespace EawXBuild
                 System.Environment.ExitCode = (int) ExitCode.Success;
                 return;
             }
+
             System.Environment.ExitCode = (int) ExitCode.ExUsage;
         }
     }

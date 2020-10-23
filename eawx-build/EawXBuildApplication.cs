@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EawXBuild.Configuration;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
-using EawXBuild.Configuration.v1;
+using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Configuration.Xml.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
@@ -43,21 +42,69 @@ namespace EawXBuild
         private ExitCode RunInternal(RunOptions runOptions)
         {
             _logger?.LogInformation("Running application in RUN mode.");
-            IIOService ioService = Services.GetService<IIOService>();
-            if (!ioService.IsValidPath(runOptions.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+            if (runOptions.BackendXml)
             {
-                return ioService.ValidatePath(runOptions.ConfigPath,
-                    ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                return RunBackendXmlInternal(runOptions);
             }
-            string path = ioService.ResolvePath(runOptions.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
-            IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
-                Services.GetService<IBuildComponentFactory>(),
-                Services.GetRequiredService<ILoggerFactory>().CreateLogger<BuildConfigParser>());
+
+            if (runOptions.BackendLua)
+            {
+                return RunBackendLuaInternal(runOptions);
+            }
+
+            return ExitCode.ExUsage;
+        }
+
+        private static bool TryExtractAndValidatePathInternal(IIOService ioService, string pathIn, string fileExtension,
+            out string pathOut, out ExitCode exitCode)
+        {
+            if (!ioService.IsValidPath(pathIn,
+                ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension))
+            {
+                pathOut = null;
+                exitCode = ioService.ValidatePath(pathIn,
+                    ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension);
+                return false;
+            }
+
+            pathOut = ioService.ResolvePath(pathIn,
+                ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension);
+            exitCode = ExitCode.Success;
+            return true;
+        }
+
+        private ExitCode RunBackendLuaInternal(RunOptions runOptions)
+        {
+            IIOService ioService = Services.GetService<IIOService>();
+            if (!TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath, ".lua", out string path,
+                out ExitCode exitCode))
+            {
+                return exitCode;
+            }
+
+            IBuildConfigParser buildConfigParser = GetLuaBuildConfigParserInternal(ioService);
+            return ExecRunInternal(runOptions, buildConfigParser, path);
+        }
+
+        private ExitCode RunBackendXmlInternal(RunOptions runOptions)
+        {
+            IIOService ioService = Services.GetService<IIOService>();
+            if (!TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath, ".xml", out string path,
+                out ExitCode exitCode))
+            {
+                return exitCode;
+            }
+
+            IBuildConfigParser buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
+            return ExecRunInternal(runOptions, buildConfigParser, path);
+        }
+
+        private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string path)
+        {
             IEnumerable<IProject> projects = buildConfigParser.Parse(path);
             IProject project =
-                projects.FirstOrDefault(p => p.Name.Equals(runOptions.ProjectName, StringComparison.CurrentCulture));
+                projects.FirstOrDefault(p =>
+                    p.Name.Equals(runOptions.ProjectName, StringComparison.CurrentCulture));
 
             if (null == project)
             {
@@ -94,7 +141,8 @@ namespace EawXBuild
             foreach (Task task in tasks.Where(task => null != task.Exception))
             {
                 errCount += 1;
-                _logger?.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ", task.Exception);
+                _logger?.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ",
+                    task.Exception);
             }
 
             if (errCount == 0)
@@ -109,25 +157,46 @@ namespace EawXBuild
                 return ExitCode.RunFailed;
             }
 
-            _logger?.LogInformation($"{project.Name} could not complete: {errCount} of {tasks.Count} tasks failed.");
+            _logger?.LogInformation(
+                $"{project.Name} could not complete: {errCount} of {tasks.Count} tasks failed.");
             return ExitCode.MultipleJobsFailed;
         }
 
-        private ExitCode RunValidateInternal(ValidateOptions opt)
+        private XmlBuildConfigParser GetXmlBuildConfigParserInternal(IIOService ioService)
+        {
+            return new XmlBuildConfigParser(ioService.FileSystem,
+                Services.GetService<IBuildComponentFactory>(),
+                Services.GetRequiredService<ILoggerFactory>().CreateLogger<XmlBuildConfigParser>());
+        }
+
+        private LuaBuildConfigParser GetLuaBuildConfigParserInternal(IIOService ioService)
+        {
+            return new LuaBuildConfigParser(
+                Services.GetService<ILuaParser>(), Services.GetService<IBuildComponentFactory>());
+        }
+
+        private ExitCode RunValidateInternal(IOptions validateOptions)
         {
             _logger?.LogInformation("Running application in VALIDATION mode.");
             IIOService ioService = Services.GetService<IIOService>();
-            if (!ioService.IsValidPath(opt.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+            string fileExtension;
+            IBuildConfigParser buildConfigParser;
+            if (validateOptions.BackendXml)
             {
-                return ioService.ValidatePath(opt.ConfigPath,
-                    ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                fileExtension = ".xml";
+                buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
             }
-            string path = ioService.ResolvePath(opt.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
-            IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
-                Services.GetService<IBuildComponentFactory>(),
-                Services.GetRequiredService<ILoggerFactory>().CreateLogger<BuildConfigParser>());
+            else
+            {
+                fileExtension = ".lua";
+                buildConfigParser = GetLuaBuildConfigParserInternal(ioService);
+            }
+
+            if (!TryExtractAndValidatePathInternal(ioService, validateOptions.ConfigPath, fileExtension, out string path,
+                out ExitCode exitCode))
+            {
+                return exitCode;
+            }
             return buildConfigParser.TestIsValidConfiguration(path) ? ExitCode.Success : ExitCode.ExConfig;
         }
     }
