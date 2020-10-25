@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>EawXBuild</RootNamespace>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
     <Title>EaW CI</Title>
     <Authors>Sven Marcus &amp; Lukas Grünwald</Authors>
@@ -39,7 +39,6 @@
     <None Remove="Configuration\v1\eaw-ci.xsd" />
     <None Include="..\LICENSE">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 
@@ -50,4 +49,22 @@
   <ItemGroup>
     <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <Target Name="CopyLibSteam" AfterTargets="AfterBuild">
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.so" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.bundle" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('OSX'))" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/steam_api64.dll" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
+  </Target>
 </Project>
