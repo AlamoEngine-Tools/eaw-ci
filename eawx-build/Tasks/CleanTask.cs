@@ -12,6 +12,9 @@ namespace EawXBuild.Tasks {
 
         public string Path { get; set; }
 
+        public string Id { get; set; }
+        public string Name { get; set; }
+
         public void Run() {
             if (fileSystem.Path.IsPathRooted(Path)) throw new NoRelativePathException(Path);
             if (fileSystem.Directory.Exists(Path)) fileSystem.Directory.Delete(Path, true);

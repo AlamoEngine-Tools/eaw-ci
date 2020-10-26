@@ -11,16 +11,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest.Configuration.Xml.v1
 {
     [TestClass]
-    public class BuildConfigParserTest
-    {
+    public class BuildConfigParserTest {
         private const string Path = "MyXml.xml";
 
         private MockFileSystem _fileSystem;
         private MockFileData _mockFileData;
 
         [TestInitialize]
-        public void SetUp()
-        {
+        public void SetUp() {
             _mockFileData = new MockFileData(string.Empty);
             _fileSystem = new MockFileSystem();
             _fileSystem.AddFile(Path, _mockFileData);
@@ -28,8 +26,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
 
         [TestMethod]
         public void
-            GivenXmlWithWrongConfigVersion__WhenCallingParse__ShouldThrowException()
-        {
+            GivenXmlWithWrongConfigVersion__WhenCallingParse__ShouldThrowException() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.1"" 
@@ -53,12 +50,10 @@ namespace EawXBuildTest.Configuration.Xml.v1
                 "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
             var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
             var sut = new BuildConfigParser(_fileSystem, factoryStub);
-            try
-            {
+            try {
                 sut.Parse(Path);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Assert.AreEqual(typeof(InvalidOperationException), e.GetType());
                 Assert.AreEqual(typeof(XmlSchemaValidationException), e.InnerException.GetType());
                 Assert.AreEqual(exceptionMessage, e.InnerException.Message);
@@ -66,8 +61,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenXmlWithSingleProject__WhenCallingParse__ShouldReturnArrayWithMatchingProject()
-        {
+        public void GivenXmlWithSingleProject__WhenCallingParse__ShouldReturnArrayWithMatchingProject() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -100,8 +94,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenXmlWithSingleProjectAndJob__WhenCallingParse__ProjectShouldHaveMatchingJob()
-        {
+        public void GivenXmlWithSingleProjectAndJob__WhenCallingParse__ProjectShouldHaveMatchingJob() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -134,8 +127,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldRequestTaskBuilderForCorrectType()
-        {
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldRequestTaskBuilderForCorrectType() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -173,8 +165,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldConfigureTaskWithBuilder()
-        {
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldConfigureTaskWithBuilder() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -201,8 +192,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
 
             _mockFileData.TextContents = xml;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
-            {
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
                 {"Id", "TestTask"},
                 {"Name", "TestTask"},
                 {"CopyFromPath", "path/to/source"},
@@ -221,8 +211,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldAddTaskToJob()
-        {
+        public void GivenProjectWithJobAndCopyTask__WhenCallingParse__ShouldAddTaskToJob() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -260,8 +249,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenGlobalCopyTaskAndReferenceInProjectJob__WhenCallingParse__ShouldAddTaskToJob()
-        {
+        public void GivenGlobalCopyTaskAndReferenceInProjectJob__WhenCallingParse__ShouldAddTaskToJob() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -303,8 +291,8 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenTwoGlobalTasksAndReferenceToSecondInProjectJob__WhenCallingParse__ShouldBuildSecondGlobalTask()
-        {
+        public void
+            GivenTwoGlobalTasksAndReferenceToSecondInProjectJob__WhenCallingParse__ShouldBuildSecondGlobalTask() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -344,8 +332,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             _mockFileData.TextContents = xml;
 
             var jobStub = new JobStub();
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
-            {
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
                 {"Id", "ExpectedTask"},
                 {"Name", "ExpectedTask"},
                 {"CopyFromPath", "path/to/source"},
@@ -364,8 +351,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenProjectWithJobAndTwoTasks__WhenCallingParse__ShouldAddBothTasksToJob()
-        {
+        public void GivenProjectWithJobAndTwoTasks__WhenCallingParse__ShouldAddBothTasksToJob() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -419,8 +405,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
 
 
         [TestMethod]
-        public void GivenProjectWithTwoJobs__WhenCallingParse__ShouldAddBothJobsToProject()
-        {
+        public void GivenProjectWithTwoJobs__WhenCallingParse__ShouldAddBothJobsToProject() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -445,8 +430,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
 
             var expectedJobs = new List<IJob> {new JobStub(), new JobStub()};
             var projectStub = new ProjectStub();
-            var factoryStub = new JobIteratingBuildComponentFactoryStub
-            {
+            var factoryStub = new JobIteratingBuildComponentFactoryStub {
                 Project = projectStub,
                 Jobs = expectedJobs
             };
@@ -459,8 +443,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenBuildConfigWithTwoProjects__WhenCallingParse__ShouldReturnBothProjects()
-        {
+        public void GivenBuildConfigWithTwoProjects__WhenCallingParse__ShouldReturnBothProjects() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -487,8 +470,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
             _mockFileData.TextContents = xml;
 
             var expectedProjects = new List<IProject> {new ProjectDummy(), new ProjectDummy()};
-            var factoryStub = new ProjectIteratingBuildComponentFactoryStub()
-            {
+            var factoryStub = new ProjectIteratingBuildComponentFactoryStub() {
                 Projects = expectedProjects
             };
 
@@ -538,8 +520,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
                                     </Project>
                                   </Projects>
                                 </eaw-ci:BuildConfiguration>", false)]
-        public void GivenConfig__TestIsValidConfiguration__IsExpected(string xmlContent, bool expected)
-        {
+        public void GivenConfig__TestIsValidConfiguration__IsExpected(string xmlContent, bool expected) {
             _mockFileData.TextContents = xmlContent;
             var sut = new BuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(Path);
@@ -547,16 +528,14 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse()
-        {
+        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse() {
             var sut = new BuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(null);
             Assert.IsFalse(actual);
         }
 
         [TestMethod]
-        public void GivenEmptyConfig__TestIsValidConfiguration__ReturnsFalse()
-        {
+        public void GivenEmptyConfig__TestIsValidConfiguration__ReturnsFalse() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>";
             _mockFileData.TextContents = xml;
             var sut = new BuildConfigParser(_fileSystem, null);
@@ -567,8 +546,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void
-            GivenProjectWithJobAndTaskReferenceToNonExistingGlobalTask__WhenCallingParse__ShouldThrowInvalidOperationException()
-        {
+            GivenProjectWithJobAndTaskReferenceToNonExistingGlobalTask__WhenCallingParse__ShouldThrowInvalidOperationException() {
             const string xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
                                 <eaw-ci:BuildConfiguration
                                   ConfigVersion=""1.0.0"" 
@@ -599,20 +577,17 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
 
-        private static void AssertJobHasExpectedTask(JobStub jobStub, ITask element)
-        {
+        private static void AssertJobHasExpectedTask(JobStub jobStub, ITask element) {
             CollectionAssert.Contains(jobStub.Tasks, element,
                 "Should Job should have expected task, but does not.");
         }
 
-        private static void AssertProjectNameEquals(string projectName, string actualName)
-        {
+        private static void AssertProjectNameEquals(string projectName, string actualName) {
             Assert.AreEqual(projectName, actualName,
                 $"Should return Project with name {projectName}, but was {actualName}");
         }
 
-        private static void AssertJobNameEquals(string jobName, IJob actualJob)
-        {
+        private static void AssertJobNameEquals(string jobName, IJob actualJob) {
             Assert.AreEqual(jobName, actualJob.Name, $"Job name should be {jobName}, but was {actualJob.Name}");
         }
     }

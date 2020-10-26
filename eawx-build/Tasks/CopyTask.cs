@@ -21,6 +21,9 @@ namespace EawXBuild.Tasks {
         public string FilePattern { get; set; }
         public bool AlwaysOverwrite { get; set; }
 
+        public string Id { get; set; }
+        public string Name { get; set; }
+
         public void Run() {
             CheckRelativePaths();
 

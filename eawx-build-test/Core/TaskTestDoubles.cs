@@ -2,8 +2,10 @@ using EawXBuild.Core;
 
 namespace EawXBuildTest.Core {
     public class TaskDummy : ITask {
-        public virtual void Run() {
-        }
+        public string Id { get; set; }
+        public string Name { get; set; }
+
+        public virtual void Run() { }
     }
 
     public class TaskSpy : TaskDummy {
