@@ -42,17 +42,31 @@ namespace EawXBuild
         private ExitCode RunInternal(RunOptions runOptions)
         {
             _logger?.LogInformation("Running application in RUN mode.");
+            IIOService ioService = Services.GetService<IIOService>();
+            IBuildConfigParser buildConfigParser = null;
             if (runOptions.BackendXml)
             {
-                return RunBackendXmlInternal(runOptions);
+                buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
             }
-
-            if (runOptions.BackendLua)
+            else
             {
-                return RunBackendLuaInternal(runOptions);
+                if (runOptions.BackendLua)
+                {
+                    buildConfigParser = GetLuaBuildConfigParserInternal();
+                }
             }
 
-            return ExitCode.ExUsage;
+            if (buildConfigParser == null)
+            {
+                return ExitCode.ExUsage;
+            }
+
+            return !TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath,
+                buildConfigParser.ConfiguredFileExtension,
+                out string path,
+                out ExitCode exitCode)
+                ? exitCode
+                : ExecRunInternal(runOptions, buildConfigParser, path);
         }
 
         private static bool TryExtractAndValidatePathInternal(IIOService ioService, string pathIn, string fileExtension,
@@ -71,32 +85,6 @@ namespace EawXBuild
                 ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension);
             exitCode = ExitCode.Success;
             return true;
-        }
-
-        private ExitCode RunBackendLuaInternal(RunOptions runOptions)
-        {
-            IIOService ioService = Services.GetService<IIOService>();
-            if (!TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath, ".lua", out string path,
-                out ExitCode exitCode))
-            {
-                return exitCode;
-            }
-
-            IBuildConfigParser buildConfigParser = GetLuaBuildConfigParserInternal(ioService);
-            return ExecRunInternal(runOptions, buildConfigParser, path);
-        }
-
-        private ExitCode RunBackendXmlInternal(RunOptions runOptions)
-        {
-            IIOService ioService = Services.GetService<IIOService>();
-            if (!TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath, ".xml", out string path,
-                out ExitCode exitCode))
-            {
-                return exitCode;
-            }
-
-            IBuildConfigParser buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
-            return ExecRunInternal(runOptions, buildConfigParser, path);
         }
 
         private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string path)
@@ -169,7 +157,7 @@ namespace EawXBuild
                 Services.GetRequiredService<ILoggerFactory>().CreateLogger<XmlBuildConfigParser>());
         }
 
-        private LuaBuildConfigParser GetLuaBuildConfigParserInternal(IIOService ioService)
+        private LuaBuildConfigParser GetLuaBuildConfigParserInternal()
         {
             return new LuaBuildConfigParser(
                 Services.GetService<ILuaParser>(), Services.GetService<IBuildComponentFactory>());
@@ -189,14 +177,16 @@ namespace EawXBuild
             else
             {
                 fileExtension = ".lua";
-                buildConfigParser = GetLuaBuildConfigParserInternal(ioService);
+                buildConfigParser = GetLuaBuildConfigParserInternal();
             }
 
-            if (!TryExtractAndValidatePathInternal(ioService, validateOptions.ConfigPath, fileExtension, out string path,
+            if (!TryExtractAndValidatePathInternal(ioService, validateOptions.ConfigPath, fileExtension,
+                out string path,
                 out ExitCode exitCode))
             {
                 return exitCode;
             }
+
             return buildConfigParser.TestIsValidConfiguration(path) ? ExitCode.Success : ExitCode.ExConfig;
         }
     }

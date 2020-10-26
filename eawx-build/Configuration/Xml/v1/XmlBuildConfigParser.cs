@@ -35,6 +35,8 @@ namespace EawXBuild.Configuration.Xml.v1
 </eaw-ci:BuildConfiguration>";
 
         private const ConfigVersion CONFIG_VERSION = ConfigVersion.V1;
+        private const string FILE_EXTENSION = ".xml";
+
         [NotNull] private readonly IFileSystem _fileSystem;
         [NotNull] private readonly IBuildComponentFactory _factory;
         private readonly ILogger<XmlBuildConfigParser> _logger;
@@ -116,6 +118,7 @@ namespace EawXBuild.Configuration.Xml.v1
         }
 
         public ConfigVersion Version => CONFIG_VERSION;
+        public string ConfiguredFileExtension => FILE_EXTENSION;
         public string DefaultXml => DEFAULT_XML;
 
         private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject)
