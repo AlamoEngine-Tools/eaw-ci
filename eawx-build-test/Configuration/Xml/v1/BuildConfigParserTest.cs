@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Xml.Schema;
-using EawXBuild.Configuration.v1;
 using EawXBuild.Configuration.Xml.v1;
 using EawXBuild.Core;
-using EawXBuild.Exceptions;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.v1
+namespace EawXBuildTest.Configuration.Xml.v1
 {
     [TestClass]
     public class BuildConfigParserTest
