@@ -14,6 +14,12 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
 
         public ITaskBuilder With(string name, object value) {
             switch (name) {
+                case "Id":
+                    _runProcessTask.Id = (string) value;
+                    break;
+                case "Name":
+                    _runProcessTask.Name = (string) value;
+                    break;
                 case "ExecutablePath":
                     _runProcessTask.ExecutablePath = (string) value;
                     break;

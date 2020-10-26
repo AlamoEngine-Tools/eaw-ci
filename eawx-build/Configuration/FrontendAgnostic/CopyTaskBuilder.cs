@@ -13,6 +13,12 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
 
         public ITaskBuilder With(string name, object value) {
             switch (name) {
+                case "Id":
+                    _copyTask.Id = (string) value;
+                    break;
+                case "Name":
+                    _copyTask.Name = (string) value;
+                    break;
                 case "CopyFromPath":
                     _copyTask.Source = (string) value;
                     break;
