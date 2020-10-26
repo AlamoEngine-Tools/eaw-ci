@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace EawXBuildTest.Core {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
-        public async System.Threading.Tasks.Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob() {
+        public async Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob() {
             var jobSpy = MakeJobSpy("job");
             _sut.AddJob(jobSpy);
 
@@ -30,7 +29,23 @@ namespace EawXBuildTest.Core {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
-        public async System.Threading.Tasks.Task
+        public async Task GivenProjectWithJob__WhenCallingRunWithJobName__ShouldLogRunningJob() {
+            var builder = new StringBuilder();
+            Console.SetOut(new StringWriter(builder));
+
+            const string jobName = "My_Awesome_Job";
+            var jobSpy = MakeJobSpy(jobName);
+            _sut.AddJob(jobSpy);
+
+            await _sut.RunJobAsync(jobName);
+
+            var actual = builder.ToString();
+            Assert.AreEqual($"Running job {jobName}" + Environment.NewLine, actual);
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public async Task
             GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName() {
             var otherJob = MakeJobSpy("other");
             _sut.AddJob(otherJob);
@@ -83,13 +98,13 @@ namespace EawXBuildTest.Core {
         }
 
         private static void AssertJobWasRun(JobSpy jobSpy) {
-            Assert.IsNotNull(jobSpy != null, nameof(jobSpy) + " != null");
+            Assert.IsNotNull(jobSpy, nameof(jobSpy) + " != null");
             Assert.IsTrue(jobSpy.WasRun, $"Job {jobSpy.Name} should have been run, but wasn't.");
         }
 
-        private static void AssertJobWasNotRun(JobSpy otherJob) {
-            Assert.IsNotNull(otherJob != null, nameof(otherJob) + " != null");
-            Assert.IsFalse(otherJob.WasRun, $"Should not have run Job {otherJob.Name}, but did.");
+        private static void AssertJobWasNotRun(JobSpy jobSpy) {
+            Assert.IsNotNull(jobSpy, nameof(jobSpy) + " != null");
+            Assert.IsFalse(jobSpy.WasRun, $"Should not have run Job {jobSpy.Name}, but did.");
         }
     }
 }

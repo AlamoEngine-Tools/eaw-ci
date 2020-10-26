@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EawXBuild.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace EawXBuild.Core {
     public class Project : IProject {
@@ -21,6 +23,7 @@ namespace EawXBuild.Core {
             if (job == null)
                 throw new JobNotFoundException(jobName);
 
+            Console.WriteLine($"Running job {job.Name}");
             return Task.Run(() => job.Run());
         }
 

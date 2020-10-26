@@ -12,7 +12,11 @@ namespace EawXBuild.Core {
         public string Name { get; }
 
         public void Run() {
-            foreach (var task in _tasks) task.Run();
+            for (var index = 0; index < _tasks.Count; index++) {
+                var task = _tasks[index];
+                Console.WriteLine($"Launching task {task.Name ?? index.ToString()}");
+                task.Run();
+            }
         }
 
         public void AddTask(ITask task) {
