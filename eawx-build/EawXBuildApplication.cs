@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EawXBuild.Configuration;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
-using EawXBuild.Configuration.v1;
 using EawXBuild.Configuration.Xml.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
@@ -50,6 +48,7 @@ namespace EawXBuild
                 return ioService.ValidatePath(runOptions.ConfigPath,
                     ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             }
+
             string path = ioService.ResolvePath(runOptions.ConfigPath,
                 ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
@@ -94,7 +93,8 @@ namespace EawXBuild
             foreach (Task task in tasks.Where(task => null != task.Exception))
             {
                 errCount += 1;
-                _logger?.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ", task.Exception);
+                _logger?.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ",
+                    task.Exception);
             }
 
             if (errCount == 0)
@@ -123,6 +123,7 @@ namespace EawXBuild
                 return ioService.ValidatePath(opt.ConfigPath,
                     ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             }
+
             string path = ioService.ResolvePath(opt.ConfigPath,
                 ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
             IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
