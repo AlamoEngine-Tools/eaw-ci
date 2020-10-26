@@ -15,6 +15,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         private const string FilePattern = "*.xml";
         private const bool AlwaysOverwrite = true;
 
+        private const string TaskId = "TaskId";
+        private const string TaskName = "TaskName";
+
         [TestMethod]
         public void
             GivenSourcePathDestPathRecursiveAndFilePattern__WhenCallingBuild__ShouldReturnCopyTaskWithMatchingConfig() {
@@ -22,8 +25,10 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
             ConfigureTask(sut);
 
-            CopyTask task = (CopyTask) sut.Build();
+            var task = (CopyTask) sut.Build();
 
+            Assert.AreEqual(TaskId, task.Id);
+            Assert.AreEqual(TaskName, task.Name);
             Assert.AreEqual(TheSourcePath, task.Source);
             Assert.AreEqual(TheDestPath, task.Destination);
             Assert.AreEqual(FilePattern, task.FilePattern);
@@ -41,7 +46,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             var sut = new CopyTaskBuilder(copyPolicySpy, fileSystem);
 
             ConfigureTask(sut);
-            CopyTask task = (CopyTask) sut.Build();
+            var task = (CopyTask) sut.Build();
 
             task.Run();
 
@@ -49,7 +54,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         }
 
         private static void ConfigureTask(CopyTaskBuilder sut) {
-            sut.With("CopyFromPath", TheSourcePath)
+            sut.With("Id", TaskId)
+                .With("Name", TaskName)
+                .With("CopyFromPath", TheSourcePath)
                 .With("CopyToPath", TheDestPath)
                 .With("CopySubfolders", Recursive)
                 .With("CopyFileByPattern", FilePattern)

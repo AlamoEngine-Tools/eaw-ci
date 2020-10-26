@@ -12,8 +12,20 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
         }
 
         public ITaskBuilder With(string name, object value) {
-            if (!name.Equals("Path")) throw new InvalidOperationException($"Invalid configuration option: {name}");
-            _cleanTask.Path = (string) value;
+            switch (name) {
+                case "Id":
+                    _cleanTask.Id = (string) value;
+                    break;
+                case "Name":
+                    _cleanTask.Name = (string) value;
+                    break;
+                case "Path":
+                    _cleanTask.Path = (string) value;
+                    break;
+                default:
+                    throw new InvalidOperationException($"Invalid configuration option: {name}");
+            }
+
             return this;
         }
 

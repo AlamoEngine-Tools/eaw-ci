@@ -14,6 +14,9 @@ namespace EawXBuild.Tasks {
             _filesystem = filesystem ?? new FileSystem();
         }
 
+        public string Id { get; set; }
+        public string Name { get; set; }
+
         public void Run() {
             if (_filesystem.Path.IsPathRooted(ExecutablePath)) throw new NoRelativePathException(ExecutablePath);
             _runner.Start(new ProcessStartInfo {
