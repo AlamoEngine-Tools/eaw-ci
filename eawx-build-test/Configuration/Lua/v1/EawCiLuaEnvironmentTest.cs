@@ -1,6 +1,8 @@
 using EawXBuild.Configuration.Lua.v1;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLua;
+using static EawXBuildTest.Configuration.Lua.v1.NLuaUtilities;
 
 namespace EawXBuildTest.Configuration.Lua.v1 {
     [TestClass]
@@ -75,6 +77,30 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var actual = sut.RunProcess(string.Empty);
             
             Assert.IsInstanceOfType(actual, typeof(LuaRunProcessTask));
+        }
+        
+        [TestMethod]
+        public void WhenCallingCreateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithCreateWorkshopItemTaskName() {
+            var factorySpy = new BuildComponentFactorySpy();
+            var sut = new EawCiLuaEnvironment(factorySpy);
+
+            using var luaInterpreter = new NLua.Lua();
+            var table = MakeLuaTable(luaInterpreter, "the_table");
+            sut.CreateSteamWorkshopItem(table);
+
+            Assert.AreSame("CreateSteamWorkshopItem", factorySpy.ActualTaskTypeName);
+        }
+        
+        [TestMethod]
+        public void WhenCallingCreateSteamWorkshopItem__ShouldReturnLuaCreateSteamWorkshopItemTask() {
+            var factorySpy = new BuildComponentFactorySpy();
+            var sut = new EawCiLuaEnvironment(factorySpy);
+            
+            using var luaInterpreter = new NLua.Lua();
+            var table = MakeLuaTable(luaInterpreter, "the_table");
+            var actual = sut.CreateSteamWorkshopItem(table);
+            
+            Assert.IsInstanceOfType(actual, typeof(LuaCreateSteamWorkshopItemTask));
         }
 
     }

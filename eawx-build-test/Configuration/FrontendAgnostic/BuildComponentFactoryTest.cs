@@ -1,6 +1,7 @@
 using System;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Core;
+using EawXBuild.Steam;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Configuration.FrontendAgnostic {
@@ -59,6 +60,15 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             var taskBuilder = sut.Task("SoftCopy");
             
             Assert.IsInstanceOfType(taskBuilder, typeof(CopyTaskBuilder));
+        }
+        
+        [TestMethod]
+        public void BuildComponentFactory__WhenCallingTaskWith_CreateSteamWorkshopItem__ShouldReturnCopyTaskBuilder() {
+            var sut = new BuildComponentFactory();
+
+            var taskBuilder = sut.Task("CreateSteamWorkshopItem");
+            
+            Assert.IsInstanceOfType(taskBuilder, typeof(CreateSteamWorkshopItemTaskBuilder));
         }
         
         [TestMethod]
