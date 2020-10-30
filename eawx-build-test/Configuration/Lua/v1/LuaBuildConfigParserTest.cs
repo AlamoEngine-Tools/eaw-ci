@@ -3,6 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
+using EawXBuild.Steam;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -228,6 +229,37 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"AllowedToFail", true}
             });
 
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            taskBuilderMock.Verify();
+        }
+
+        [TestMethod]
+        public void GivenConfigWithCreateSteamWorkshopItemTask__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description = 'My description',
+                    item_folder = 'path/to/folder',
+                    visibility = 'private',
+                    language = 'English'
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+                {"AppId", 32470},
+                {"Title", "my-test-item"},
+                {"Description", "My description"},
+                {"ItemFolderPath", "path/to/folder"},
+                {"Visibility", "Private"},
+                {"Language", "English"},
+            });
+            
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 

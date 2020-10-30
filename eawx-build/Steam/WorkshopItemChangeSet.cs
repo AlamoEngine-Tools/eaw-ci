@@ -1,4 +1,4 @@
-using System.IO;
+using System.IO.Abstractions;
 
 namespace EawXBuild.Steam
 {
@@ -10,7 +10,7 @@ namespace EawXBuild.Steam
         
         public string Description { get; set; }
         
-        public DirectoryInfo Content { get; set; }
+        public IDirectoryInfo ItemFolder { get; set; }
         
         public WorkshopItemVisibility Visibility { get; set; }
     }

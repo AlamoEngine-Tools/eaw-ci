@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using EawXBuild.Core;
 using EawXBuild.Native;
 using EawXBuild.Tasks;
@@ -8,6 +9,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
     internal enum Tasks {
         Clean,
         Copy,
+        CreateSteamWorkshopItem,
         RunProgram,
         SoftCopy
     }
@@ -35,6 +37,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
                 Tasks.Clean => new CleanTaskBuilder(),
                 Tasks.Copy => new CopyTaskBuilder(new CopyPolicy()),
                 Tasks.SoftCopy => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
+                Tasks.CreateSteamWorkshopItem => new CreateSteamWorkshopItemTaskBuilder(),
                 _ => null
             };
         }
