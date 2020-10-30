@@ -6,11 +6,10 @@ using EawXBuild.Steam.Facepunch.Adapters;
 
 namespace EawXBuild.Configuration.FrontendAgnostic {
     public class CreateSteamWorkshopItemTaskBuilder : ITaskBuilder {
-        private readonly ISteamWorkshop _steamWorkshop = new SteamWorkshop();
         private readonly CreateSteamWorkshopItemTask _task;
 
         public CreateSteamWorkshopItemTaskBuilder() {
-            _task = new CreateSteamWorkshopItemTask(_steamWorkshop, new FileSystem());
+            _task = new CreateSteamWorkshopItemTask(SteamWorkshop.Instance, new FileSystem());
         }
 
         public ITaskBuilder With(string name, object value) {
