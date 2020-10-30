@@ -17,12 +17,12 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
         public uint AppId {
             get => _appId;
             set {
-                LaunchSteamClient(value);
+                RestartSteamClient(value);
                 _appId = value;
             }
         }
 
-        private void LaunchSteamClient(uint newAppId) {
+        private void RestartSteamClient(uint newAppId) {
             if (newAppId == _appId) return;
             if (_clientStarted)
                 SteamClient.Shutdown();
