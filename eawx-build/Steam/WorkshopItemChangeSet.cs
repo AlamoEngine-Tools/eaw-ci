@@ -13,5 +13,13 @@ namespace EawXBuild.Steam
         public IDirectoryInfo ItemFolder { get; set; }
         
         public WorkshopItemVisibility Visibility { get; set; }
+
+        public override string ToString() {
+            return Title
+                   + "\n" + Description
+                   + "\n" + Language
+                   + "\n" + ItemFolder.FullName
+                   + "\n" + Visibility;
+        }
     }
 }

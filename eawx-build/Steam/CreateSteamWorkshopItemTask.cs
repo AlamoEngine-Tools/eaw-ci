@@ -27,7 +27,7 @@ namespace EawXBuild.Steam {
             _workshop.AppId = AppId;
             var taskResult = _workshop.PublishNewWorkshopItemAsync(MakeWorkshopSettings());
             Task.WaitAll(taskResult);
-            if (taskResult.Result is PublishResult.Failed)
+            if (taskResult.Result.Result is PublishResult.Failed)
                 throw new ProcessFailedException("Failed to publish to Steam Workshop");
         }
 

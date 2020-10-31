@@ -6,7 +6,7 @@ namespace EawXBuild.Steam
     {
         uint AppId { get; set; }
 
-        Task<PublishResult> PublishNewWorkshopItemAsync(WorkshopItemChangeSet settings);
+        Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(WorkshopItemChangeSet settings);
 
         Task<IWorkshopItem> QueryWorkshopItemByIdAsync(ulong id);
     }
