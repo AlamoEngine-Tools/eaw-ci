@@ -28,7 +28,11 @@ namespace EawXBuild
             //     .WithParsed<ValidateOptions>(ExecInternal)
             //     .WithNotParsed(HandleParseErrorsInternal);
 
-
+            var _steamAppIdFile = new FileInfo("steam_appid.txt");
+            var streamWriter = _steamAppIdFile.AppendText();
+            streamWriter.WriteLine("32470");
+            streamWriter.Close();
+            
             SteamClient.Init(32470);
 
             var dir = new DirectoryInfo("./test");
@@ -44,7 +48,7 @@ namespace EawXBuild
                 .ForAppId(32470)
                 .WithTitle("Empire at War Expanded: The automatically released version")
                 .WithContent(dir)
-                .SubmitAsync();
+                .SubmitAsync(new Progress<float>());
 
             Task.WaitAll(submitAsync);
 
@@ -56,6 +60,7 @@ namespace EawXBuild
             
             dir.Delete(true);
             SteamClient.Shutdown();
+            _steamAppIdFile.Delete();
         }
 
         private static void ExecInternal(IOptions opts)

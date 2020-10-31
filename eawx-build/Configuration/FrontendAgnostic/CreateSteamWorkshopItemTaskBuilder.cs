@@ -9,7 +9,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
         private readonly CreateSteamWorkshopItemTask _task;
 
         public CreateSteamWorkshopItemTaskBuilder() {
-            _task = new CreateSteamWorkshopItemTask(SteamWorkshop.Instance, new FileSystem());
+            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance, new FileSystem());
         }
 
         public ITaskBuilder With(string name, object value) {
