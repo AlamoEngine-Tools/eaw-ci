@@ -20,8 +20,8 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
                 case "Title":
                     _task.Title = (string) value;
                     break;
-                case "Description":
-                    _task.Description = (string) value;
+                case "DescriptionFilePath":
+                    _task.DescriptionFilePath = (string) value;
                     break;
                 case "ItemFolderPath":
                     _task.ItemFolderPath = (string) value;

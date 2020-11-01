@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EawXBuild.Steam;
 using EawXBuild.Steam.Facepunch.Adapters;
@@ -16,11 +17,18 @@ namespace EawXBuildTest.Steam {
     }
 
     public class SteamWorkshopStub : SteamWorkshopDummy {
-        public PublishResult Result { get; set; } = PublishResult.Ok;
 
+        public WorkshopItemPublishResult WorkshopItemPublishResult { get; set; }
+
+        public Dictionary<ulong, IWorkshopItem> WorkshopItemsById { get; } = new Dictionary<ulong, IWorkshopItem>();
+        
         public override async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(
             WorkshopItemChangeSet settings) {
-            return new WorkshopItemPublishResult(0, Result);
+            return WorkshopItemPublishResult;
+        }
+        
+        public override Task<IWorkshopItem> QueryWorkshopItemByIdAsync(ulong id) {
+            return Task.FromResult(WorkshopItemsById[id]);
         }
     }
 
@@ -46,7 +54,7 @@ namespace EawXBuildTest.Steam {
             await Task.CompletedTask;
             CallOrder += "p";
 
-            return new WorkshopItemPublishResult(0, Result);
+            return WorkshopItemPublishResult;
         }
 
         public override async Task<IWorkshopItem> QueryWorkshopItemByIdAsync(ulong id) {

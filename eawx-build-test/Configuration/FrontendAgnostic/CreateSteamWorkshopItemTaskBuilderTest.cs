@@ -8,7 +8,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
     public class CreateSteamWorkshopItemTaskBuilderTest {
         private const uint AppId = 32470;
         private const string Title = "My title";
-        private const string Description = "The description";
+        private const string DescriptionFilePath = "path/to/description";
         private const string ItemFolderPath = "path/to/item";
         private const string PublicVisibility = "Public";
         private const string PrivateVisibility = "Private";
@@ -21,7 +21,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             var actual = (CreateSteamWorkshopItemTask) sut
                 .With("AppId", AppId)
                 .With("Title", Title)
-                .With("Description", Description)
+                .With("DescriptionFilePath", DescriptionFilePath)
                 .With("ItemFolderPath", ItemFolderPath)
                 .With("Visibility", PublicVisibility)
                 .With("Language", Language)
@@ -29,7 +29,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
             Assert.AreEqual(AppId, actual.AppId);
             Assert.AreEqual(Title, actual.Title);
-            Assert.AreEqual(Description, actual.Description);
+            Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
             Assert.AreEqual(ItemFolderPath, actual.ItemFolderPath);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
             Assert.AreEqual(Language, actual.Language);

@@ -18,7 +18,7 @@ namespace EawXBuild.Steam {
         public uint AppId { get; set; }
         public string Title { get; set; }
         public string ItemFolderPath { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string DescriptionFilePath { get; set; }
         public string Language { get; set; } = "English";
         public WorkshopItemVisibility Visibility { get; set; } = WorkshopItemVisibility.Private;
 
@@ -42,11 +42,23 @@ namespace EawXBuild.Steam {
         private WorkshopItemChangeSet MakeWorkshopSettings() {
             return new WorkshopItemChangeSet {
                 Title = Title,
-                Description = Description,
+                Description = GetDescriptionFromFile(),
                 ItemFolder = _fileSystem.DirectoryInfo.FromDirectoryName(ItemFolderPath),
                 Visibility = Visibility,
                 Language = Language
             };
+        }
+
+        private string GetDescriptionFromFile() {
+            var description = string.Empty;
+            if (string.IsNullOrEmpty(DescriptionFilePath)) return description;
+            
+            var descriptionFile = _fileSystem.FileInfo.FromFileName(DescriptionFilePath);
+            if (!descriptionFile.Exists) return description;
+            
+            using var reader = descriptionFile.OpenText();
+            description = reader.ReadToEnd();
+            return description;
         }
     }
 }

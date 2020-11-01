@@ -234,6 +234,32 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
+        
+        [TestMethod]
+        public void GivenConfigWithProjectWithJobAndCreateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = 'private',
+                    language = 'English'
+                })  
+            ";
+            _mockFileData.TextContents = lua;
+
+            var jobStub = new JobStub();
+            var taskDummy = new TaskDummy();
+            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+
+            MakeSutAndParse(factoryStub);
+
+            var actualTask = jobStub.Tasks.First();
+            Assert.AreEqual(taskDummy, actualTask);
+        }
 
         [TestMethod]
         public void GivenConfigWithCreateSteamWorkshopItemTask__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
@@ -243,7 +269,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 j:add_task(create_steam_workshop_item {
                     app_id = 32470,
                     title = 'my-test-item',
-                    description = 'My description',
+                    description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
                     visibility = 'private',
                     language = 'English'
@@ -254,7 +280,66 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
                 {"AppId", 32470},
                 {"Title", "my-test-item"},
-                {"Description", "My description"},
+                {"DescriptionFilePath", "path/to/description"},
+                {"ItemFolderPath", "path/to/folder"},
+                {"Visibility", "Private"},
+                {"Language", "English"},
+            });
+            
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            taskBuilderMock.Verify();
+        }
+        
+        [TestMethod]
+        public void GivenConfigWithProjectWithJobAndUpdateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = 'private',
+                    language = 'English'
+                })  
+            ";
+            _mockFileData.TextContents = lua;
+
+            var jobStub = new JobStub();
+            var taskDummy = new TaskDummy();
+            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+
+            MakeSutAndParse(factoryStub);
+
+            var actualTask = jobStub.Tasks.First();
+            Assert.AreEqual(taskDummy, actualTask);
+        }
+
+        [TestMethod]
+        public void GivenConfigWithUpdateSteamWorkshopItemTask__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    item_id = 1234,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = 'private',
+                    language = 'English'
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+                {"AppId", 32470},
+                {"ItemId", 1234},
+                {"Title", "my-test-item"},
+                {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
                 {"Visibility", "Private"},
                 {"Language", "English"},

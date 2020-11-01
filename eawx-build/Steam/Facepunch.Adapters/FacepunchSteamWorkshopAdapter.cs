@@ -1,4 +1,4 @@
-using System;
+#nullable enable
 using System.IO;
 using System.Threading.Tasks;
 using Steamworks;
@@ -41,13 +41,12 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             return new WorkshopItemPublishResult(submitResult.FileId, publishResult);
         }
 
-        public async Task<IWorkshopItem> QueryWorkshopItemByIdAsync(ulong id) {
+        public async Task<IWorkshopItem?> QueryWorkshopItemByIdAsync(ulong id) {
+            RestartSteamClient(AppId);
             var result = await Item.GetAsync(id);
+            ShutdownSteamClient();
 
-            if (!result.HasValue)
-                throw new WorkshopItemNotFoundException();
-
-            return new WorkshopItem(result.Value);
+            return !result.HasValue ? null : new WorkshopItem(result.Value, AppId);
         }
 
         private void ShutdownSteamClient() {
