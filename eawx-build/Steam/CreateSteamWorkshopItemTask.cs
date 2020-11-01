@@ -16,49 +16,44 @@ namespace EawXBuild.Steam {
         }
 
         public uint AppId { get; set; }
-        public string Title { get; set; }
-        public string ItemFolderPath { get; set; }
-        public string DescriptionFilePath { get; set; }
-        public string Language { get; set; } = "English";
-        public WorkshopItemVisibility Visibility { get; set; } = WorkshopItemVisibility.Private;
+        public WorkshopItemChangeSet ChangeSet { get; set; }
 
         public void Run() {
             ValidateSettings();
             _workshop.AppId = AppId;
-            var taskResult = _workshop.PublishNewWorkshopItemAsync(MakeWorkshopSettings());
+            var taskResult = _workshop.PublishNewWorkshopItemAsync(ChangeSet);
             Task.WaitAll(taskResult);
             if (taskResult.Result.Result is PublishResult.Failed)
                 throw new ProcessFailedException("Failed to publish to Steam Workshop");
         }
 
         private void ValidateSettings() {
+            ValidateAppId();
+            ValidateChangeSet();
+            ValidateItemFolderPath();
+            ValidateDescriptionFilePath();
+        }
+
+        private void ValidateAppId() {
             if (AppId == 0) throw new InvalidOperationException("No AppId set");
-            if (string.IsNullOrEmpty(Title)) throw new InvalidOperationException("Workshop item has no title");
-            if (_fileSystem.Path.IsPathRooted(ItemFolderPath)) throw new NoRelativePathException(ItemFolderPath);
-            if (!_fileSystem.Directory.Exists(ItemFolderPath))
+        }
+
+        private void ValidateChangeSet() {
+            if (ChangeSet == null) throw new InvalidOperationException("No change set given");
+        }
+
+        private void ValidateItemFolderPath() {
+            if (_fileSystem.Path.IsPathRooted(ChangeSet.ItemFolderPath))
+                throw new NoRelativePathException(ChangeSet.ItemFolderPath);
+            if (!_fileSystem.Directory.Exists(ChangeSet.ItemFolderPath))
                 throw new DirectoryNotFoundException("Workshop item directory does not exist");
         }
 
-        private WorkshopItemChangeSet MakeWorkshopSettings() {
-            return new WorkshopItemChangeSet {
-                Title = Title,
-                Description = GetDescriptionFromFile(),
-                ItemFolder = _fileSystem.DirectoryInfo.FromDirectoryName(ItemFolderPath),
-                Visibility = Visibility,
-                Language = Language
-            };
-        }
-
-        private string GetDescriptionFromFile() {
-            var description = string.Empty;
-            if (string.IsNullOrEmpty(DescriptionFilePath)) return description;
-            
-            var descriptionFile = _fileSystem.FileInfo.FromFileName(DescriptionFilePath);
-            if (!descriptionFile.Exists) return description;
-            
-            using var reader = descriptionFile.OpenText();
-            description = reader.ReadToEnd();
-            return description;
+        private void ValidateDescriptionFilePath() {
+            if (_fileSystem.Path.IsPathRooted(ChangeSet.DescriptionFilePath))
+                throw new NoRelativePathException(ChangeSet.DescriptionFilePath);
+            if (!string.IsNullOrEmpty(ChangeSet.DescriptionFilePath) && !_fileSystem.File.Exists(ChangeSet.DescriptionFilePath))
+                throw new FileNotFoundException("Description file does not exist");
         }
     }
 }

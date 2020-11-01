@@ -30,8 +30,8 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             editor = EditorWithVisibility(settings.Visibility, ref editor)
                 .ForAppId(AppId)
                 .WithTitle(settings.Title)
-                .WithDescription(settings.Description)
-                .WithContent(new DirectoryInfo(settings.ItemFolder.FullName))
+                .WithDescription(settings.GetDescriptionTextFromFile())
+                .WithContent(new DirectoryInfo(settings.ItemFolderPath))
                 .InLanguage(settings.Language);
             
             var submitResult = await editor.SubmitAsync();

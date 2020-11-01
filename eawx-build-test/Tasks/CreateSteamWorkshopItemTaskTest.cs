@@ -31,23 +31,25 @@ namespace EawXBuildTest.Tasks {
 
             var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
-                AppId = AppId, Title = Title,
-                DescriptionFilePath = DescriptionFilePath,
-                ItemFolderPath = ExpectedDirectoryName,
-                Language = Language,
-                Visibility = WorkshopItemVisibility.Public
+                AppId = AppId,
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = Title,
+                    DescriptionFilePath = DescriptionFilePath,
+                    ItemFolderPath = ExpectedDirectoryName,
+                    Language = Language,
+                    Visibility = WorkshopItemVisibility.Public
+                }
             };
 
             sut.Run();
 
-            var expectedDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(ExpectedDirectoryName);
             var actual = workshopSpy.ReceivedSettings;
             Assert.AreEqual(AppId, workshopSpy.AppId);
             Assert.AreEqual(Title, actual.Title);
-            Assert.AreEqual(Description, actual.Description);
+            Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
             Assert.AreEqual(Language, actual.Language);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
-            Assert.AreEqual(expectedDirectory.FullName, actual.ItemFolder.FullName);
+            Assert.AreEqual(ExpectedDirectoryName, actual.ItemFolderPath);
         }
 
         [TestMethod]
@@ -58,8 +60,10 @@ namespace EawXBuildTest.Tasks {
             var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
                 AppId = AppId,
-                Title = Title,
-                ItemFolderPath = ExpectedDirectoryName
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = Title,
+                    ItemFolderPath = ExpectedDirectoryName
+                }
             };
 
             sut.Run();
@@ -76,8 +80,10 @@ namespace EawXBuildTest.Tasks {
             var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
                 AppId = AppId,
-                Title = Title,
-                ItemFolderPath = ExpectedDirectoryName
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = Title,
+                    ItemFolderPath = ExpectedDirectoryName
+                }
             };
 
             sut.Run();
@@ -94,8 +100,10 @@ namespace EawXBuildTest.Tasks {
                 {WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)};
             var sut = new CreateSteamWorkshopItemTask(workshopStub, _fileSystem) {
                 AppId = AppId,
-                Title = Title,
-                ItemFolderPath = ExpectedDirectoryName
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = Title,
+                    ItemFolderPath = ExpectedDirectoryName
+                }
             };
 
             sut.Run();
@@ -112,13 +120,13 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
-        public void GivenTaskWithoutTitle__WhenRunningTask__ShouldThrowException() {
+        public void GivenTaskWithoutChangeSet__WhenRunningTask__ShouldThrowException() {
             var workshop = new SteamWorkshopDummy();
             var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem) {AppId = AppId};
 
             var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
-            Assert.AreEqual("Workshop item has no title", actual.Message);
+            Assert.AreEqual("No change set given", actual.Message);
         }
 
         [TestMethod]
@@ -126,8 +134,13 @@ namespace EawXBuildTest.Tasks {
             _fileSystem.AddFile("path/to/file", new MockFileData(string.Empty));
 
             var workshop = new SteamWorkshopDummy();
-            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem)
-                {AppId = AppId, Title = "Title", ItemFolderPath = "path/to/file"};
+            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem) {
+                AppId = AppId,
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = "Title",
+                    ItemFolderPath = "path/to/file"
+                }
+            };
 
             var actual = Assert.ThrowsException<DirectoryNotFoundException>(() => sut.Run());
 
@@ -139,8 +152,49 @@ namespace EawXBuildTest.Tasks {
         public void GivenTaskWithNonRelativeItemPath__WhenRunningTask__ShouldThrowException() {
             var workshop = new SteamWorkshopDummy();
 
-            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem)
-                {AppId = AppId, Title = "Title", ItemFolderPath = "/absolute/path/to/file"};
+            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem) {
+                AppId = AppId,
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = "Title",
+                    ItemFolderPath = "/absolute/path/to/file"
+                }
+            };
+
+            sut.Run();
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(NoRelativePathException))]
+        public void GivenTaskWithNonRelativeDescriptionFilePath__WhenRunningTask__ShouldThrowException() {
+            _fileSystem.AddDirectory("path/to/item");
+            var workshop = new SteamWorkshopDummy();
+
+            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem) {
+                AppId = AppId,
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = "Title",
+                    ItemFolderPath = "path/to/item",
+                    DescriptionFilePath = "/absolute/path/to/description"
+                }
+            };
+
+            sut.Run();
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(FileNotFoundException))]
+        public void GivenTaskWithNonExistingDescriptionFilePath__WhenRunningTask__ShouldThrowException() {
+            _fileSystem.AddDirectory("path/to/item");
+            var workshop = new SteamWorkshopDummy();
+
+            var sut = new CreateSteamWorkshopItemTask(workshop, _fileSystem) {
+                AppId = AppId,
+                ChangeSet = new WorkshopItemChangeSet(_fileSystem) {
+                    Title = "Title",
+                    ItemFolderPath = "path/to/item",
+                    DescriptionFilePath = "absolute/path/to/description"
+                }
+            };
 
             sut.Run();
         }
@@ -150,7 +204,6 @@ namespace EawXBuildTest.Tasks {
         }
 
         private static void AssertPublishedWithDefaultSettings(WorkshopItemChangeSet actual) {
-            Assert.AreEqual(string.Empty, actual.Description);
             Assert.AreEqual("English", actual.Language);
             Assert.AreEqual(WorkshopItemVisibility.Private, actual.Visibility);
         }

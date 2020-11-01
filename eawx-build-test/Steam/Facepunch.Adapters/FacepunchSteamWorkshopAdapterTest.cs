@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 using EawXBuild.Steam;
 using EawXBuild.Steam.Facepunch.Adapters;
@@ -15,6 +16,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
     public class FacepunchSteamWorkshopAdapterTest {
         private const string SteamUploadPath = "my_steam_upload";
         private const string Title = "eaw-ci Test upload";
+        private const string DescriptionFilePath = "description.txt";
         private const string Description = "The description";
         private const string Language = "Spanish";
         private FileInfo _steamAppIdFile;
@@ -24,16 +26,23 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         public void SetUp() {
             var fileSystem = new FileSystem();
             CreateItemFolderWithSingleFile(fileSystem);
+            CreateDescriptionFile(fileSystem);
             _steamAppIdFile = new FileInfo("steam_appid.txt");
             var streamWriter = _steamAppIdFile.AppendText();
             streamWriter.WriteLine("32470");
             streamWriter.Close();
         }
 
+        private static void CreateDescriptionFile(FileSystem fileSystem) {
+            var writer = fileSystem.File.CreateText(DescriptionFilePath);
+            writer.WriteLine(Description);
+            writer.Close();
+        }
+
         private void CreateItemFolderWithSingleFile(FileSystem fileSystem) {
             _itemFolder = fileSystem.DirectoryInfo.FromDirectoryName(SteamUploadPath);
             _itemFolder.Create();
-            fileSystem.File.CreateText(_itemFolder.FullName + "/file.txt").Close();
+            fileSystem.File.CreateText(SteamUploadPath + "/file.txt").Close();
         }
 
         [TestCleanup]
@@ -47,12 +56,12 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         public async Task GivenWorkshopChangeSet__WhenPublishingToSteam__ItemShouldBeOnWorkshop() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
 
-            var changeSet = new WorkshopItemChangeSet {
+            var changeSet = new WorkshopItemChangeSet(new MockFileSystem()) {
                 Title = Title,
-                Description = Description,
+                DescriptionFilePath = DescriptionFilePath,
                 Language = Language,
                 Visibility = WorkshopItemVisibility.Private,
-                ItemFolder = _itemFolder
+                ItemFolderPath = SteamUploadPath
             };
             
             var sut = FacepunchSteamWorkshopAdapter.Instance;

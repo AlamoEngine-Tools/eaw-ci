@@ -7,9 +7,14 @@ using EawXBuild.Steam.Facepunch.Adapters;
 namespace EawXBuild.Configuration.FrontendAgnostic {
     public class CreateSteamWorkshopItemTaskBuilder : ITaskBuilder {
         private readonly CreateSteamWorkshopItemTask _task;
+        private WorkshopItemChangeSet _changeSet;
 
         public CreateSteamWorkshopItemTaskBuilder() {
-            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance, new FileSystem());
+            var fileSystem = new FileSystem();
+            _changeSet = new WorkshopItemChangeSet(fileSystem);
+            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance, fileSystem) {
+                ChangeSet = _changeSet
+            };
         }
 
         public ITaskBuilder With(string name, object value) {
@@ -18,20 +23,20 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
                     _task.AppId = (uint) value;
                     break;
                 case "Title":
-                    _task.Title = (string) value;
+                    _changeSet.Title = (string) value;
                     break;
                 case "DescriptionFilePath":
-                    _task.DescriptionFilePath = (string) value;
+                    _changeSet.DescriptionFilePath = (string) value;
                     break;
                 case "ItemFolderPath":
-                    _task.ItemFolderPath = (string) value;
+                    _changeSet.ItemFolderPath = (string) value;
                     break;
                 case "Language":
-                    _task.Language = (string) value;
+                    _changeSet.Language = (string) value;
                     break;
                 case "Visibility":
                     Enum.TryParse((string) value, out WorkshopItemVisibility visibility);
-                    _task.Visibility = visibility;
+                    _changeSet.Visibility = visibility;
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid configuration option: {name}");
