@@ -102,6 +102,30 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             
             Assert.IsInstanceOfType(actual, typeof(LuaCreateSteamWorkshopItemTask));
         }
+        
+        [TestMethod]
+        public void WhenCallingUpdateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithUpdateWorkshopItemTaskName() {
+            var factorySpy = new BuildComponentFactorySpy();
+            var sut = new EawCiLuaEnvironment(factorySpy);
+
+            using var luaInterpreter = new NLua.Lua();
+            var table = MakeLuaTable(luaInterpreter, "the_table");
+            sut.UpdateSteamWorkshopItem(table);
+
+            Assert.AreSame("UpdateSteamWorkshopItem", factorySpy.ActualTaskTypeName);
+        }
+        
+        [TestMethod]
+        public void WhenCallingUpdateSteamWorkshopItem__ShouldReturnLuaUpdateSteamWorkshopItemTask() {
+            var factorySpy = new BuildComponentFactorySpy();
+            var sut = new EawCiLuaEnvironment(factorySpy);
+            
+            using var luaInterpreter = new NLua.Lua();
+            var table = MakeLuaTable(luaInterpreter, "the_table");
+            var actual = sut.UpdateSteamWorkshopItem(table);
+            
+            Assert.IsInstanceOfType(actual, typeof(LuaUpdateSteamWorkshopItemTask));
+        }
 
     }
 }

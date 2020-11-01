@@ -11,8 +11,9 @@ namespace EawXBuildTest.Tasks {
     public class CreateSteamWorkshopItemTaskTest {
         private MockFileSystem _fileSystem;
 
-        private const string MyWorkshopItem = "My Workshop Item";
-        private const string TheDescription = "The description";
+        private const string Title = "My Workshop Item";
+        private const string Description = "The description";
+        private const string DescriptionFilePath = "path/to/description";
         private const string Language = "Spanish";
         private const string ExpectedDirectoryName = "path/to/directory";
         private const uint AppId = 32470;
@@ -26,11 +27,12 @@ namespace EawXBuildTest.Tasks {
         public void
             GivenTaskWithAppId_Title_Description_Language_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings() {
             _fileSystem.AddDirectory(ExpectedDirectoryName);
+            _fileSystem.AddFile(DescriptionFilePath, new MockFileData(Description));
 
-            var workshopSpy = new SteamWorkshopSpy();
+            var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
-                AppId = AppId, Title = MyWorkshopItem,
-                Description = TheDescription,
+                AppId = AppId, Title = Title,
+                DescriptionFilePath = DescriptionFilePath,
                 ItemFolderPath = ExpectedDirectoryName,
                 Language = Language,
                 Visibility = WorkshopItemVisibility.Public
@@ -41,8 +43,8 @@ namespace EawXBuildTest.Tasks {
             var expectedDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(ExpectedDirectoryName);
             var actual = workshopSpy.ReceivedSettings;
             Assert.AreEqual(AppId, workshopSpy.AppId);
-            Assert.AreEqual(MyWorkshopItem, actual.Title);
-            Assert.AreEqual(TheDescription, actual.Description);
+            Assert.AreEqual(Title, actual.Title);
+            Assert.AreEqual(Description, actual.Description);
             Assert.AreEqual(Language, actual.Language);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
             Assert.AreEqual(expectedDirectory.FullName, actual.ItemFolder.FullName);
@@ -53,10 +55,10 @@ namespace EawXBuildTest.Tasks {
             GivenConfiguredTaskWithoutLanguage_And_Visibility__WhenRunningTask__ShouldPublishWith_EmptyDescription_PrivateVisibility_And_EnglishLanguage() {
             _fileSystem.AddDirectory(ExpectedDirectoryName);
 
-            var workshopSpy = new SteamWorkshopSpy();
+            var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
                 AppId = AppId,
-                Title = MyWorkshopItem,
+                Title = Title,
                 ItemFolderPath = ExpectedDirectoryName
             };
 
@@ -71,10 +73,10 @@ namespace EawXBuildTest.Tasks {
             GivenTaskWithAppId_Title_And_Folder__WhenRunningTask__ShouldSetAppIdBeforePublishing() {
             _fileSystem.AddDirectory(ExpectedDirectoryName);
 
-            var workshopSpy = new SteamWorkshopSpy();
+            var workshopSpy = MakeSteamWorkshopSpy();
             var sut = new CreateSteamWorkshopItemTask(workshopSpy, _fileSystem) {
                 AppId = AppId,
-                Title = MyWorkshopItem,
+                Title = Title,
                 ItemFolderPath = ExpectedDirectoryName
             };
 
@@ -88,10 +90,11 @@ namespace EawXBuildTest.Tasks {
         public void GivenValidTask__WhenCallingRun_ButPublishFails__ShouldThrowProcessFailedException() {
             _fileSystem.AddDirectory(ExpectedDirectoryName);
 
-            var workshopStub = new SteamWorkshopStub {Result = PublishResult.Failed};
+            var workshopStub = new SteamWorkshopStub
+                {WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)};
             var sut = new CreateSteamWorkshopItemTask(workshopStub, _fileSystem) {
                 AppId = AppId,
-                Title = MyWorkshopItem,
+                Title = Title,
                 ItemFolderPath = ExpectedDirectoryName
             };
 
@@ -150,6 +153,12 @@ namespace EawXBuildTest.Tasks {
             Assert.AreEqual(string.Empty, actual.Description);
             Assert.AreEqual("English", actual.Language);
             Assert.AreEqual(WorkshopItemVisibility.Private, actual.Visibility);
+        }
+
+        private static SteamWorkshopSpy MakeSteamWorkshopSpy() {
+            return new SteamWorkshopSpy {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(1, PublishResult.Ok)
+            };
         }
     }
 }

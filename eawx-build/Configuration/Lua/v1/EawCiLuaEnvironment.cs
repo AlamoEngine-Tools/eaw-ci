@@ -44,5 +44,10 @@ namespace EawXBuild.Configuration.Lua.v1 {
         public ILuaTask CreateSteamWorkshopItem(LuaTable luaTable) {
             return new LuaCreateSteamWorkshopItemTask(_factory.Task("CreateSteamWorkshopItem"), luaTable);
         }
+
+        [LuaGlobal(Name = "update_steam_workshop_item")]
+        public ILuaTask UpdateSteamWorkshopItem(LuaTable luaTable) {
+            return new LuaUpdateSteamWorkshopItemTask(_factory.Task("UpdateSteamWorkshopItem"), luaTable);
+        }
     }
 }
