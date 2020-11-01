@@ -22,7 +22,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             editor
                 .InLanguage(settings.Language)
                 .WithTitle(settings.Title)
-                .WithContent(new DirectoryInfo(settings.ItemFolder.FullName));
+                .WithContent(new DirectoryInfo(settings.ItemFolderPath));
 
             EditorWithVisibility(settings.Visibility, ref editor);
             var result = await editor.SubmitAsync();

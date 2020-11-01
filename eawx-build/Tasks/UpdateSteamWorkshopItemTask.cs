@@ -1,7 +1,11 @@
+using System;
+using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 using EawXBuild.Core;
+using EawXBuild.Exceptions;
 using EawXBuild.Steam;
+using EawXBuild.Steam.Facepunch.Adapters;
 
 namespace EawXBuild.Tasks {
     public class UpdateSteamWorkshopItemTask : ITask {
@@ -14,33 +18,43 @@ namespace EawXBuild.Tasks {
         }
 
         public uint ItemId { get; set; }
-        public string Title { get; set; }
-        public string DescriptionFilePath { get; set; }
-        public string ItemFolderPath { get; set; }
-        public WorkshopItemVisibility Visibility { get; set; }
+
+        public WorkshopItemChangeSet ChangeSet { get; set; }
 
         public void Run() {
+            ValidateItemId();
+            ValidateChangeSet();
+            var item = QueryWorkshopItem();
+            UpdateItem(item);
+        }
+
+        private IWorkshopItem QueryWorkshopItem() {
             var queryItemTask = _workshop.QueryWorkshopItemByIdAsync(ItemId);
             Task.WaitAll(queryItemTask);
             var item = queryItemTask.Result;
-            var updateTask = item.UpdateItemAsync(new WorkshopItemChangeSet {
-                Title = Title,
-                Description = GetDescriptionFromFile(),
-                ItemFolder = _fileSystem.DirectoryInfo.FromDirectoryName(ItemFolderPath),
-                Visibility = Visibility,
-            });
+            if (item == null)
+                throw new WorkshopItemNotFoundException("No workshop item with given Id");
+            return item;
         }
-        
-        private string GetDescriptionFromFile() {
-            var description = string.Empty;
-            if (string.IsNullOrEmpty(DescriptionFilePath)) return description;
-            
-            var descriptionFile = _fileSystem.FileInfo.FromFileName(DescriptionFilePath);
-            if (!descriptionFile.Exists) return description;
-            
-            using var reader = descriptionFile.OpenText();
-            description = reader.ReadToEnd();
-            return description;
+
+        private void UpdateItem(IWorkshopItem item) {
+            var updateTask = item.UpdateItemAsync(ChangeSet);
+            Task.WaitAll(updateTask);
+            if (updateTask.Result is PublishResult.Failed)
+                throw new ProcessFailedException("Workshop item update failed");
+        }
+
+        private void ValidateItemId() {
+            if (ItemId == 0) throw new InvalidOperationException("No item ID set");
+        }
+
+        private void ValidateChangeSet() {
+            if (!string.IsNullOrEmpty(ChangeSet.ItemFolderPath)
+                && !_fileSystem.Directory.Exists(ChangeSet.ItemFolderPath))
+                throw new DirectoryNotFoundException();
+            if (!string.IsNullOrEmpty(ChangeSet.DescriptionFilePath)
+                && !_fileSystem.File.Exists(ChangeSet.DescriptionFilePath))
+                throw new FileNotFoundException();
         }
     }
 }

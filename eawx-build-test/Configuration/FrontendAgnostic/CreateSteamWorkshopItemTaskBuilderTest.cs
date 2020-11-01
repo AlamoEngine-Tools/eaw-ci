@@ -28,11 +28,11 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
                 .Build();
 
             Assert.AreEqual(AppId, actual.AppId);
-            Assert.AreEqual(Title, actual.Title);
-            Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
-            Assert.AreEqual(ItemFolderPath, actual.ItemFolderPath);
-            Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
-            Assert.AreEqual(Language, actual.Language);
+            Assert.AreEqual(Title, actual.ChangeSet.Title);
+            Assert.AreEqual(DescriptionFilePath, actual.ChangeSet.DescriptionFilePath);
+            Assert.AreEqual(ItemFolderPath, actual.ChangeSet.ItemFolderPath);
+            Assert.AreEqual(WorkshopItemVisibility.Public, actual.ChangeSet.Visibility);
+            Assert.AreEqual(Language, actual.ChangeSet.Language);
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
             var actual = (CreateSteamWorkshopItemTask) sut.With("Visibility", PrivateVisibility).Build();
 
-            Assert.AreEqual(WorkshopItemVisibility.Private, actual.Visibility);
+            Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
         }
         
         [TestMethod]
