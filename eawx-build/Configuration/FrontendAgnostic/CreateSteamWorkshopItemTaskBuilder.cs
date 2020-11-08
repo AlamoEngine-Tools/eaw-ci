@@ -12,7 +12,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
         public CreateSteamWorkshopItemTaskBuilder() {
             var fileSystem = new FileSystem();
             _changeSet = new WorkshopItemChangeSet(fileSystem);
-            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance, fileSystem) {
+            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance) {
                 ChangeSet = _changeSet
             };
         }

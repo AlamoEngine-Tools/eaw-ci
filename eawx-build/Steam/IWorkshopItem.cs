@@ -7,6 +7,6 @@ namespace EawXBuild.Steam {
         string Description { get; }
         
 
-        Task<PublishResult> UpdateItemAsync(WorkshopItemChangeSet settings);
+        Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings);
     }
 }
