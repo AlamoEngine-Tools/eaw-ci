@@ -24,7 +24,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             _clientStarted = true;
         }
 
-        public async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(WorkshopItemChangeSet settings) {
+        public async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(IWorkshopItemChangeSet settings) {
             RestartSteamClient(AppId);
             var editor = Editor.NewCommunityFile;
             editor = EditorWithVisibility(settings.Visibility, ref editor)
@@ -46,7 +46,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             var result = await Item.GetAsync(id);
             ShutdownSteamClient();
 
-            return !result.HasValue ? null : new WorkshopItem(result.Value, AppId);
+            return !result.HasValue ? null : new FacepunchWorkshopItemAdapter(result.Value, AppId);
         }
 
         private void ShutdownSteamClient() {

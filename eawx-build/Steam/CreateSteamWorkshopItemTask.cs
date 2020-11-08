@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.IO.Abstractions;
 using System.Threading.Tasks;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
@@ -8,15 +6,13 @@ using EawXBuild.Exceptions;
 namespace EawXBuild.Steam {
     public class CreateSteamWorkshopItemTask : ITask {
         private readonly ISteamWorkshop _workshop;
-        private readonly IFileSystem _fileSystem;
 
-        public CreateSteamWorkshopItemTask(ISteamWorkshop workshop, IFileSystem fileSystem) {
+        public CreateSteamWorkshopItemTask(ISteamWorkshop workshop) {
             _workshop = workshop;
-            _fileSystem = fileSystem;
         }
 
         public uint AppId { get; set; }
-        public WorkshopItemChangeSet ChangeSet { get; set; }
+        public IWorkshopItemChangeSet ChangeSet { get; set; }
 
         public void Run() {
             ValidateSettings();
@@ -30,8 +26,6 @@ namespace EawXBuild.Steam {
         private void ValidateSettings() {
             ValidateAppId();
             ValidateChangeSet();
-            ValidateItemFolderPath();
-            ValidateDescriptionFilePath();
         }
 
         private void ValidateAppId() {
@@ -40,20 +34,10 @@ namespace EawXBuild.Steam {
 
         private void ValidateChangeSet() {
             if (ChangeSet == null) throw new InvalidOperationException("No change set given");
-        }
+            var (isValid, exception) = ChangeSet.IsValidNewChangeSet();
+            if (!isValid) throw exception;
 
-        private void ValidateItemFolderPath() {
-            if (_fileSystem.Path.IsPathRooted(ChangeSet.ItemFolderPath))
-                throw new NoRelativePathException(ChangeSet.ItemFolderPath);
-            if (!_fileSystem.Directory.Exists(ChangeSet.ItemFolderPath))
-                throw new DirectoryNotFoundException("Workshop item directory does not exist");
-        }
-
-        private void ValidateDescriptionFilePath() {
-            if (_fileSystem.Path.IsPathRooted(ChangeSet.DescriptionFilePath))
-                throw new NoRelativePathException(ChangeSet.DescriptionFilePath);
-            if (!string.IsNullOrEmpty(ChangeSet.DescriptionFilePath) && !_fileSystem.File.Exists(ChangeSet.DescriptionFilePath))
-                throw new FileNotFoundException("Description file does not exist");
+            ChangeSet.Language ??= "English";
         }
     }
 }

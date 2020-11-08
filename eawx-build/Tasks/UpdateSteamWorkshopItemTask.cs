@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.IO.Abstractions;
 using System.Threading.Tasks;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
@@ -10,22 +8,31 @@ using EawXBuild.Steam.Facepunch.Adapters;
 namespace EawXBuild.Tasks {
     public class UpdateSteamWorkshopItemTask : ITask {
         private readonly ISteamWorkshop _workshop;
-        private readonly IFileSystem _fileSystem;
 
-        public UpdateSteamWorkshopItemTask(ISteamWorkshop workshop, IFileSystem fileSystem) {
+        public UpdateSteamWorkshopItemTask(ISteamWorkshop workshop) {
             _workshop = workshop;
-            _fileSystem = fileSystem;
         }
 
         public uint ItemId { get; set; }
 
-        public WorkshopItemChangeSet ChangeSet { get; set; }
+        public IWorkshopItemChangeSet ChangeSet { get; set; }
 
         public void Run() {
             ValidateItemId();
             ValidateChangeSet();
+
             var item = QueryWorkshopItem();
             UpdateItem(item);
+        }
+
+        private void ValidateItemId() {
+            if (ItemId == 0) throw new InvalidOperationException("No item ID set");
+        }
+
+        private void ValidateChangeSet() {
+            if (ChangeSet == null) throw new InvalidOperationException("No change set given");
+            var (isValid, exception) = ChangeSet.IsValidNewChangeSet();
+            if (!isValid) throw exception;
         }
 
         private IWorkshopItem QueryWorkshopItem() {
@@ -42,19 +49,6 @@ namespace EawXBuild.Tasks {
             Task.WaitAll(updateTask);
             if (updateTask.Result is PublishResult.Failed)
                 throw new ProcessFailedException("Workshop item update failed");
-        }
-
-        private void ValidateItemId() {
-            if (ItemId == 0) throw new InvalidOperationException("No item ID set");
-        }
-
-        private void ValidateChangeSet() {
-            if (!string.IsNullOrEmpty(ChangeSet.ItemFolderPath)
-                && !_fileSystem.Directory.Exists(ChangeSet.ItemFolderPath))
-                throw new DirectoryNotFoundException();
-            if (!string.IsNullOrEmpty(ChangeSet.DescriptionFilePath)
-                && !_fileSystem.File.Exists(ChangeSet.DescriptionFilePath))
-                throw new FileNotFoundException();
         }
     }
 }

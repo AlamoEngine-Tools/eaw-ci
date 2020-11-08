@@ -10,16 +10,16 @@ namespace EawXBuildTest.Steam {
 
         public string Description { get; set; }
 
-        public virtual async Task<PublishResult> UpdateItemAsync(WorkshopItemChangeSet settings) {
+        public virtual async Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings) {
             return Result;
         }
     }
 
     public class WorkshopItemSpy : WorkshopItemStub {
         
-        public WorkshopItemChangeSet ReceivedSettings { get; private set; }
+        public IWorkshopItemChangeSet ReceivedSettings { get; private set; }
         
-        public override Task<PublishResult> UpdateItemAsync(WorkshopItemChangeSet settings) {
+        public override Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings) {
             ReceivedSettings = settings;
             return base.UpdateItemAsync(settings);
         }

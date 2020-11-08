@@ -7,7 +7,8 @@ namespace EawXBuildTest.Steam {
     public class SteamWorkshopDummy : ISteamWorkshop {
         public virtual uint AppId { get; set; }
 
-        public virtual async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(WorkshopItemChangeSet settings) {
+        public virtual async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(
+            IWorkshopItemChangeSet settings) {
             return null;
         }
 
@@ -23,7 +24,7 @@ namespace EawXBuildTest.Steam {
         public Dictionary<ulong, IWorkshopItem> WorkshopItemsById { get; } = new Dictionary<ulong, IWorkshopItem>();
         
         public override async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(
-            WorkshopItemChangeSet settings) {
+            IWorkshopItemChangeSet settings) {
             return WorkshopItemPublishResult;
         }
         
@@ -43,12 +44,12 @@ namespace EawXBuildTest.Steam {
             }
         }
 
-        public WorkshopItemChangeSet ReceivedSettings { get; private set; }
+        public IWorkshopItemChangeSet ReceivedSettings { get; private set; }
 
         public string CallOrder { get; private set; } = "";
 
         public override async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(
-            WorkshopItemChangeSet settings) {
+            IWorkshopItemChangeSet settings) {
             ReceivedSettings = settings;
 
             await Task.CompletedTask;
