@@ -11,23 +11,23 @@ using PublishResult = EawXBuild.Steam.PublishResult;
 
 namespace EawXBuildTest.Steam.Facepunch.Adapters {
     /// <summary>
-    /// THIS TEST CLASS IS CURRENTLY BEING IGNORED!
+    /// MOST TESTS IN THIS CLASS ARE CURRENTLY BEING IGNORED!
     /// It seems to take a while before changes on Workshop items are available via the Steam API which makes it hard to test
-    ///
+    /// The only test that can be run safely is the content changing test
     /// 
     /// These tests require an existing steam workshop item
     /// Set the environment variable EAW_CI_STEAM_WORKSHOP_ITEM_ID to the workshop item ID
     /// </summary>
     [TestClass]
-    // [Ignore]
     public class FacepunchWorkshopItemAdapterTest {
         private const uint AppId = 32470;
         private const string SteamUploadPath = "my_steam_upload";
-        private const string Title = "eaw-ci Test upload";
+        private const string Title = "EaW CI Test Upload New Title";
         private const string DescriptionFilePath = "description.txt";
         private const string Description = "The description";
-        private FileInfo _steamAppIdFile;
+        private IFileInfo _steamAppIdFile;
         private IDirectoryInfo _itemFolder;
+        private IFileInfo _descriptionFile;
 
         private ulong _itemId;
 
@@ -37,12 +37,13 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             if (itemIdString == null) return;
 
             var fileSystem = new FileSystem();
-            CreateItemFolderWithSingleFile(fileSystem);
-            CreateDescriptionFile(fileSystem);
-            CreateSteamAppIdFile();
+            _steamAppIdFile = Utilities.CreateSteamAppIdFile(fileSystem);
+            _itemFolder = Utilities.CreateItemFolderWithSingleFile(fileSystem, SteamUploadPath);
+            _descriptionFile = Utilities.CreateDescriptionFile(fileSystem, DescriptionFilePath, Description);
 
             SteamClient.Init(AppId);
-            var item = GetItem(itemIdString);
+            _itemId = ulong.Parse(itemIdString);
+            var item = GetItem(_itemId);
 
             var restoreSettingsTask = item.Edit()
                 .ForAppId(AppId)
@@ -56,9 +57,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             Assert.AreEqual(Result.OK, restoreSettingsTask.Result.Result);
         }
 
-        private Item GetItem(string itemIdString) {
-            _itemId = ulong.Parse(itemIdString);
-            var itemTask = Item.GetAsync(_itemId);
+        private static Item GetItem(ulong itemId) {
+            var itemTask = Item.GetAsync(itemId);
             Task.WaitAll(itemTask);
             var item = itemTask.Result;
             Assert.IsNotNull(item);
@@ -67,33 +67,20 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
 
         [TestCleanup]
         public void TearDown() {
-            SteamClient.Shutdown();
+            var itemIdString = Environment.GetEnvironmentVariable("EAW_CI_STEAM_WORKSHOP_ITEM_ID");
+            if (itemIdString == null) return;
+
             _steamAppIdFile.Delete();
             _itemFolder.Delete(true);
+            _descriptionFile.Delete();
+
+            var item = GetItem(_itemId);
+            var directory = new DirectoryInfo(item.Directory);
+            if (directory.Exists) directory.Delete(true);
+            
+            SteamClient.Shutdown();
         }
 
-        private void CreateSteamAppIdFile() {
-            _steamAppIdFile = new FileInfo("steam_appid.txt");
-            var streamWriter = _steamAppIdFile.AppendText();
-            streamWriter.WriteLine("32470");
-            streamWriter.Close();
-        }
-
-        private static void CreateDescriptionFile(IFileSystem fileSystem) {
-            var writer = fileSystem.File.CreateText(DescriptionFilePath);
-            writer.Write(Description);
-            writer.Close();
-        }
-
-        private void CreateItemFolderWithSingleFile(IFileSystem fileSystem) {
-            _itemFolder = fileSystem.DirectoryInfo.FromDirectoryName(SteamUploadPath);
-            _itemFolder.Create();
-            _itemFolder.CreateSubdirectory("sub_dir");
-            Console.Out.WriteLine(_itemFolder.FullName);
-            using var streamWriter = fileSystem.File.CreateText(SteamUploadPath + "/sub_dir/file.txt");
-            streamWriter.Write("My awesome content!");
-            streamWriter.Close();
-        }
 
         [TestMethod]
         public async Task GivenWorkshopItem__WhenUpdatingSuccessfully__ShouldReturnOk() {
@@ -110,6 +97,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         }
 
         [TestMethod]
+        [Ignore]
         public async Task GivenWorkshopItemWithChangedTitle__WhenUpdating__TitleShouldHaveChanged() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
 
@@ -120,12 +108,12 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {Title = Title});
 
-            item = await Item.GetAsync(_itemId);
-            Assert.IsNotNull(item);
+            item = GetItem(_itemId);
             Assert.AreEqual(Title, item.Value.Title);
         }
 
         [TestMethod]
+        [Ignore]
         public async Task GivenWorkshopItemWithChangedDescription__WhenUpdating__DescriptionShouldHaveChanged() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
 
@@ -138,12 +126,12 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
                 DescriptionFilePath = DescriptionFilePath
             });
 
-            item = await Item.GetAsync(_itemId);
-            Assert.IsNotNull(item);
+            item = GetItem(_itemId);
             Assert.AreEqual(Description, item.Value.Description);
         }
 
         [TestMethod]
+        [Ignore]
         public async Task GivenWorkshopItemWithChangedVisibility__WhenUpdating__VisibilityShouldHaveChanged() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
 
@@ -156,28 +144,29 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
                 Visibility = WorkshopItemVisibility.Public
             });
 
-            item = await Item.GetAsync(_itemId);
-            Assert.IsNotNull(item);
+            item = GetItem(_itemId);
             Assert.IsTrue(item.Value.IsPublic);
         }
 
         [TestMethod]
         public async Task GivenWorkshopItemWithChangedItemFolderPath__WhenUpdating__ShouldHaveChangedFiles() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-            var item = await Item.GetAsync(_itemId);
-            Assert.IsNotNull(item);
+            var item = GetItem(_itemId);
 
-            var sut = new FacepunchWorkshopItemAdapter(item.Value, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item, AppId);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {
                 ItemFolderPath = _itemFolder.FullName
             });
             Assert.AreEqual(PublishResult.Ok, actual);
 
-            item = await Item.GetAsync(_itemId);
-            Assert.IsNotNull(item);
-            var download = await item.Value.DownloadAsync();
-            Assert.IsTrue(download);
+            item = GetItem(_itemId);
+            await item.DownloadAsync();
+            var itemDirectory = new DirectoryInfo(item.Directory);
+            var subDirectory = itemDirectory.GetDirectories()[0];
+
+            Assert.AreEqual("sub_dir", subDirectory.Name);
+            Assert.AreEqual("file.txt", subDirectory.GetFiles()[0].Name);
         }
     }
 }

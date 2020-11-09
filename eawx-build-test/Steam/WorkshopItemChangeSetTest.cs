@@ -19,7 +19,7 @@ namespace EawXBuildTest.Steam {
                 ItemFolderPath = itemFolderPath
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsTrue(isValid);
             Assert.IsNull(exception);
@@ -35,7 +35,7 @@ namespace EawXBuildTest.Steam {
                 ItemFolderPath = itemFolderPath
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(InvalidOperationException));
@@ -51,7 +51,7 @@ namespace EawXBuildTest.Steam {
                 Title = "Title",
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(InvalidOperationException));
@@ -69,7 +69,7 @@ namespace EawXBuildTest.Steam {
                 ItemFolderPath = nonExistingFolder
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(DirectoryNotFoundException));
@@ -87,7 +87,7 @@ namespace EawXBuildTest.Steam {
                 ItemFolderPath = absolutePath
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
@@ -107,7 +107,7 @@ namespace EawXBuildTest.Steam {
                 DescriptionFilePath = descriptionFilePath
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(FileNotFoundException));
@@ -129,132 +129,12 @@ namespace EawXBuildTest.Steam {
                 DescriptionFilePath = descriptionFilePath
             };
 
-            var (isValid, exception) = sut.IsValidNewChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
         }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithValidItemFolder__WhenCallingIsValidUpdate__ShouldReturnTrueAndNoException() {
-            const string itemFolderPath = "path/to/item/folder";
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddDirectory(itemFolderPath);
 
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                ItemFolderPath = itemFolderPath
-            };
-
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-
-            Assert.IsTrue(isValid);
-            Assert.IsNull(exception);
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithNonExistingItemFolder__WhenCallingIsValidUpdate__ShouldReturnFalseAndDirectoryNotFoundException() {
-            const string nonExistingFolder = "non/existing/folder";
-            var fileSystem = new MockFileSystem();
-
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                ItemFolderPath = nonExistingFolder
-            };
-
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-
-            Assert.IsFalse(isValid);
-            Assert.IsInstanceOfType(exception, typeof(DirectoryNotFoundException));
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithAbsoluteItemFolderPath__WhenCallingIsValidUpdate__ShouldReturnFalseAndNoRelativePathException() {
-            const string absolutePath = "/absolute/path";
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddDirectory(absolutePath);
-            
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                ItemFolderPath = absolutePath
-            };
-        
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-        
-            Assert.IsFalse(isValid);
-            Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithValidDescriptionFile__WhenCallingIsValidUpdate__ShouldReturnTrueAndNoException() {
-            const string descriptionFilePath = "path/to/description";
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile(descriptionFilePath, MockFileData.NullObject);
-
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                DescriptionFilePath = descriptionFilePath
-            };
-
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-
-            Assert.IsTrue(isValid);
-            Assert.IsNull(exception);
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithNonExistingDescriptionFile__WhenCallingIsValidUpdate__ShouldReturnFalseAndFileNotFoundException() {
-            const string nonExistingFile = "non/existing/file";
-            var fileSystem = new MockFileSystem();
-
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                DescriptionFilePath = nonExistingFile
-            };
-
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-
-            Assert.IsFalse(isValid);
-            Assert.IsInstanceOfType(exception, typeof(FileNotFoundException));
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithAbsoluteDescriptionFilePath__WhenCallingIsValidUpdate__ShouldReturnFalseAndNoRelativePathException() {
-            const string absolutePath = "/absolute/path";
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddFile(absolutePath, absolutePath);
-            
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                DescriptionFilePath = absolutePath
-            };
-        
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-        
-            Assert.IsFalse(isValid);
-            Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
-        }
-        
-        [TestMethod]
-        public void
-            GivenWorkshopItemChangeSetWithValidItemFolderAndAbsoluteDescriptionFilePath__WhenCallingIsValidUpdate__ShouldReturnFalseAndNoRelativePathException() {
-            const string itemFolder = "path/to/folder";
-            const string absolutePath = "/absolute/path";
-            var fileSystem = new MockFileSystem();
-            fileSystem.AddDirectory(itemFolder);
-            fileSystem.AddFile(absolutePath, MockFileData.NullObject);
-            
-            var sut = new WorkshopItemChangeSet(fileSystem) {
-                ItemFolderPath = itemFolder,
-                DescriptionFilePath = absolutePath
-            };
-        
-            var (isValid, exception) = sut.IsValidUpdateChangeSet();
-        
-            Assert.IsFalse(isValid);
-            Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
-        }
-        
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithDescriptionFilePath__WhenCallingGetDescriptionTextFromFile__ShouldReturnDescriptionText() {

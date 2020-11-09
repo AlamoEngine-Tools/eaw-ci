@@ -31,7 +31,7 @@ namespace EawXBuild.Tasks {
 
         private void ValidateChangeSet() {
             if (ChangeSet == null) throw new InvalidOperationException("No change set given");
-            var (isValid, exception) = ChangeSet.IsValidNewChangeSet();
+            var (isValid, exception) = ChangeSet.IsValidChangeSet();
             if (!isValid) throw exception;
         }
 

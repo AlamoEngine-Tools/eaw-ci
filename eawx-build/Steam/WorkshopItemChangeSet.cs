@@ -24,30 +24,16 @@ namespace EawXBuild.Steam {
             return reader.ReadToEnd();
         }
 
-        public (bool, Exception) IsValidNewChangeSet() {
+        public (bool, Exception) IsValidChangeSet() {
             if (Title == null) return (false, new InvalidOperationException("No title set"));
 
             (bool isValid, Exception exception) result = ValidateItemFolderPath();
-            if (!result.isValid) return result;
-
-            return ValidateNullableDescriptionFilePath();
-        }
-
-        public (bool, Exception) IsValidUpdateChangeSet() {
-            (bool isValid, Exception) result = ValidateNullableItemFolderPath();
-            if (!result.isValid) return result;
-
-            return ValidateNullableDescriptionFilePath();
+            return !result.isValid ? result : ValidateDescriptionFilePath();
         }
 
         private (bool, Exception) ValidateItemFolderPath() {
-            return ItemFolderPath == null
-                ? (false, new InvalidOperationException("No item folder set"))
-                : ValidateNullableItemFolderPath();
-        }
-
-        private (bool, Exception) ValidateNullableItemFolderPath() {
-            if (ItemFolderPath == null) return (true, null);
+            if (ItemFolderPath == null)
+                return (false, new InvalidOperationException("No item folder set"));
 
             if (!_fileSystem.Directory.Exists(ItemFolderPath))
                 return (false, new DirectoryNotFoundException());
@@ -62,7 +48,7 @@ namespace EawXBuild.Steam {
                 : (true, null);
         }
 
-        private (bool, Exception) ValidateNullableDescriptionFilePath() {
+        private (bool, Exception) ValidateDescriptionFilePath() {
             if (DescriptionFilePath == null) return (true, null);
             if (!_fileSystem.File.Exists(DescriptionFilePath)) return (false, new FileNotFoundException());
             (bool isRelativePath, Exception exception) result = ValidateRelativePath(DescriptionFilePath);
