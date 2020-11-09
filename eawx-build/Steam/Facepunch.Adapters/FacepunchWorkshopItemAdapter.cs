@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Steamworks.Ugc;
-using static EawXBuild.Steam.Facepunch.Adapters.Utilities;
 
 namespace EawXBuild.Steam.Facepunch.Adapters {
     public class FacepunchWorkshopItemAdapter : IWorkshopItem {

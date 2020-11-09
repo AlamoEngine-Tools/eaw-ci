@@ -9,7 +9,7 @@ namespace EawXBuildTest.Steam {
         public WorkshopItemVisibility Visibility { get; set; }
         public string DescriptionFilePath { get; set; }
         
-        public virtual (bool, Exception) IsValidNewChangeSet() {
+        public virtual (bool, Exception) IsValidChangeSet() {
             return (false, null);
         }
 
@@ -26,7 +26,7 @@ namespace EawXBuildTest.Steam {
         public (bool, Exception) ChangeSetValidationResult { get; set; }
         public (bool, Exception) ValidUpdateChangeSet { get; set; }
         
-        public override (bool, Exception) IsValidNewChangeSet() {
+        public override (bool, Exception) IsValidChangeSet() {
             return ChangeSetValidationResult;
         }
 
