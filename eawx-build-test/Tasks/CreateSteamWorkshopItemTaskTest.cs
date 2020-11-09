@@ -1,6 +1,7 @@
 using System;
 using EawXBuild.Exceptions;
 using EawXBuild.Steam;
+using EawXBuild.Tasks;
 using EawXBuildTest.Steam;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,29 +9,34 @@ namespace EawXBuildTest.Tasks {
     [TestClass]
     public class CreateSteamWorkshopItemTaskTest {
         private const string Title = "My Workshop Item";
-        private const string Description = "The description";
         private const string DescriptionFilePath = "path/to/description";
         private const string Language = "Spanish";
         private const string ExpectedDirectoryName = "path/to/directory";
         private const uint AppId = 32470;
-        
+
+        private static CreateSteamWorkshopItemTask MakeSutWithWorkshopAndChangeSet(ISteamWorkshop workshop,
+            IWorkshopItemChangeSet changeSet) {
+            return new CreateSteamWorkshopItemTask(workshop) {
+                AppId = AppId,
+                ChangeSet = changeSet
+            };
+        }
 
         [TestMethod]
         public void
             GivenTaskWithAppId_Title_Description_Language_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings() {
             var workshopSpy = MakeSteamWorkshopSpy();
-            var sut = new CreateSteamWorkshopItemTask(workshopSpy) {
-                AppId = AppId,
-                ChangeSet = new WorkshopItemChangeSetStub {
-                    ChangeSetValidationResult = (true, null),
+            var changeSetStub = new WorkshopItemChangeSetStub {
+                ChangeSetValidationResult = (true, null),
 
-                    Title = Title,
-                    DescriptionFilePath = DescriptionFilePath,
-                    ItemFolderPath = ExpectedDirectoryName,
-                    Language = Language,
-                    Visibility = WorkshopItemVisibility.Public
-                }
+                Title = Title,
+                DescriptionFilePath = DescriptionFilePath,
+                ItemFolderPath = ExpectedDirectoryName,
+                Language = Language,
+                Visibility = WorkshopItemVisibility.Public
             };
+
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, changeSetStub);
 
             sut.Run();
 
@@ -47,10 +53,7 @@ namespace EawXBuildTest.Tasks {
         public void
             GivenConfiguredTaskWithoutLanguage_And_Visibility__WhenRunningTask__ShouldPublishWith_EmptyDescription_PrivateVisibility_And_EnglishLanguage() {
             var workshopSpy = MakeSteamWorkshopSpy();
-            var sut = new CreateSteamWorkshopItemTask(workshopSpy) {
-                AppId = AppId,
-                ChangeSet = CreateValidChangeSet()
-            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
 
             sut.Run();
 
@@ -62,23 +65,17 @@ namespace EawXBuildTest.Tasks {
         public void
             GivenTaskWithAppId__WhenRunningTask__ShouldSetAppIdBeforePublishing() {
             var workshopSpy = MakeSteamWorkshopSpy();
-            var sut = new CreateSteamWorkshopItemTask(workshopSpy) {
-                AppId = AppId,
-                ChangeSet = CreateValidChangeSet()
-            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
 
             sut.Run();
 
             AssertAppIdSetBeforePublish(workshopSpy);
         }
-        
+
         [TestMethod]
         public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldThrowExceptionFromChangeSet() {
             var workshopSpy = MakeSteamWorkshopSpy();
-            var sut = new CreateSteamWorkshopItemTask(workshopSpy) {
-                AppId = AppId,
-                ChangeSet = CreateInvalidChangeSet()
-            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateInvalidChangeSet());
 
             Action actual = () => sut.Run();
 
@@ -88,10 +85,7 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldNotPublishToSteamWorkshop() {
             var workshopSpy = MakeSteamWorkshopSpy();
-            var sut = new CreateSteamWorkshopItemTask(workshopSpy) {
-                AppId = AppId,
-                ChangeSet = CreateInvalidChangeSet()
-            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateInvalidChangeSet());
 
             Action actual = () => sut.Run();
             Assert.ThrowsException<InvalidOperationException>(actual);
@@ -106,10 +100,7 @@ namespace EawXBuildTest.Tasks {
                 WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)
             };
 
-            var sut = new CreateSteamWorkshopItemTask(workshopStub) {
-                AppId = AppId,
-                ChangeSet = CreateValidChangeSet()
-            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopStub, CreateValidChangeSet());
 
             sut.Run();
         }
@@ -117,7 +108,9 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         public void GivenTaskWithoutAppId__WhenRunningTask__ShouldThrowException() {
             var workshop = new SteamWorkshopDummy();
-            var sut = new CreateSteamWorkshopItemTask(workshop);
+            var sut = new CreateSteamWorkshopItemTask(workshop) {
+                ChangeSet = CreateValidChangeSet()
+            };
 
             var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
@@ -148,13 +141,13 @@ namespace EawXBuildTest.Tasks {
                 WorkshopItemPublishResult = new WorkshopItemPublishResult(1, PublishResult.Ok)
             };
         }
-        
+
         private static WorkshopItemChangeSetStub CreateValidChangeSet() {
             return new WorkshopItemChangeSetStub {
                 ChangeSetValidationResult = (true, null)
             };
         }
-        
+
         private static WorkshopItemChangeSetStub CreateInvalidChangeSet() {
             return new WorkshopItemChangeSetStub {
                 ChangeSetValidationResult = (false, new InvalidOperationException())

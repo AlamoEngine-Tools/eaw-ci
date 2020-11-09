@@ -1,12 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using EawXBuild.Core;
 using EawXBuild.Exceptions;
 using EawXBuild.Steam;
 using EawXBuild.Steam.Facepunch.Adapters;
 
 namespace EawXBuild.Tasks {
-    public class UpdateSteamWorkshopItemTask : ITask {
+    public class UpdateSteamWorkshopItemTask : SteamWorkshopTask {
         private readonly ISteamWorkshop _workshop;
 
         public UpdateSteamWorkshopItemTask(ISteamWorkshop workshop) {
@@ -15,12 +14,8 @@ namespace EawXBuild.Tasks {
 
         public uint ItemId { get; set; }
 
-        public IWorkshopItemChangeSet ChangeSet { get; set; }
-
-        public void Run() {
+        protected override void PublishToWorkshop() {
             ValidateItemId();
-            ValidateChangeSet();
-
             var item = QueryWorkshopItem();
             UpdateItem(item);
         }
@@ -29,19 +24,11 @@ namespace EawXBuild.Tasks {
             if (ItemId == 0) throw new InvalidOperationException("No item ID set");
         }
 
-        private void ValidateChangeSet() {
-            if (ChangeSet == null) throw new InvalidOperationException("No change set given");
-            var (isValid, exception) = ChangeSet.IsValidChangeSet();
-            if (!isValid) throw exception;
-        }
-
         private IWorkshopItem QueryWorkshopItem() {
             var queryItemTask = _workshop.QueryWorkshopItemByIdAsync(ItemId);
             Task.WaitAll(queryItemTask);
             var item = queryItemTask.Result;
-            if (item == null)
-                throw new WorkshopItemNotFoundException("No workshop item with given Id");
-            return item;
+            return item ?? throw new WorkshopItemNotFoundException("No workshop item with given Id");
         }
 
         private void UpdateItem(IWorkshopItem item) {

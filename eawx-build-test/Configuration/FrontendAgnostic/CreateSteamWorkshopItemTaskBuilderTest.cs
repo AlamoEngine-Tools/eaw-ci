@@ -1,6 +1,7 @@
 using System;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Steam;
+using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Configuration.FrontendAgnostic {
