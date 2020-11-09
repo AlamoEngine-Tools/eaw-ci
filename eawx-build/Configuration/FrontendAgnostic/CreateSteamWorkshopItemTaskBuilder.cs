@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Steam;
 using EawXBuild.Steam.Facepunch.Adapters;
+using EawXBuild.Tasks;
 
 namespace EawXBuild.Configuration.FrontendAgnostic {
     public class CreateSteamWorkshopItemTaskBuilder : ITaskBuilder {

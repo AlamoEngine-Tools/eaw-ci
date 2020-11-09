@@ -33,6 +33,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
 
         [TestInitialize]
         public void SetUp() {
+            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") return;
+
             var itemIdString = Environment.GetEnvironmentVariable("EAW_CI_STEAM_WORKSHOP_ITEM_ID");
             if (itemIdString == null) return;
 
@@ -67,6 +69,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
 
         [TestCleanup]
         public void TearDown() {
+            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") return;
+
             var itemIdString = Environment.GetEnvironmentVariable("EAW_CI_STEAM_WORKSHOP_ITEM_ID");
             if (itemIdString == null) return;
 
