@@ -51,13 +51,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
+        <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
             <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
         </Reference>
-        <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+        <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
             <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
         </Reference>
-        <Reference Include="Facepunch.Steamworks.Win64, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+        <Reference Include="Facepunch.Steamworks.Win64, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
             <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
         </Reference>
     </ItemGroup>
