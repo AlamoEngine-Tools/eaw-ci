@@ -24,30 +24,30 @@
         <Deterministic>false</Deterministic>
     </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.9" />
-    <PackageReference Include="NLua" Version="1.5.4" />
-    <PackageReference Include="semver" Version="2.0.6" />
-    <PackageReference Include="System.IO.Abstractions" Version="12.2.19" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommandLineParser" Version="2.8.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.9"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.9"/>
+        <PackageReference Include="NLua" Version="1.5.4"/>
+        <PackageReference Include="semver" Version="2.0.6"/>
+        <PackageReference Include="System.IO.Abstractions" Version="12.2.19"/>
+    </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Configuration\v1\eaw-ci.xsd" />
+        <None Remove="Configuration\v1\eaw-ci.xsd"/>
         <None Include="..\LICENSE">
             <Pack>True</Pack>
         </None>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\.editorconfig" />
+        <None Include="..\.editorconfig"/>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd" />
+        <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -57,14 +57,14 @@
         <Reference Include="Facepunch.Steamworks.Posix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
             <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
         </Reference>
-        <Reference Include="Facepunch.Steamworks.Win64, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+        <Reference Include="Facepunch.Steamworks.Win64, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
             <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
         </Reference>
     </ItemGroup>
 
     <Target Name="CopyLibSteam" AfterTargets="AfterBuild">
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.so" DestinationFolder="$(OutDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.bundle" DestinationFolder="$(OutDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI/steam_api64.dll" DestinationFolder="$(OutDir)" />
+        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(OutDir)"/>
+        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(OutDir)"/>
+        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(OutDir)"/>
     </Target>
 </Project>
