@@ -93,7 +93,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
-            var sut = new FacepunchWorkshopItemAdapter(item.Value, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item.Value);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy());
 
@@ -108,7 +108,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
-            var sut = new FacepunchWorkshopItemAdapter(item.Value, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item.Value);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {Title = Title});
 
@@ -124,7 +124,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
-            var sut = new FacepunchWorkshopItemAdapter(item.Value, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item.Value);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {
                 DescriptionFilePath = DescriptionFilePath
@@ -142,7 +142,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
-            var sut = new FacepunchWorkshopItemAdapter(item.Value, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item.Value);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {
                 Visibility = WorkshopItemVisibility.Public
@@ -157,7 +157,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
             var item = GetItem(_itemId);
 
-            var sut = new FacepunchWorkshopItemAdapter(item, AppId);
+            var sut = new FacepunchWorkshopItemAdapter(item);
 
             var actual = await sut.UpdateItemAsync(new WorkshopItemChangeSetDummy {
                 ItemFolderPath = _itemFolder.FullName

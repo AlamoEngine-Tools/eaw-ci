@@ -6,11 +6,9 @@ using Steamworks.Ugc;
 namespace EawXBuild.Steam.Facepunch.Adapters {
     public class FacepunchWorkshopItemAdapter : IWorkshopItem {
         private Item _item;
-        private readonly uint _appId;
 
-        public FacepunchWorkshopItemAdapter(Item item, uint appId) {
+        public FacepunchWorkshopItemAdapter(Item item) {
             _item = item;
-            _appId = appId;
         }
 
         public ulong ItemId => _item.Id;
@@ -29,7 +27,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
 
             return result.Success ? PublishResult.Ok : PublishResult.Failed;
         }
-        
+
         private static void UpdateDescription(IWorkshopItemChangeSet settings, ref Editor editor) {
             string description = null;
             if (settings.DescriptionFilePath != null) {
@@ -53,7 +51,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
+
         private static void UpdateContent(IWorkshopItemChangeSet settings, ref Editor editor) {
             if (settings.ItemFolderPath != null)
                 editor.WithContent(settings.ItemFolderPath);

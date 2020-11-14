@@ -41,7 +41,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
         public async Task<IWorkshopItem?> QueryWorkshopItemByIdAsync(ulong id) {
             var result = await Item.GetAsync(id);
 
-            return !result.HasValue ? null : new FacepunchWorkshopItemAdapter(result.Value, AppId);
+            return !result.HasValue ? null : new FacepunchWorkshopItemAdapter(result.Value);
         }
     }
 }
