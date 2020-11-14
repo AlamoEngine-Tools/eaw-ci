@@ -11,15 +11,10 @@ namespace EawXBuild.Configuration.Lua.v1 {
                 .With("Title", table["title"])
                 .With("DescriptionFilePath", table["description_file"])
                 .With("ItemFolderPath", table["item_folder"])
-                .With("Visibility", GetVisibility(table))
+                .With("Visibility", table["visibility"])
                 .With("Language", table["language"]);
 
             Task = taskBuilder.Build();
-        }
-        
-        private static string GetVisibility(LuaTable table) {
-            var visibility = table["visibility"];
-            return visibility != null ? visibility.Equals("public") ? "Public" : "Private" : string.Empty;
         }
 
         public ITask Task { get; }

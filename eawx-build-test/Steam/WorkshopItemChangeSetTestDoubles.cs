@@ -13,10 +13,6 @@ namespace EawXBuildTest.Steam {
             return (false, null);
         }
 
-        public virtual (bool, Exception) IsValidUpdateChangeSet() {
-            return (false, null);
-        }
-
         public string GetDescriptionTextFromFile() {
             return string.Empty;
         }
@@ -24,14 +20,9 @@ namespace EawXBuildTest.Steam {
 
     public class WorkshopItemChangeSetStub : WorkshopItemChangeSetDummy {
         public (bool, Exception) ChangeSetValidationResult { get; set; }
-        public (bool, Exception) ValidUpdateChangeSet { get; set; }
-        
+
         public override (bool, Exception) IsValidChangeSet() {
             return ChangeSetValidationResult;
-        }
-
-        public override (bool, Exception) IsValidUpdateChangeSet() {
-            return ValidUpdateChangeSet;
         }
     }
 }

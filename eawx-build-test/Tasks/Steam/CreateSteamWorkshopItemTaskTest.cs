@@ -1,11 +1,11 @@
 using System;
 using EawXBuild.Exceptions;
 using EawXBuild.Steam;
-using EawXBuild.Tasks;
+using EawXBuild.Tasks.Steam;
 using EawXBuildTest.Steam;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Tasks {
+namespace EawXBuildTest.Tasks.Steam {
     [TestClass]
     public class CreateSteamWorkshopItemTaskTest {
         private const string Title = "My Workshop Item";
@@ -63,13 +63,26 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         public void
-            GivenTaskWithAppId__WhenRunningTask__ShouldSetAppIdBeforePublishing() {
+            GivenTaskWithAppId__WhenRunningTask__ShouldSetAppIdThenPublishThenShutdown() {
             var workshopSpy = MakeSteamWorkshopSpy();
             var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
 
             sut.Run();
 
-            AssertAppIdSetBeforePublish(workshopSpy);
+            AssertSetAppIdThenPublishThenShutdown(workshopSpy);
+        }
+        
+        [TestMethod]
+        public void
+            GivenValidTask__WhenRunningTask__ShouldShutdownAfterPublishFinished() {
+            var workshopMock = new VerifyAwaitPublishTaskMock {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(1, PublishResult.Ok)
+            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopMock, CreateValidChangeSet());
+
+            sut.Run();
+
+            workshopMock.Verify();
         }
 
         [TestMethod]
@@ -95,7 +108,7 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [ExpectedException(typeof(ProcessFailedException))]
-        public void GivenValidTask__WhenCallingRun_ButPublishFails__ShouldThrowProcessFailedException() {
+        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldThrowProcessFailedException() {
             var workshopStub = new SteamWorkshopStub {
                 WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)
             };
@@ -103,6 +116,21 @@ namespace EawXBuildTest.Tasks {
             var sut = MakeSutWithWorkshopAndChangeSet(workshopStub, CreateValidChangeSet());
 
             sut.Run();
+        }
+        
+        [TestMethod]
+        public void
+            GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient() {
+            var workshopSpy = new SteamWorkshopSpy {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)
+            };
+
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
+
+            Action action = () => sut.Run();
+
+            Assert.ThrowsException<ProcessFailedException>(action);
+            Assert.IsTrue(workshopSpy.WasShutdown);
         }
 
         [TestMethod]
@@ -127,8 +155,8 @@ namespace EawXBuildTest.Tasks {
             Assert.AreEqual("No change set given", actual.Message);
         }
 
-        private static void AssertAppIdSetBeforePublish(SteamWorkshopSpy workshopSpy) {
-            Assert.AreEqual("ap", workshopSpy.CallOrder);
+        private static void AssertSetAppIdThenPublishThenShutdown(SteamWorkshopSpy workshopSpy) {
+            Assert.AreEqual("apd", workshopSpy.CallOrder);
         }
 
         private static void AssertPublishedWithDefaultSettings(IWorkshopItemChangeSet actual) {

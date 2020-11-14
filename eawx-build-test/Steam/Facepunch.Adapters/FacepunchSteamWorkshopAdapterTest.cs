@@ -21,16 +21,20 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         private const string Language = "Spanish";
         private FileInfo _steamAppIdFile;
         private IDirectoryInfo _itemFolder;
-        
+        private FacepunchSteamWorkshopAdapter _sut;
+        private FileSystem _fileSystem;
+
         [TestInitialize]
         public void SetUp() {
-            var fileSystem = new FileSystem();
-            CreateItemFolderWithSingleFile(fileSystem);
-            CreateDescriptionFile(fileSystem);
+            _fileSystem = new FileSystem();
+            CreateItemFolderWithSingleFile(_fileSystem);
+            CreateDescriptionFile(_fileSystem);
             _steamAppIdFile = new FileInfo("steam_appid.txt");
             var streamWriter = _steamAppIdFile.AppendText();
             streamWriter.WriteLine("32470");
             streamWriter.Close();
+            
+            _sut = FacepunchSteamWorkshopAdapter.Instance;
         }
 
         private static void CreateDescriptionFile(FileSystem fileSystem) {
@@ -56,18 +60,16 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         public async Task GivenWorkshopChangeSet__WhenPublishingToSteam__ItemShouldBeOnWorkshop() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
 
-            var changeSet = new WorkshopItemChangeSet(new MockFileSystem()) {
+            var changeSet = new WorkshopItemChangeSet(_fileSystem) {
                 Title = Title,
                 DescriptionFilePath = DescriptionFilePath,
                 Language = Language,
                 Visibility = WorkshopItemVisibility.Private,
                 ItemFolderPath = SteamUploadPath
             };
-            
-            var sut = FacepunchSteamWorkshopAdapter.Instance;
-            sut.AppId = 32470;
 
-            var publishTaskResult = await sut.PublishNewWorkshopItemAsync(changeSet);
+            _sut.Init(32470);
+            var publishTaskResult = await _sut.PublishNewWorkshopItemAsync(changeSet);
 
             var publishResult = publishTaskResult.Result;
             Assert.AreEqual(PublishResult.Ok, publishResult);
@@ -77,19 +79,16 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         [TestMethod]
         public async Task WhenQueryingForItemId__ShouldReturnItemWithId() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-            
-            var sut = FacepunchSteamWorkshopAdapter.Instance;
-            sut.AppId = 32470;
 
+            _sut.Init(32470);
             const ulong fotrWorkshopId = 1976399102;
-            var workshopItem = await sut.QueryWorkshopItemByIdAsync(fotrWorkshopId);
+            var workshopItem = await _sut.QueryWorkshopItemByIdAsync(fotrWorkshopId);
             
             Assert.AreEqual(fotrWorkshopId, workshopItem.ItemId);
             StringAssert.StartsWith(workshopItem.Title, "Empire at War Expanded");
         }
 
         private static async Task AssertItemMatchesSettings(WorkshopItemPublishResult publishTaskResult) {
-            SteamClient.Init(32470);
             var item = await Item.GetAsync(publishTaskResult.ItemId);
             Assert.IsTrue(item.HasValue);
             

@@ -7,14 +7,14 @@ using EawXBuild.Tasks;
 using EawXBuild.Tasks.Steam;
 
 namespace EawXBuild.Configuration.FrontendAgnostic {
-    public class CreateSteamWorkshopItemTaskBuilder : ITaskBuilder {
-        private readonly CreateSteamWorkshopItemTask _task;
+    public class UpdateSteamWorkshopItemTaskBuilder : ITaskBuilder {
+        private readonly UpdateSteamWorkshopItemTask _task;
         private readonly WorkshopItemChangeSet _changeSet;
 
-        public CreateSteamWorkshopItemTaskBuilder() {
+        public UpdateSteamWorkshopItemTaskBuilder() {
             var fileSystem = new FileSystem();
             _changeSet = new WorkshopItemChangeSet(fileSystem);
-            _task = new CreateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance) {
+            _task = new UpdateSteamWorkshopItemTask(FacepunchSteamWorkshopAdapter.Instance) {
                 ChangeSet = _changeSet
             };
         }
@@ -23,6 +23,9 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             switch (name) {
                 case "AppId":
                     _task.AppId = Convert.ToUInt32(value);
+                    break;
+                case "ItemId":
+                    _task.ItemId = Convert.ToUInt64(value);
                     break;
                 case "Title":
                     _changeSet.Title = (string) value;

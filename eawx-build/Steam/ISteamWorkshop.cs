@@ -4,7 +4,10 @@ namespace EawXBuild.Steam
 {
     public interface ISteamWorkshop
     {
-        uint AppId { get; set; }
+
+        void Init(uint appId);
+
+        void Shutdown();
 
         Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(IWorkshopItemChangeSet settings);
 

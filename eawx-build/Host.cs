@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading.Tasks;
 using CommandLine;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
@@ -14,8 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
-using Steamworks;
-using Steamworks.Ugc;
 
 namespace EawXBuild
 {
@@ -23,44 +18,10 @@ namespace EawXBuild
     {
         private static void Main(string[] args)
         {
-            // Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
-            //     .WithParsed<RunOptions>(ExecInternal)
-            //     .WithParsed<ValidateOptions>(ExecInternal)
-            //     .WithNotParsed(HandleParseErrorsInternal);
-
-            var _steamAppIdFile = new FileInfo("steam_appid.txt");
-            var streamWriter = _steamAppIdFile.AppendText();
-            streamWriter.WriteLine("32470");
-            streamWriter.Close();
-            
-            SteamClient.Init(32470);
-
-            var dir = new DirectoryInfo("./test");
-            if (!dir.Exists) dir.Create();
-            var file = new FileInfo("./test/myfile.txt");
-            file.Create().Close();
-            
-            Console.Out.WriteLine(SteamClient.Name);
-            Console.Out.WriteLine(SteamClient.AppId);
-            var submitAsync = Editor.NewCommunityFile
-                .InLanguage("English")
-                .WithPrivateVisibility()
-                .ForAppId(32470)
-                .WithTitle("Empire at War Expanded: The automatically released version")
-                .WithContent(dir)
-                .SubmitAsync(new Progress<float>());
-
-            Task.WaitAll(submitAsync);
-
-            var publishedItemTask = Item.GetAsync(submitAsync.Result.FileId);
-
-            var item = publishedItemTask.Result;
-            var updateTask = item?.Edit().WithDescription("My updated description").SubmitAsync();
-            Task.WaitAll(updateTask ?? Task.CompletedTask);
-            
-            dir.Delete(true);
-            SteamClient.Shutdown();
-            _steamAppIdFile.Delete();
+            Parser.Default.ParseArguments<RunOptions, ValidateOptions>(args)
+                .WithParsed<RunOptions>(ExecInternal)
+                .WithParsed<ValidateOptions>(ExecInternal)
+                .WithNotParsed(HandleParseErrorsInternal);
         }
 
         private static void ExecInternal(IOptions opts)

@@ -245,7 +245,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                     title = 'my-test-item',
                     description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
-                    visibility = 'private',
+                    visibility = visibility.private,
                     language = 'English'
                 })  
             ";
@@ -271,7 +271,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                     title = 'my-test-item',
                     description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
-                    visibility = 'private',
+                    visibility = visibility.private,
                     language = 'English'
                 })
             ";
@@ -282,7 +282,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
-                {"Visibility", "Private"},
+                {"Visibility", WorkshopItemVisibility.Private},
                 {"Language", "English"},
             });
             
@@ -302,7 +302,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                     title = 'my-test-item',
                     description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
-                    visibility = 'private',
+                    visibility = visibility.private,
                     language = 'English'
                 })  
             ";
@@ -329,7 +329,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                     title = 'my-test-item',
                     description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
-                    visibility = 'private',
+                    visibility = visibility.private,
                     language = 'English'
                 })
             ";
@@ -341,7 +341,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
-                {"Visibility", "Private"},
+                {"Visibility", WorkshopItemVisibility.Private},
                 {"Language", "English"},
             });
             

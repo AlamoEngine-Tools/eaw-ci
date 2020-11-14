@@ -12,16 +12,16 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             var sut = new BuildComponentFactory();
 
             var project = sut.MakeProject();
-            
+
             Assert.IsInstanceOfType(project, typeof(Project));
         }
-        
+
         [TestMethod]
         public void BuildComponentFactory__WhenCallingMakeJob__ShouldReturnJob() {
             var sut = new BuildComponentFactory();
 
             var job = sut.MakeJob("job");
-            
+
             Assert.IsInstanceOfType(job, typeof(Job));
             Assert.AreEqual("job", job.Name);
         }
@@ -31,46 +31,57 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             var sut = new BuildComponentFactory();
 
             var taskBuilder = sut.Task("Copy");
-            
+
             Assert.IsInstanceOfType(taskBuilder, typeof(CopyTaskBuilder));
         }
-        
+
         [TestMethod]
         public void BuildComponentFactory__WhenCallingTaskWith_RunProgram__ShouldReturnRunProcessTaskBuilder() {
             var sut = new BuildComponentFactory();
 
             var taskBuilder = sut.Task("RunProgram");
-            
+
             Assert.IsInstanceOfType(taskBuilder, typeof(RunProcessTaskBuilder));
         }
-        
+
         [TestMethod]
         public void BuildComponentFactory__WhenCallingTaskWith_Clean__ShouldReturnCleanTaskBuilder() {
             var sut = new BuildComponentFactory();
 
             var taskBuilder = sut.Task("Clean");
-            
+
             Assert.IsInstanceOfType(taskBuilder, typeof(CleanTaskBuilder));
         }
-        
+
         [TestMethod]
         public void BuildComponentFactory__WhenCallingTaskWith_SoftCopy__ShouldReturnCopyTaskBuilder() {
             var sut = new BuildComponentFactory();
 
             var taskBuilder = sut.Task("SoftCopy");
-            
+
             Assert.IsInstanceOfType(taskBuilder, typeof(CopyTaskBuilder));
         }
-        
+
         [TestMethod]
-        public void BuildComponentFactory__WhenCallingTaskWith_CreateSteamWorkshopItem__ShouldReturnCopyTaskBuilder() {
+        public void
+            BuildComponentFactory__WhenCallingTaskWith_CreateSteamWorkshopItem__ShouldReturnCreateSteamWorkshopItemTaskBuilder() {
             var sut = new BuildComponentFactory();
 
             var taskBuilder = sut.Task("CreateSteamWorkshopItem");
-            
+
             Assert.IsInstanceOfType(taskBuilder, typeof(CreateSteamWorkshopItemTaskBuilder));
         }
-        
+
+        [TestMethod]
+        public void
+            BuildComponentFactory__WhenCallingTaskWith_UpdateSteamWorkshopItem__ShouldReturnUpdateSteamWorkshopItemTaskBuilder() {
+            var sut = new BuildComponentFactory();
+
+            var taskBuilder = sut.Task("UpdateSteamWorkshopItem");
+
+            Assert.IsInstanceOfType(taskBuilder, typeof(UpdateSteamWorkshopItemTaskBuilder));
+        }
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void BuildComponentFactory__WhenCallingTaskWithUnknownTaskType__ShouldThrowInvalidOperationException() {
@@ -78,6 +89,5 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
             sut.Task("Unknown");
         }
-        
     }
 }
