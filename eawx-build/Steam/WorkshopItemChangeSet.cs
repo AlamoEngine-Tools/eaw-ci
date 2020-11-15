@@ -18,37 +18,38 @@ namespace EawXBuild.Steam {
         public string DescriptionFilePath { get; set; }
 
         public string GetDescriptionTextFromFile() {
+            if (DescriptionFilePath == null) return string.Empty;
             var fileInfo = _fileSystem.FileInfo.FromFileName(DescriptionFilePath);
             using var reader = fileInfo.OpenText();
 
             return reader.ReadToEnd();
         }
 
-        public (bool, Exception) IsValidChangeSet() {
+        public (bool isValid, Exception exception) IsValidChangeSet() {
             if (Title == null) return (false, new InvalidOperationException("No title set"));
 
-            (bool isValid, Exception exception) result = ValidateItemFolderPath();
+            var result = ValidateItemFolderPath();
             return !result.isValid ? result : ValidateDescriptionFilePath();
         }
 
-        private (bool, Exception) ValidateItemFolderPath() {
+        private (bool isValid, Exception exception) ValidateItemFolderPath() {
             if (ItemFolderPath == null)
                 return (false, new InvalidOperationException("No item folder set"));
 
             if (!_fileSystem.Directory.Exists(ItemFolderPath))
                 return (false, new DirectoryNotFoundException());
 
-            (bool isRelativePath, Exception exception) result = ValidateRelativePath(ItemFolderPath);
-            return !result.isRelativePath ? result : (true, null);
+            var result = ValidateRelativePath(ItemFolderPath);
+            return !result.isValid ? result : (true, null);
         }
 
-        private (bool, Exception) ValidateRelativePath(string path) {
+        private (bool isValid, Exception exception) ValidateRelativePath(string path) {
             return _fileSystem.Path.IsPathRooted(path)
                 ? (false, new NoRelativePathException(path))
                 : (true, null);
         }
 
-        private (bool, Exception) ValidateDescriptionFilePath() {
+        private (bool isValid, Exception exception) ValidateDescriptionFilePath() {
             if (DescriptionFilePath == null) return (true, null);
             if (!_fileSystem.File.Exists(DescriptionFilePath)) return (false, new FileNotFoundException());
             (bool isRelativePath, Exception exception) result = ValidateRelativePath(DescriptionFilePath);

@@ -12,7 +12,7 @@ namespace EawXBuild.Steam {
 
         public string DescriptionFilePath { get; set; }
 
-        (bool, Exception) IsValidChangeSet();
+        (bool isValid, Exception exception) IsValidChangeSet();
 
         public string GetDescriptionTextFromFile();
     }

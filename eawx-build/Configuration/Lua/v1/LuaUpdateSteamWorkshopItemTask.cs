@@ -1,13 +1,13 @@
+using System;
 using EawXBuild.Core;
-using Microsoft.VisualBasic.CompilerServices;
 using NLua;
 
 namespace EawXBuild.Configuration.Lua.v1 {
     public class LuaUpdateSteamWorkshopItemTask : ILuaTask {
         public LuaUpdateSteamWorkshopItemTask(ITaskBuilder taskBuilder, LuaTable table) {
             taskBuilder
-                .With("AppId", IntegerType.FromObject(table["app_id"]))
-                .With("ItemId", IntegerType.FromObject(table["item_id"]))
+                .With("AppId", Convert.ToUInt32(table["app_id"]))
+                .With("ItemId", Convert.ToUInt64(table["item_id"]))
                 .With("Title", table["title"])
                 .With("DescriptionFilePath", table["description_file"])
                 .With("ItemFolderPath", table["item_folder"])

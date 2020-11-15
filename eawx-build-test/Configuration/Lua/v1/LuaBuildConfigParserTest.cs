@@ -234,7 +234,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectWithJobAndCreateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
             const string lua = @"
@@ -278,20 +278,20 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             _mockFileData.TextContents = lua;
 
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
-                {"AppId", 32470},
+                {"AppId", (uint) 32470},
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
                 {"Visibility", WorkshopItemVisibility.Private},
                 {"Language", "English"},
             });
-            
+
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenConfigWithProjectWithJobAndUpdateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
             const string lua = @"
@@ -336,15 +336,15 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             _mockFileData.TextContents = lua;
 
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
-                {"AppId", 32470},
-                {"ItemId", 1234},
+                {"AppId", (uint) 32470},
+                {"ItemId", (ulong) 1234},
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
                 {"Visibility", WorkshopItemVisibility.Private},
                 {"Language", "English"},
             });
-            
+
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
@@ -361,7 +361,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             _mockFileData.TextContents = lua;
 
             var jobStub = new JobStub();
-            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()}; 
+            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()};
             var factoryStub = new BuildComponentFactoryStub {
                 Job = jobStub,
                 TaskBuilder = new IteratingTaskBuilderStub {

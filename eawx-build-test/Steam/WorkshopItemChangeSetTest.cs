@@ -149,5 +149,17 @@ namespace EawXBuildTest.Steam {
 
             Assert.AreEqual(expectedDescriptionText, actual);
         }
+        
+        [TestMethod]
+        public void
+            GivenWorkshopItemChangeSetWithoutDescriptionFilePath__WhenCallingGetDescriptionTextFromFile__ShouldReturnEmptyString() {
+            var expectedDescriptionText = string.Empty;
+            var fileSystem = new MockFileSystem();
+            var sut = new WorkshopItemChangeSet(fileSystem);
+
+            var actual = sut.GetDescriptionTextFromFile();
+
+            Assert.AreEqual(expectedDescriptionText, actual);
+        }
     }
 }

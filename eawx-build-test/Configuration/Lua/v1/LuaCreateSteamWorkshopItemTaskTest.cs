@@ -8,7 +8,8 @@ using NLua;
 namespace EawXBuildTest.Configuration.Lua.v1 {
     [TestClass]
     public class LuaCreateSteamWorkshopItemTaskTest {
-        private const int AppId = 32740;
+        private const long AppIdAsLong = 32740;
+        private const uint AppIdAsUInt = (uint) AppIdAsLong;
         private const string Title = "My Awesome title";
         private const string DescriptionFilePath = "path/to/description";
         private const string FolderPath = "path/to/folder";
@@ -43,7 +44,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
         private static TaskBuilderMock CreateTaskBuilderMock(WorkshopItemVisibility visibility) {
             return new TaskBuilderMock(new Dictionary<string, object> {
-                {"AppId", AppId},
+                {"AppId", AppIdAsUInt},
                 {"Title", Title},
                 {"DescriptionFilePath", DescriptionFilePath},
                 {"ItemFolderPath", FolderPath},
@@ -55,7 +56,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         private static LuaTable CreateConfigurationTable(NLua.Lua luaInterpreter, string luaVisibility) {
             var table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
             var visibility = (WorkshopItemVisibility) luaInterpreter.GetObjectFromPath("visibility." + luaVisibility);
-            table["app_id"] = AppId;
+            table["app_id"] = AppIdAsLong;
             table["title"] = Title;
             table["description_file"] = DescriptionFilePath;
             table["item_folder"] = FolderPath;
