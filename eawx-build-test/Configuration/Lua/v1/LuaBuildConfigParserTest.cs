@@ -15,6 +15,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         private MockFileSystem _fileSystem;
         private MockFileData _mockFileData;
         private LuaMockFileSystemParser _luaMockFileParser;
+        
+        private static readonly string[] ExpectedTags = {"EAW", "FOC"};
 
         [TestInitialize]
         public void SetUp() {
@@ -246,6 +248,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                     description_file = 'path/to/description',
                     item_folder = 'path/to/folder',
                     visibility = visibility.private,
+                    tags = {'EAW', 'FOC'},
                     language = 'English'
                 })  
             ";
@@ -262,7 +265,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
-        public void GivenConfigWithCreateSteamWorkshopItemTask__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+        public void GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -283,13 +286,44 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
                 {"Visibility", WorkshopItemVisibility.Private},
-                {"Language", "English"},
+                {"Language", "English"}
             });
 
             var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
+        }
+        
+        /// <summary>
+        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
+        /// Instead we're querying the "Tags" key manually
+        /// </summary>
+        [TestMethod]
+        public void GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English',
+                    tags = {'EAW', 'FOC'}
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderSpy = new TaskBuilderSpy();
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderSpy};
+            MakeSutAndParse(factoryStub);
+
+            var actual = taskBuilderSpy["Tags"];
+            Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
         [TestMethod]
@@ -319,7 +353,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
-        public void GivenConfigWithUpdateSteamWorkshopItemTask__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -349,6 +383,38 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
+        }
+        
+        /// <summary>
+        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
+        /// Instead we're querying the "Tags" key manually
+        /// </summary>
+        [TestMethod]
+        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    item_id = 1234,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English',
+                    tags = {'EAW', 'FOC'}
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderSpy();
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            var actual = taskBuilderMock["Tags"];
+            Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
         [TestMethod]

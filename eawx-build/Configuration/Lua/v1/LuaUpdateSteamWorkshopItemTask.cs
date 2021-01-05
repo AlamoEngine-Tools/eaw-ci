@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using EawXBuild.Core;
 using NLua;
 
@@ -14,6 +15,11 @@ namespace EawXBuild.Configuration.Lua.v1 {
                 .With("Visibility", table["visibility"])
                 .With("Language", table["language"]);
 
+            var tags = (LuaTable) table["tags"];
+            var stringTags = tags?.Values.Cast<string>().ToHashSet();
+            if (stringTags != null)
+                taskBuilder.With("Tags", stringTags);
+            
             Task = taskBuilder.Build();
         }
 

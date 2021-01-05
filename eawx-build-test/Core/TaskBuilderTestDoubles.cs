@@ -1,5 +1,9 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using EawXBuild.Core;
+using Microsoft.VisualBasic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest.Core
@@ -44,18 +48,28 @@ namespace EawXBuildTest.Core
 
         public override ITask Build()
         {
-            if(_enumerator == null)
-                _enumerator = Tasks.GetEnumerator();
+            _enumerator ??= Tasks.GetEnumerator();
 
             _enumerator.MoveNext();
             return _enumerator.Current;
         }
     }
 
-    public class TaskBuilderMock : TaskBuilderStub
+    public class TaskBuilderSpy : TaskBuilderStub {
+        protected readonly Dictionary<string, object> _actualEntries = new Dictionary<string, object>();
+        
+        public override ITaskBuilder With(string name, object value)
+        {
+            _actualEntries.Add(name, value);
+            return this;
+        }
+
+        public object this[string configurationOption] => _actualEntries[configurationOption];
+    }
+
+    public class TaskBuilderMock : TaskBuilderSpy
     {
         private readonly Dictionary<string, object> _expectedEntries;
-        private readonly Dictionary<string, object> _actualEntries = new Dictionary<string, object>();
 
         public TaskBuilderMock(Dictionary<string, object> expectedEntries)
         {
@@ -66,21 +80,43 @@ namespace EawXBuildTest.Core
             _expectedEntries.Add(key, value);
         }
 
-        public override ITaskBuilder With(string name, object value)
-        {
-            _actualEntries.Add(name, value);
-            return this;
-        }
+        public void Verify() {
+            Console.WriteLine("Actual");
+            foreach (var (key, value) in _actualEntries) {
+                if (!(value is IEnumerable<string> collection)) {
+                    Console.WriteLine($"{key}, {value}");
+                    continue;
+                }
 
-        public override ITask Build()
-        {
-            return new TaskDummy();
-        }
+                var str = $"{key}, [";
+                foreach (var entry in collection) {
+                    str += $"{entry}, ";
+                }
 
-        public void Verify()
-        {
+                str = str.TrimEnd().Substring(0, str.Length - 2);
+                str += "]";
+                Console.WriteLine(str);
+            }
+            Console.WriteLine("\nExpected");
+            foreach (var (key, value) in _expectedEntries) {
+                if (!(value is IEnumerable<string> collection)) {
+                    Console.WriteLine($"{key}, {value}");
+                    continue;
+                }
+
+                var str = $"{key}, [";
+                foreach (var entry in collection) {
+                    str += $"{entry}, ";
+                }
+
+                str = str.TrimEnd().Substring(0, str.Length - 2);
+                str += "]";
+                Console.WriteLine(str);
+            }
+            
             CollectionAssert.AreEquivalent(_expectedEntries, _actualEntries,
                 "Actual TaskBuilder configuration entries do not match expected ones");
+            
         }
     }
 }
