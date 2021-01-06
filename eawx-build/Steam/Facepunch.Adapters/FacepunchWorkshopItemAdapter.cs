@@ -22,6 +22,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             UpdateDescription(settings, ref editor);
             UpdateVisibility(settings, ref editor);
             UpdateContent(settings, ref editor);
+            UpdateTags(settings, ref editor);
 
             var result = await editor.SubmitAsync();
 
@@ -55,6 +56,10 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
         private static void UpdateContent(IWorkshopItemChangeSet settings, ref Editor editor) {
             if (settings.ItemFolderPath != null)
                 editor.WithContent(settings.ItemFolderPath);
+        }
+
+        private static void UpdateTags(IWorkshopItemChangeSet settings, ref Editor editor) {
+            foreach (var tag in settings.Tags) editor.WithTag(tag);
         }
     }
 }

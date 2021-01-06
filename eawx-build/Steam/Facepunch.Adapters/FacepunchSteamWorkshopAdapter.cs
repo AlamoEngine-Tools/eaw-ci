@@ -31,6 +31,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
                 .WithDescription(settings.GetDescriptionTextFromFile())
                 .WithContent(new DirectoryInfo(settings.ItemFolderPath))
                 .InLanguage(settings.Language);
+            WithTags(settings, ref editor);
             
             var submitResult = await editor.SubmitAsync();
             var publishResult = submitResult.Success ? PublishResult.Ok : PublishResult.Failed;
@@ -42,6 +43,10 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             var result = await Item.GetAsync(id);
 
             return !result.HasValue ? null : new FacepunchWorkshopItemAdapter(result.Value);
+        }
+        
+        private static void WithTags(IWorkshopItemChangeSet settings, ref Editor editor) {
+            foreach (var tag in settings.Tags) editor.WithTag(tag);
         }
     }
 }

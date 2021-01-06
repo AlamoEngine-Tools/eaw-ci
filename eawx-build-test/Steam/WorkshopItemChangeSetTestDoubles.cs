@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EawXBuild.Steam;
 
 namespace EawXBuildTest.Steam {
@@ -9,6 +10,8 @@ namespace EawXBuildTest.Steam {
         public WorkshopItemVisibility Visibility { get; set; }
         public string DescriptionFilePath { get; set; }
         
+        public HashSet<string> Tags { get; set; }
+
         public virtual (bool, Exception) IsValidChangeSet() {
             return (false, null);
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EawXBuild.Exceptions;
 using EawXBuild.Steam;
 using EawXBuild.Steam.Facepunch.Adapters;
@@ -14,6 +15,7 @@ namespace EawXBuildTest.Tasks.Steam {
         private const string Title = "My Workshop Item";
         private const string DescriptionFilePath = "path/to/description";
         private const string ExpectedDirectoryName = "path/to/directory";
+        private readonly HashSet<string> ExpectedTags = new HashSet<string> {"EAW", "FOC"};
         
         
         [TestMethod]
@@ -33,7 +35,8 @@ namespace EawXBuildTest.Tasks.Steam {
                     Title = Title,
                     DescriptionFilePath = DescriptionFilePath,
                     ItemFolderPath = ExpectedDirectoryName,
-                    Visibility = WorkshopItemVisibility.Public
+                    Visibility = WorkshopItemVisibility.Public,
+                    Tags = ExpectedTags
                 }
             };
 
@@ -45,6 +48,7 @@ namespace EawXBuildTest.Tasks.Steam {
             Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
             Assert.AreEqual(ExpectedDirectoryName, actual.ItemFolderPath);
+            Assert.AreEqual(ExpectedTags, actual.Tags);
         }
 
         [TestMethod]

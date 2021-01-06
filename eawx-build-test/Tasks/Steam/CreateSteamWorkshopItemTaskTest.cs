@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EawXBuild.Exceptions;
 using EawXBuild.Steam;
 using EawXBuild.Tasks.Steam;
@@ -13,6 +14,7 @@ namespace EawXBuildTest.Tasks.Steam {
         private const string Language = "Spanish";
         private const string ExpectedDirectoryName = "path/to/directory";
         private const uint AppId = 32470;
+        private readonly HashSet<string> ExpectedTags = new HashSet<string> {"EAW", "FOC"};
 
         private static CreateSteamWorkshopItemTask MakeSutWithWorkshopAndChangeSet(ISteamWorkshop workshop,
             IWorkshopItemChangeSet changeSet) {
@@ -33,7 +35,8 @@ namespace EawXBuildTest.Tasks.Steam {
                 DescriptionFilePath = DescriptionFilePath,
                 ItemFolderPath = ExpectedDirectoryName,
                 Language = Language,
-                Visibility = WorkshopItemVisibility.Public
+                Visibility = WorkshopItemVisibility.Public,
+                Tags = ExpectedTags
             };
 
             var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, changeSetStub);
@@ -47,6 +50,7 @@ namespace EawXBuildTest.Tasks.Steam {
             Assert.AreEqual(Language, actual.Language);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
             Assert.AreEqual(ExpectedDirectoryName, actual.ItemFolderPath);
+            Assert.AreEqual(ExpectedTags, actual.Tags);
         }
 
         [TestMethod]

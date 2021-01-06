@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Steam;
 using EawXBuild.Tasks;
@@ -14,6 +15,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         private const string DescriptionFilePath = "path/to/description";
         private const string ItemFolderPath = "path/to/item";
         private const string Language = "Spanish";
+        private readonly HashSet<string> Tags = new HashSet<string> {"EAW", "FOC"};
 
         [TestMethod]
         public void GivenTaskBuilder_WhenConfiguringTask_ShouldReturnConfiguredTask() {
@@ -26,6 +28,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
                 .With("ItemFolderPath", ItemFolderPath)
                 .With("Visibility", WorkshopItemVisibility.Public)
                 .With("Language", Language)
+                .With("Tags", Tags)
                 .Build();
 
             Assert.AreEqual(AppId, actual.AppId);
@@ -35,6 +38,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             Assert.AreEqual(ItemFolderPath, actual.ChangeSet.ItemFolderPath);
             Assert.AreEqual(WorkshopItemVisibility.Public, actual.ChangeSet.Visibility);
             Assert.AreEqual(Language, actual.ChangeSet.Language);
+            Assert.AreEqual(Tags, actual.ChangeSet.Tags);
         }
 
         [TestMethod]
