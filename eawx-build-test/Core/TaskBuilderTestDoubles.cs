@@ -81,42 +81,8 @@ namespace EawXBuildTest.Core
         }
 
         public void Verify() {
-            Console.WriteLine("Actual");
-            foreach (var (key, value) in _actualEntries) {
-                if (!(value is IEnumerable<string> collection)) {
-                    Console.WriteLine($"{key}, {value}");
-                    continue;
-                }
-
-                var str = $"{key}, [";
-                foreach (var entry in collection) {
-                    str += $"{entry}, ";
-                }
-
-                str = str.TrimEnd().Substring(0, str.Length - 2);
-                str += "]";
-                Console.WriteLine(str);
-            }
-            Console.WriteLine("\nExpected");
-            foreach (var (key, value) in _expectedEntries) {
-                if (!(value is IEnumerable<string> collection)) {
-                    Console.WriteLine($"{key}, {value}");
-                    continue;
-                }
-
-                var str = $"{key}, [";
-                foreach (var entry in collection) {
-                    str += $"{entry}, ";
-                }
-
-                str = str.TrimEnd().Substring(0, str.Length - 2);
-                str += "]";
-                Console.WriteLine(str);
-            }
-            
             CollectionAssert.AreEquivalent(_expectedEntries, _actualEntries,
                 "Actual TaskBuilder configuration entries do not match expected ones");
-            
         }
     }
 }
