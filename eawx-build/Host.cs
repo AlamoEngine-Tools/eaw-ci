@@ -4,6 +4,7 @@ using System.Linq;
 using CommandLine;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
+using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
 using EawXBuild.Services.IO;
@@ -54,6 +55,7 @@ namespace EawXBuild
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
                 new BuildComponentFactory(
                     lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
+            serviceCollection.AddTransient<ILuaParser, NLuaParser>(s => new NLuaParser());
         }
 
         private static void HandleParseErrorsInternal(IEnumerable<Error> errs)

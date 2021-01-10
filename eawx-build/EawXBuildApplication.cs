@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
+using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Configuration.Xml.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
@@ -42,21 +43,56 @@ namespace EawXBuild
         {
             _logger?.LogInformation("Running application in RUN mode.");
             IIOService ioService = Services.GetService<IIOService>();
-            if (!ioService.IsValidPath(runOptions.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+            IBuildConfigParser buildConfigParser = null;
+            if (runOptions.BackendXml)
             {
-                return ioService.ValidatePath(runOptions.ConfigPath,
-                    ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
+            }
+            else
+            {
+                if (runOptions.BackendLua)
+                {
+                    buildConfigParser = GetLuaBuildConfigParserInternal();
+                }
             }
 
-            string path = ioService.ResolvePath(runOptions.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
-            IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
-                Services.GetService<IBuildComponentFactory>(),
-                Services.GetRequiredService<ILoggerFactory>().CreateLogger<BuildConfigParser>());
+            if (buildConfigParser == null)
+            {
+                return ExitCode.ExUsage;
+            }
+
+            return !TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath,
+                buildConfigParser.ConfiguredFileExtension,
+                out string path,
+                out ExitCode exitCode)
+                ? exitCode
+                : ExecRunInternal(runOptions, buildConfigParser, path);
+        }
+
+        private static bool TryExtractAndValidatePathInternal(IIOService ioService, string pathIn, string fileExtension,
+            out string pathOut, out ExitCode exitCode)
+        {
+            if (!ioService.IsValidPath(pathIn,
+                ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension))
+            {
+                pathOut = null;
+                exitCode = ioService.ValidatePath(pathIn,
+                    ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension);
+                return false;
+            }
+
+            pathOut = ioService.ResolvePath(pathIn,
+                ioService.FileSystem.Directory.GetCurrentDirectory(), fileExtension);
+            exitCode = ExitCode.Success;
+            return true;
+        }
+
+        private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string path)
+        {
             IEnumerable<IProject> projects = buildConfigParser.Parse(path);
             IProject project =
-                projects.FirstOrDefault(p => p.Name.Equals(runOptions.ProjectName, StringComparison.CurrentCulture));
+                projects.FirstOrDefault(p =>
+                    p.Name.Equals(runOptions.ProjectName, StringComparison.CurrentCulture));
 
             if (null == project)
             {
@@ -109,26 +145,48 @@ namespace EawXBuild
                 return ExitCode.RunFailed;
             }
 
-            _logger?.LogInformation($"{project.Name} could not complete: {errCount} of {tasks.Count} tasks failed.");
+            _logger?.LogInformation(
+                $"{project.Name} could not complete: {errCount} of {tasks.Count} tasks failed.");
             return ExitCode.MultipleJobsFailed;
         }
 
-        private ExitCode RunValidateInternal(ValidateOptions opt)
+        private XmlBuildConfigParser GetXmlBuildConfigParserInternal(IIOService ioService)
+        {
+            return new XmlBuildConfigParser(ioService.FileSystem,
+                Services.GetService<IBuildComponentFactory>(),
+                Services.GetRequiredService<ILoggerFactory>().CreateLogger<XmlBuildConfigParser>());
+        }
+
+        private LuaBuildConfigParser GetLuaBuildConfigParserInternal()
+        {
+            return new LuaBuildConfigParser(
+                Services.GetService<ILuaParser>(), Services.GetService<IBuildComponentFactory>());
+        }
+
+        private ExitCode RunValidateInternal(IOptions validateOptions)
         {
             _logger?.LogInformation("Running application in VALIDATION mode.");
             IIOService ioService = Services.GetService<IIOService>();
-            if (!ioService.IsValidPath(opt.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml"))
+            string fileExtension;
+            IBuildConfigParser buildConfigParser;
+            if (validateOptions.BackendXml)
             {
-                return ioService.ValidatePath(opt.ConfigPath,
-                    ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
+                fileExtension = ".xml";
+                buildConfigParser = GetXmlBuildConfigParserInternal(ioService);
+            }
+            else
+            {
+                fileExtension = ".lua";
+                buildConfigParser = GetLuaBuildConfigParserInternal();
             }
 
-            string path = ioService.ResolvePath(opt.ConfigPath,
-                ioService.FileSystem.Directory.GetCurrentDirectory(), ".xml");
-            IBuildConfigParser buildConfigParser = new BuildConfigParser(ioService.FileSystem,
-                Services.GetService<IBuildComponentFactory>(),
-                Services.GetRequiredService<ILoggerFactory>().CreateLogger<BuildConfigParser>());
+            if (!TryExtractAndValidatePathInternal(ioService, validateOptions.ConfigPath, fileExtension,
+                out string path,
+                out ExitCode exitCode))
+            {
+                return exitCode;
+            }
+
             return buildConfigParser.TestIsValidConfiguration(path) ? ExitCode.Success : ExitCode.ExConfig;
         }
     }
