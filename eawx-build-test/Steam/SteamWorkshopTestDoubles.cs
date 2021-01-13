@@ -42,9 +42,9 @@ namespace EawXBuildTest.Steam {
         public string CallOrder { get; private set; } = "";
 
         public bool WasInitialized { get; private set; }
-        
+
         public bool WasShutdown { get; private set; }
-        
+
         public override void Init(uint appId) {
             AppId = appId;
             CallOrder += "a";
@@ -71,10 +71,10 @@ namespace EawXBuildTest.Steam {
     }
 
     public class VerifyAwaitPublishTaskMock : SteamWorkshopSpy {
-
         private string _eventOrder = "";
-        
-        public override async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(IWorkshopItemChangeSet settings) {
+
+        public override async Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(
+            IWorkshopItemChangeSet settings) {
             var publishTask = base.PublishNewWorkshopItemAsync(settings);
             Task.WaitAll(publishTask);
             var workshopItemPublishResult = publishTask.Result;

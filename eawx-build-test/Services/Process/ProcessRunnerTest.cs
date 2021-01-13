@@ -8,11 +8,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest.Services.Process {
     [TestClass]
     public class ProcessRunnerTest {
-        
         [TestMethod]
         public void GivenEcho__WhenStarting__ShouldExitWithCodeZero() {
             var sut = new ProcessRunner();
-            
+
             sut.Start("echo");
             sut.WaitForExit();
 
@@ -34,7 +33,7 @@ namespace EawXBuildTest.Services.Process {
             var actual = stringBuilder.ToString().Trim();
             Assert.AreEqual(expected, actual);
         }
-        
+
         [TestMethod]
         public void GivenProcessStartInfoForEcho__WhenStarting__ShouldPrintOutArgs() {
             var stringBuilder = new StringBuilder();
@@ -54,6 +53,5 @@ namespace EawXBuildTest.Services.Process {
             var actual = stringBuilder.ToString().Trim();
             Assert.AreEqual(expected, actual);
         }
-
     }
 }

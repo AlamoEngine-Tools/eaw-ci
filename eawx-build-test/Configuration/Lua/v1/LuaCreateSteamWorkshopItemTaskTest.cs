@@ -21,52 +21,56 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         private const string LuaPrivateVisibility = "private";
 
         [TestMethod]
-        public void GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PublicVisibility__OnCreation__ShouldConfigureTask() {
+        public void
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PublicVisibility__OnCreation__ShouldConfigureTask() {
             var taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Public);
 
             using var luaInterpreter = new NLua.Lua();
             PushVisibilityTable(luaInterpreter);
             var table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPublicVisibility);
             var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
-            
+
             taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
-        public void GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PrivateVisibility__OnCreation__ShouldConfigureTask() {
+        public void
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PrivateVisibility__OnCreation__ShouldConfigureTask() {
             var taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Private);
 
             using var luaInterpreter = new NLua.Lua();
             PushVisibilityTable(luaInterpreter);
             var table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPrivateVisibility);
             var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
-            
+
             taskBuilderMock.Verify();
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags() {
+        public void
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags() {
             var taskBuilderSpy = new TaskBuilderSpy();
             using var luaInterpreter = new NLua.Lua();
             var table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
-            
+
             var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderSpy, table);
 
             var actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags() {
+        public void
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags() {
             var taskBuilderSpy = new TaskBuilderSpy();
             using var luaInterpreter = new NLua.Lua();
 
@@ -113,7 +117,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             return table;
         }
-        
+
         private static void PushVisibilityTable(NLua.Lua luaInterpreter) {
             luaInterpreter.NewTable("visibility");
             var luaTable = luaInterpreter.GetTable("visibility");

@@ -48,18 +48,20 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
             Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
         }
-        
+
         [TestMethod]
-        public void GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithNullVisibility__ShouldReturnTaskWithPrivateVisibility() {
+        public void
+            GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithNullVisibility__ShouldReturnTaskWithPrivateVisibility() {
             var sut = new CreateSteamWorkshopItemTaskBuilder();
 
             var actual = (CreateSteamWorkshopItemTask) sut.With("Visibility", null).Build();
 
             Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
         }
-        
+
         [TestMethod]
-        public void GivenCreateSteamWorkshopItemTaskBuilder_WhenConfiguringTaskWithAppIdOfTypeInt_ShouldReturnTaskWithAppIdOfUInt() {
+        public void
+            GivenCreateSteamWorkshopItemTaskBuilder_WhenConfiguringTaskWithAppIdOfTypeInt_ShouldReturnTaskWithAppIdOfUInt() {
             var sut = new CreateSteamWorkshopItemTaskBuilder();
 
             const int appId = 32470;
@@ -68,7 +70,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             const uint expected = appId;
             Assert.AreEqual(expected, actual.AppId);
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void WhenCallingWithInvalidConfigOption__ShouldThrowInvalidOperationException() {

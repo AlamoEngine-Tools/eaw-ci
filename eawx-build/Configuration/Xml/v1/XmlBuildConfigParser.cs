@@ -14,10 +14,10 @@ using EawXBuild.Core;
 using Microsoft.Extensions.Logging;
 
 namespace EawXBuild.Configuration.Xml.v1 {
-    internal class BuildConfigParser : IBuildConfigParser {
-        private const string XSD_RESOURCE_ID = "v1.eaw-ci.xsd";
+    internal class XmlBuildConfigParser : IBuildConfigParser {
+        private const string XsdResourceId = "v1.eaw-ci.xsd";
 
-        private const string DEFAULT_XML = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        private const string DefaultXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <eaw-ci:BuildConfiguration ConfigVersion=""1.0.0"" xmlns:eaw-ci=""eaw-ci"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""eaw-ci eaw-ci.xsd "">
     <Projects>
         <Project Id=""pid0"" Name=""My-Project"">
@@ -31,16 +31,18 @@ namespace EawXBuild.Configuration.Xml.v1 {
     </Projects>
 </eaw-ci:BuildConfiguration>";
 
-        private const ConfigVersion CONFIG_VERSION = ConfigVersion.V1;
+        private const ConfigVersion ConfigVersion = Configuration.ConfigVersion.V1;
+        private const string FileExtension = ".xml";
+
         [NotNull] private readonly IFileSystem _fileSystem;
         [NotNull] private readonly IBuildComponentFactory _factory;
-        private readonly ILogger<BuildConfigParser> _logger;
+        private readonly ILogger<XmlBuildConfigParser> _logger;
 
-        public BuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
-            ILogger<BuildConfigParser> logger = null) {
+        public XmlBuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
+            ILoggerFactory loggerFactory = null) {
             _fileSystem = fileSystem;
             _factory = factory;
-            _logger = logger;
+            _logger = loggerFactory?.CreateLogger<XmlBuildConfigParser>();
         }
 
         public IEnumerable<IProject> Parse(string filePath) {
@@ -102,8 +104,9 @@ namespace EawXBuild.Configuration.Xml.v1 {
             return buildConfig;
         }
 
-        public ConfigVersion Version => CONFIG_VERSION;
-        public string DefaultXml => DEFAULT_XML;
+        public ConfigVersion Version => ConfigVersion;
+        public string ConfiguredFileExtension => FileExtension;
+        public string DefaultConfigFile => DefaultXml;
 
         private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject) {
             var project = _factory.MakeProject();
@@ -167,9 +170,9 @@ namespace EawXBuild.Configuration.Xml.v1 {
             var xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
             var schemas = new XmlSchemaSet();
             XmlSchema schema;
-            var res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
-                .Single(str => str.EndsWith(XSD_RESOURCE_ID));
-            using (var xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res)) {
+            string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Single(str => str.EndsWith(XsdResourceId));
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res)) {
                 schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
             }
 

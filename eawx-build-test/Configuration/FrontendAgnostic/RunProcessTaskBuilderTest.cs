@@ -27,7 +27,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
                 .With("WorkingDirectory", WorkingDirectory)
                 .With("AllowedToFail", AllowedToFail)
                 .Build();
-            
+
             Assert.AreEqual(TaskId, task.Id);
             Assert.AreEqual(TaskName, task.Name);
             Assert.AreEqual(PathToExe, task.ExecutablePath);

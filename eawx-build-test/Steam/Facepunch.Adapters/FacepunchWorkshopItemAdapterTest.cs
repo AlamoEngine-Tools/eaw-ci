@@ -81,7 +81,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var item = GetItem(_itemId);
             var directory = new DirectoryInfo(item.Directory);
             if (directory.Exists) directory.Delete(true);
-            
+
             SteamClient.Shutdown();
         }
 

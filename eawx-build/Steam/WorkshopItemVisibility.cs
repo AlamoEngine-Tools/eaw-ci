@@ -1,7 +1,5 @@
-namespace EawXBuild.Steam
-{
-    public enum WorkshopItemVisibility
-    {
+namespace EawXBuild.Steam {
+    public enum WorkshopItemVisibility {
         Private,
         Public
     }

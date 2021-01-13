@@ -24,8 +24,7 @@ namespace EawXBuild.Core {
             return Task.Run(() => job.Run());
         }
 
-        public List<Task> RunAllJobsAsync()
-        {
+        public List<Task> RunAllJobsAsync() {
             return jobs.Select(job => Task.Run(job.Run)).ToList();
         }
 

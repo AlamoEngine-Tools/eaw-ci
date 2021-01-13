@@ -24,7 +24,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         [TestMethod]
         public void GivenLuaCopyTask__WhenCallingOverwrite__ShouldBuildTaskWithOverwrite() {
             InitTaskBuilderMock(new Dictionary<string, object> {{"AlwaysOverwrite", true}});
-            
+
             var sut = new LuaCopyTask(_taskBuilderMock, Source, Target);
             sut.overwrite(true);
 
@@ -44,13 +44,13 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         [TestMethod]
         public void GivenLuaCopyTask__WhenCallingPattern__ShouldBuildTaskWithPattern() {
             InitTaskBuilderMock(new Dictionary<string, object> {{"CopyFileByPattern", "*.xml"}});
-            
+
             var sut = new LuaCopyTask(_taskBuilderMock, Source, Target);
             sut.pattern("*.xml");
 
             _taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenLuaCopyTask__WhenCallingPattern__ShouldReturnItself() {
             InitTaskBuilderMock(new Dictionary<string, object> {{"CopyFileByPattern", "*.xml"}});
@@ -60,17 +60,17 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             Assert.AreSame(sut, actual);
         }
-        
+
         [TestMethod]
         public void GivenLuaCopyTask__WhenCallingRecursive__ShouldBuildTaskWithRecursive() {
             InitTaskBuilderMock(new Dictionary<string, object> {{"CopySubfolders", true}});
-            
+
             var sut = new LuaCopyTask(_taskBuilderMock, Source, Target);
             sut.recursive(true);
 
             _taskBuilderMock.Verify();
         }
-        
+
         [TestMethod]
         public void GivenLuaCopyTask__WhenCallingRecursive__ShouldReturnItself() {
             InitTaskBuilderMock(new Dictionary<string, object> {{"CopySubfolders", true}});

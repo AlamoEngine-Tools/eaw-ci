@@ -7,7 +7,6 @@ using static EawXBuild.Steam.Facepunch.Adapters.Utilities;
 
 namespace EawXBuild.Steam.Facepunch.Adapters {
     public class FacepunchSteamWorkshopAdapter : ISteamWorkshop {
-
         public static FacepunchSteamWorkshopAdapter Instance { get; } = new FacepunchSteamWorkshopAdapter();
 
         private FacepunchSteamWorkshopAdapter() { }
@@ -32,7 +31,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
                 .WithContent(new DirectoryInfo(settings.ItemFolderPath))
                 .InLanguage(settings.Language);
             WithTags(settings, ref editor);
-            
+
             var submitResult = await editor.SubmitAsync();
             var publishResult = submitResult.Success ? PublishResult.Ok : PublishResult.Failed;
 
@@ -44,7 +43,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
 
             return !result.HasValue ? null : new FacepunchWorkshopItemAdapter(result.Value);
         }
-        
+
         private static void WithTags(IWorkshopItemChangeSet settings, ref Editor editor) {
             foreach (var tag in settings.Tags) editor.WithTag(tag);
         }

@@ -75,7 +75,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             AssertSetAppIdThenPublishThenShutdown(workshopSpy);
         }
-        
+
         [TestMethod]
         public void
             GivenValidTask__WhenRunningTask__ShouldShutdownAfterPublishFinished() {
@@ -121,7 +121,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             sut.Run();
         }
-        
+
         [TestMethod]
         public void
             GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient() {

@@ -11,7 +11,7 @@ namespace EawXBuild.Native {
             var targetBytes = Encoding.UTF8.GetBytes(platformTargetPath);
             link(sourceBytes, targetBytes);
         }
-        
+
         [DllImport("libSystem.dylib", CharSet = CharSet.Unicode)]
         private static extern int link(
             byte[] lpFileName,

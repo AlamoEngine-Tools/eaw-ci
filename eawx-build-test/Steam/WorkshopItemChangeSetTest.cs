@@ -9,7 +9,8 @@ namespace EawXBuildTest.Steam {
     [TestClass]
     public class WorkshopItemChangeSetTest {
         [TestMethod]
-        public void GivenWorkshopItemChangeSetWithValidMinimalSettings__WhenCallingIsValid__ShouldReturnTrueAndNoException() {
+        public void
+            GivenWorkshopItemChangeSetWithValidMinimalSettings__WhenCallingIsValid__ShouldReturnTrueAndNoException() {
             var fileSystem = new MockFileSystem();
             const string itemFolderPath = "path/to/item/folder";
             fileSystem.AddDirectory(itemFolderPath);
@@ -57,7 +58,7 @@ namespace EawXBuildTest.Steam {
             Assert.IsInstanceOfType(exception, typeof(InvalidOperationException));
             Assert.AreEqual("No item folder set", exception.Message);
         }
-        
+
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithNonExistingItemFolder__WhenCallingIsValid__ShouldReturnFalseAndDirectoryNotFoundException() {
@@ -74,14 +75,14 @@ namespace EawXBuildTest.Steam {
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(DirectoryNotFoundException));
         }
-        
+
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithAbsoluteItemFolderPath__WhenCallingIsValid__ShouldReturnFalseAndNoRelativePathException() {
             const string absolutePath = "/absolute/path";
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(absolutePath);
-            
+
             var sut = new WorkshopItemChangeSet(fileSystem) {
                 Title = "Title",
                 ItemFolderPath = absolutePath
@@ -92,7 +93,7 @@ namespace EawXBuildTest.Steam {
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(NoRelativePathException));
         }
-        
+
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithNonExistingDescriptionFile__WhenCallingIsValid__ShouldReturnFalseAndFileNotFoundException() {
@@ -112,7 +113,7 @@ namespace EawXBuildTest.Steam {
             Assert.IsFalse(isValid);
             Assert.IsInstanceOfType(exception, typeof(FileNotFoundException));
         }
-        
+
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithAbsoluteDescriptionFilePath__WhenCallingIsValid__ShouldReturnFalseAndNoRelativePathException() {
@@ -149,7 +150,7 @@ namespace EawXBuildTest.Steam {
 
             Assert.AreEqual(expectedDescriptionText, actual);
         }
-        
+
         [TestMethod]
         public void
             GivenWorkshopItemChangeSetWithoutDescriptionFilePath__WhenCallingGetDescriptionTextFromFile__ShouldReturnEmptyString() {

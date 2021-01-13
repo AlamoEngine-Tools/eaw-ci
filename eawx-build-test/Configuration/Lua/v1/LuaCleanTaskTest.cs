@@ -12,9 +12,9 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
                 {"Path", path}
             });
-            
+
             var sut = new LuaCleanTask(taskBuilderMock, path);
-            
+
             taskBuilderMock.Verify();
         }
     }

@@ -5,7 +5,7 @@ namespace EawXBuild.Steam {
         public ulong ItemId { get; }
         string Title { get; }
         string Description { get; }
-        
+
 
         Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings);
     }
