@@ -16,9 +16,9 @@ namespace EawXBuild.Services.IO
         private readonly ILogger<IOService> _logger;
         [NotNull] public IFileSystem FileSystem { get; }
 
-        public IOService(IFileSystem fileSystem, ILogger<IOService> logger = null)
+        public IOService(IFileSystem fileSystem, ILoggerFactory loggerFactory = null)
         {
-            _logger = logger;
+            _logger = loggerFactory?.CreateLogger<IOService>();
             FileSystem = fileSystem ?? new FileSystem();
             _logger?.LogTrace($"{nameof(IOService)} initialised successfully.");
         }

@@ -8,5 +8,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic
         IEnumerable<IProject> Parse(string filePath);
         bool TestIsValidConfiguration(string filePath);
         ConfigVersion Version { get; }
+        string ConfiguredFileExtension { get; }
+        string DefaultConfigFile { get; }
     }
 }
