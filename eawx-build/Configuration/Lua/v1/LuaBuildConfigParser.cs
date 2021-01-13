@@ -10,7 +10,9 @@ namespace EawXBuild.Configuration.Lua.v1
         private readonly ILuaParser _luaParser;
         private readonly IBuildComponentFactory _factory;
 
-        private const string FILE_EXTENSION = ".lua";
+        private const string FileExtension = ".lua";
+        private const string DefaultLua = "";
+        private const ConfigVersion ConfigVersion = Configuration.ConfigVersion.V1;
 
         public LuaBuildConfigParser(ILuaParser luaParser, IBuildComponentFactory factory)
         {
@@ -30,7 +32,8 @@ namespace EawXBuild.Configuration.Lua.v1
             throw new NotImplementedException();
         }
 
-        public ConfigVersion Version { get; }
-        public string ConfiguredFileExtension => FILE_EXTENSION;
+        public ConfigVersion Version => ConfigVersion;
+        public string ConfiguredFileExtension => FileExtension;
+        public string DefaultConfigFile => DefaultLua;
     }
 }
