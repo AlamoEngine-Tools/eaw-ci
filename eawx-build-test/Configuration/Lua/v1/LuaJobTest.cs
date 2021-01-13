@@ -45,11 +45,10 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             using var luaInterpreter = new NLua.Lua();
             var invalidTable = MakeLuaTable(luaInterpreter, "invalidTable");
             invalidTable[1] = "Invalid";
-            
+
             var jobStub = new JobStub();
             var sut = new LuaJob(jobStub);
             sut.add_tasks(invalidTable);
         }
-
     }
 }

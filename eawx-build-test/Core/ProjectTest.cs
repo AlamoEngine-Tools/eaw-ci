@@ -42,7 +42,7 @@ namespace EawXBuildTest.Core {
             AssertJobWasRun(expected);
             AssertJobWasNotRun(otherJob);
         }
-        
+
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public void GivenProjectWithMultipleJobs__WhenCallingRunAll__AllJobsRan() {

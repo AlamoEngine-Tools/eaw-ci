@@ -3,8 +3,7 @@ using EawXBuild.Tasks;
 
 namespace EawXBuildTest.Tasks {
     public class CopyPolicyDummy : ICopyPolicy {
-        public void CopyTo(IFileInfo source, IFileInfo target, bool overwrite) {
-        }
+        public void CopyTo(IFileInfo source, IFileInfo target, bool overwrite) { }
     }
 
     public class CopyPolicySpy : ICopyPolicy {

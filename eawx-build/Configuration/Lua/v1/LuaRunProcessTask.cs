@@ -23,7 +23,7 @@ namespace EawXBuild.Configuration.Lua.v1 {
             _taskBuilder.With("AllowedToFail", allowedToFail);
             return this;
         }
-        
+
         public ITask Task => _taskBuilder.Build();
     }
 }

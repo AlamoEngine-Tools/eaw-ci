@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 
-namespace EawXBuild.Core
-{
-    public interface IProject
-    {
+namespace EawXBuild.Core {
+    public interface IProject {
         string Name { get; set; }
         void AddJob(IJob job);
 

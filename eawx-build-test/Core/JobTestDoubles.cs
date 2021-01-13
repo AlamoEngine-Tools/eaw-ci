@@ -6,11 +6,9 @@ namespace EawXBuildTest.Core {
     public class JobDummy : IJob {
         public virtual string Name { get; set; }
 
-        public virtual void AddTask(ITask task) {
-        }
+        public virtual void AddTask(ITask task) { }
 
-        public virtual void Run() {
-        }
+        public virtual void Run() { }
     }
 
     public class JobStub : JobDummy {

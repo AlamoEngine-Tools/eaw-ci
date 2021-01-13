@@ -43,7 +43,7 @@ namespace EawXBuild.Configuration.Lua.v1 {
         public ILuaTask RunProcess(string path) {
             return new LuaRunProcessTask(_factory.Task("RunProgram"), path);
         }
-        
+
         [LuaGlobal(Name = "create_steam_workshop_item")]
         public ILuaTask CreateSteamWorkshopItem(LuaTable luaTable) {
             return new LuaCreateSteamWorkshopItemTask(_factory.Task("CreateSteamWorkshopItem"), luaTable);

@@ -1,10 +1,7 @@
 using System.Threading.Tasks;
 
-namespace EawXBuild.Steam
-{
-    public interface ISteamWorkshop
-    {
-
+namespace EawXBuild.Steam {
+    public interface ISteamWorkshop {
         void Init(uint appId);
 
         void Shutdown();

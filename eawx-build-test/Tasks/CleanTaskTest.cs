@@ -3,19 +3,15 @@ using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Tasks
-{
+namespace EawXBuildTest.Tasks {
     [TestClass]
-    public class CleanTaskTest
-    {
-
+    public class CleanTaskTest {
         private MockFileSystem _fileSystem;
         private FileSystemAssertions _assertions;
         private CleanTask _sut;
 
         [TestInitialize]
-        public void SetUp()
-        {
+        public void SetUp() {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
             _sut = new CleanTask(_fileSystem);
@@ -23,8 +19,7 @@ namespace EawXBuildTest.Tasks
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToFile__WhenCallingRun__ShouldDeleteFile()
-        {
+        public void GivenPathToFile__WhenCallingRun__ShouldDeleteFile() {
             const string dirPath = "Data";
             const string filePath = "Data/MyFile.txt";
 
@@ -40,8 +35,7 @@ namespace EawXBuildTest.Tasks
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectory__WhenCallingRun__ShouldDeleteDirectory()
-        {
+        public void GivenPathToDirectory__WhenCallingRun__ShouldDeleteDirectory() {
             const string dirPath = "Data";
 
             var fileSystem = new MockFileSystem();
@@ -53,7 +47,7 @@ namespace EawXBuildTest.Tasks
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
-        
+
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void GivenPathToDirectoryWithFiles__WhenCallingRun__ShouldDeleteDirectory() {
@@ -69,7 +63,7 @@ namespace EawXBuildTest.Tasks
 
             _assertions.AssertDirectoryDoesNotExist(dirPath);
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(NoRelativePathException))]
         public void GivenAbsolutePath__WhenCallingRun__ShouldThrowNoRelativePathException() {

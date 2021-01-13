@@ -6,7 +6,6 @@ using EawXBuild.Tasks.Steam;
 
 namespace EawXBuild.Configuration.FrontendAgnostic {
     public class UpdateSteamWorkshopItemTaskBuilder : BaseSteamWorkshopTaskBuilder {
-
         public override ITaskBuilder With(string name, object value) {
             Task ??= CreateTaskWithChangeSet(ChangeSet);
 
@@ -14,7 +13,6 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             var updateTask = (UpdateSteamWorkshopItemTask) Task;
             updateTask.ItemId = Convert.ToUInt64(value);
             return this;
-
         }
 
         protected override SteamWorkshopTask CreateTaskWithChangeSet(IWorkshopItemChangeSet changeSet) {

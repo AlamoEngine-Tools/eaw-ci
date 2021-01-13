@@ -19,7 +19,7 @@ namespace EawXBuild.Configuration.Lua.v1 {
             var stringTags = tags?.Values.Cast<string>().ToHashSet();
             if (stringTags != null)
                 taskBuilder.With("Tags", stringTags);
-            
+
             Task = taskBuilder.Build();
         }
 

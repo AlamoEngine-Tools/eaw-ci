@@ -12,7 +12,7 @@ namespace EawXBuild.Steam {
         public WorkshopItemVisibility Visibility { get; set; }
 
         public string DescriptionFilePath { get; set; }
-        
+
         public HashSet<string> Tags { get; set; }
 
         (bool isValid, Exception exception) IsValidChangeSet();

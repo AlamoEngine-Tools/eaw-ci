@@ -8,8 +8,7 @@ using EawXBuild.Core;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.Xml.v1
-{
+namespace EawXBuildTest.Configuration.Xml.v1 {
     [TestClass]
     public class BuildConfigParserTest {
         private const string Path = "MyXml.xml";
@@ -50,8 +49,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
                 "The value of the 'ConfigVersion' attribute does not equal its fixed value.";
             var factoryStub = new BuildComponentFactoryStub {Project = new ProjectStub()};
             var sut = new XmlBuildConfigParser(_fileSystem, factoryStub);
-            try
-            {
+            try {
                 sut.Parse(Path);
             }
             catch (Exception e) {
@@ -529,8 +527,7 @@ namespace EawXBuildTest.Configuration.Xml.v1
         }
 
         [TestMethod]
-        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse()
-        {
+        public void GivenNullConfig__TestIsValidConfiguration__ReturnsFalse() {
             var sut = new XmlBuildConfigParser(_fileSystem, null);
             var actual = sut.TestIsValidConfiguration(null);
             Assert.IsFalse(actual);

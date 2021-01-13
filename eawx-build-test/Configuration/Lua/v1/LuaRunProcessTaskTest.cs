@@ -40,10 +40,10 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             var sut = new LuaRunProcessTask(_taskBuilderMock, Path);
             var actual = sut.arguments(args);
-            
+
             Assert.AreSame(sut, actual);
         }
-        
+
         [TestMethod]
         public void GivenLuaRunProcessTask__WhenCallingWorkingDirectory__ShouldCallTaskBuilderWithWorkingDirectory() {
             const string workingDirectory = "another/dir";
@@ -61,10 +61,10 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             var sut = new LuaRunProcessTask(_taskBuilderMock, Path);
             var actual = sut.working_directory(workingDirectory);
-            
+
             Assert.AreSame(sut, actual);
         }
-        
+
         [TestMethod]
         public void GivenLuaRunProcessTask__WhenCallingAllowedToFail__ShouldCallTaskBuilderWithWorkingDirectory() {
             const bool allowedToFail = true;
@@ -82,7 +82,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             var sut = new LuaRunProcessTask(_taskBuilderMock, Path);
             var actual = sut.allowed_to_fail(allowedToFail);
-            
+
             Assert.AreSame(sut, actual);
         }
     }

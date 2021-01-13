@@ -1,10 +1,8 @@
 using CommandLine;
 
-namespace EawXBuild.Configuration.CLI
-{
+namespace EawXBuild.Configuration.CLI {
     [Verb("run", true, HelpText = "Run a CI project from an optionally specified configuration file.")]
-    internal class RunOptions : IOptions
-    {
+    internal class RunOptions : IOptions {
         public bool BackendLua { get; set; }
 
         public bool BackendXml { get; set; }

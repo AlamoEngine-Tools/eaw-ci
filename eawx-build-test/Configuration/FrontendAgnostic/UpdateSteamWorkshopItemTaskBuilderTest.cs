@@ -70,7 +70,7 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
             const uint expected = appId;
             Assert.AreEqual(expected, actual.AppId);
         }
-        
+
         [TestMethod]
         public void GivenTaskBuilder_WhenConfiguringTaskWithItemIdOfTypeInt_ShouldReturnTaskWithItemIdOfULong() {
             var sut = new UpdateSteamWorkshopItemTaskBuilder();

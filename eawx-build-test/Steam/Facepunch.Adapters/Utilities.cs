@@ -12,7 +12,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             return steamAppIdFile;
         }
 
-        public static IFileInfo CreateDescriptionFile(IFileSystem fileSystem, string descriptionFilePath, string description) {
+        public static IFileInfo CreateDescriptionFile(IFileSystem fileSystem, string descriptionFilePath,
+            string description) {
             var writer = fileSystem.File.CreateText(descriptionFilePath);
             writer.Write(description);
             writer.Close();

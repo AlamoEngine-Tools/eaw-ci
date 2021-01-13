@@ -11,7 +11,6 @@ using Steamworks.Ugc;
 using PublishResult = EawXBuild.Steam.PublishResult;
 
 namespace EawXBuildTest.Steam.Facepunch.Adapters {
-    
     [TestClass]
     public class FacepunchSteamWorkshopAdapterTest {
         private const string SteamUploadPath = "my_steam_upload";
@@ -33,7 +32,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             var streamWriter = _steamAppIdFile.AppendText();
             streamWriter.WriteLine("32470");
             streamWriter.Close();
-            
+
             _sut = FacepunchSteamWorkshopAdapter.Instance;
         }
 
@@ -55,7 +54,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             _steamAppIdFile.Delete();
             _itemFolder.Delete(true);
         }
-        
+
         [TestMethod]
         public async Task GivenWorkshopChangeSet__WhenPublishingToSteam__ItemShouldBeOnWorkshop() {
             if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
@@ -83,7 +82,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             _sut.Init(32470);
             const ulong fotrWorkshopId = 1976399102;
             var workshopItem = await _sut.QueryWorkshopItemByIdAsync(fotrWorkshopId);
-            
+
             Assert.AreEqual(fotrWorkshopId, workshopItem.ItemId);
             StringAssert.StartsWith(workshopItem.Title, "Empire at War Expanded");
         }
@@ -91,7 +90,7 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         private static async Task AssertItemMatchesSettings(WorkshopItemPublishResult publishTaskResult) {
             var item = await Item.GetAsync(publishTaskResult.ItemId);
             Assert.IsTrue(item.HasValue);
-            
+
             // TODO: The item data is not fetched properly even though it's there in Steam. Maybe it takes a while to register?
             // Assert.AreEqual(Title, item.Value.Title);
             // Assert.AreEqual(Description, item.Value.Description);
