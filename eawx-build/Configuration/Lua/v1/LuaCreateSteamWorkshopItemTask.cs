@@ -6,7 +6,6 @@ using NLua;
 namespace EawXBuild.Configuration.Lua.v1 {
     public class LuaCreateSteamWorkshopItemTask : ILuaTask {
         public LuaCreateSteamWorkshopItemTask(ITaskBuilder taskBuilder, LuaTable table) {
-            
             taskBuilder
                 .With("AppId", Convert.ToUInt32(table["app_id"]))
                 .With("Title", table["title"])

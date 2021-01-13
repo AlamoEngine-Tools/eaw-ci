@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest.Configuration.Lua.v1 {
     [TestClass]
     public class LuaProjectTest {
-
         [TestMethod]
         public void GivenLuaProjectWithName__WhenGettingProject__ProjectShouldHaveName() {
             var factoryStub = new BuildComponentFactoryStub();
@@ -15,7 +14,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var actual = sut.Project.Name;
             Assert.AreEqual("TestProject", actual);
         }
-        
+
         [TestMethod]
         public void GivenLuaProjectWithJob__WhenGettingProject__ProjectShouldHaveJob() {
             var jobStub = new JobStub();

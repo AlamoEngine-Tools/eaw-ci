@@ -3,7 +3,6 @@ using System;
 namespace EawXBuild.Exceptions {
     [Serializable]
     public class JobNotFoundException : Exception {
-        public JobNotFoundException(string jobName) : base($"No Job with name {jobName}") {
-        }
+        public JobNotFoundException(string jobName) : base($"No Job with name {jobName}") { }
     }
 }

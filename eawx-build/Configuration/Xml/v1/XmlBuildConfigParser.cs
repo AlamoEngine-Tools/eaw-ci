@@ -13,10 +13,8 @@ using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Core;
 using Microsoft.Extensions.Logging;
 
-namespace EawXBuild.Configuration.Xml.v1
-{
-    internal class XmlBuildConfigParser : IBuildConfigParser
-    {
+namespace EawXBuild.Configuration.Xml.v1 {
+    internal class XmlBuildConfigParser : IBuildConfigParser {
         private const string XsdResourceId = "v1.eaw-ci.xsd";
 
         private const string DefaultXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -41,8 +39,7 @@ namespace EawXBuild.Configuration.Xml.v1
         private readonly ILogger<XmlBuildConfigParser> _logger;
 
         public XmlBuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
-            ILoggerFactory loggerFactory = null)
-        {
+            ILoggerFactory loggerFactory = null) {
             _fileSystem = fileSystem;
             _factory = factory;
             _logger = loggerFactory?.CreateLogger<XmlBuildConfigParser>();
@@ -175,8 +172,7 @@ namespace EawXBuild.Configuration.Xml.v1
             XmlSchema schema;
             string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
                 .Single(str => str.EndsWith(XsdResourceId));
-            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
-            {
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res)) {
                 schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
             }
 

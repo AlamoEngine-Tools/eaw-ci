@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EawXBuildTest {
     [TestClass]
-    public class EawXBuildApplicationTest {
+    public class EawXBuildXmlApplicationTest {
         private const string DefaultXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <eaw-ci:BuildConfiguration ConfigVersion=""1.0.0"" xmlns:eaw-ci=""eaw-ci"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""eaw-ci eaw-ci.xsd "">
     <Projects>
@@ -119,8 +119,7 @@ namespace EawXBuildTest {
                 options.AddFilter<ConsoleLoggerProvider>(null, logLevel));
             services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
             services.AddTransient<IIOService, IOService>(serviceProvider =>
-                new IOService(fileSystem,
-                    serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<IOService>()));
+                new IOService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
             return services;
         }
     }

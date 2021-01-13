@@ -42,8 +42,8 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
                     break;
                 default:
                     throw new InvalidOperationException($"Invalid configuration option: {name}");
-                    
             }
+
             return this;
         }
 

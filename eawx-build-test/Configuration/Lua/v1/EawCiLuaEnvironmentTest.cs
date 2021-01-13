@@ -9,9 +9,8 @@ using static EawXBuildTest.Configuration.Lua.v1.NLuaUtilities;
 namespace EawXBuildTest.Configuration.Lua.v1 {
     [TestClass]
     public class EawCiLuaEnvironmentTest {
-
         private LuaMockFileSystemParser _luaParser;
-        
+
         [TestInitialize]
         public void SetUp() {
             _luaParser = new LuaMockFileSystemParser(new MockFileSystem());
@@ -21,7 +20,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         public void TearDown() {
             _luaParser.Dispose();
         }
-        
+
         [TestMethod]
         public void WhenCallingCopy__ShouldCallBuildComponentFactoryWithCopyTaskName() {
             var factorySpy = new BuildComponentFactorySpy();
@@ -39,7 +38,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             Assert.IsInstanceOfType(actual, typeof(LuaCopyTask));
         }
-        
+
         [TestMethod]
         public void WhenCallingLink__ShouldCallBuildComponentFactoryWithSoftCopyTaskName() {
             var factorySpy = new BuildComponentFactorySpy();
@@ -48,7 +47,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             Assert.AreSame("SoftCopy", factorySpy.ActualTaskTypeName);
         }
-        
+
         [TestMethod]
         public void WhenCallingLink__ShouldReturnLuaCopyTask() {
             var factoryStub = new BuildComponentFactoryStub();
@@ -72,10 +71,10 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             var factorySpy = new BuildComponentFactorySpy();
             var sut = new EawCiLuaEnvironment(factorySpy, _luaParser);
             var actual = sut.Clean(string.Empty);
-            
+
             Assert.IsInstanceOfType(actual, typeof(LuaCleanTask));
         }
-        
+
         [TestMethod]
         public void WhenCallingRunProcess__ShouldCallBuildComponentFactoryWithRunProgramTaskName() {
             var factorySpy = new BuildComponentFactorySpy();
@@ -84,49 +83,51 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             Assert.AreSame("RunProgram", factorySpy.ActualTaskTypeName);
         }
-        
+
         [TestMethod]
         public void WhenCallingRunProcess__ShouldReturnLuaRunProcessTask() {
             var factorySpy = new BuildComponentFactorySpy();
             var sut = new EawCiLuaEnvironment(factorySpy, _luaParser);
             var actual = sut.RunProcess(string.Empty);
-            
+
             Assert.IsInstanceOfType(actual, typeof(LuaRunProcessTask));
         }
-        
+
         [TestMethod]
-        public void WhenCallingCreateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithCreateWorkshopItemTaskName() {
+        public void
+            WhenCallingCreateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithCreateWorkshopItemTaskName() {
             var factorySpy = new BuildComponentFactorySpy();
             var sut = new EawCiLuaEnvironment(factorySpy, _luaParser);
-            
+
             var table = MakeLuaTable(_luaParser.Lua, "the_table");
             sut.CreateSteamWorkshopItem(table);
 
             Assert.AreSame("CreateSteamWorkshopItem", factorySpy.ActualTaskTypeName);
         }
-        
+
         [TestMethod]
         public void WhenCallingCreateSteamWorkshopItem__ShouldReturnLuaCreateSteamWorkshopItemTask() {
             var factorySpy = new BuildComponentFactorySpy();
             var sut = new EawCiLuaEnvironment(factorySpy, _luaParser);
-            
+
             var table = MakeLuaTable(_luaParser.Lua, "the_table");
             var actual = sut.CreateSteamWorkshopItem(table);
-            
+
             Assert.IsInstanceOfType(actual, typeof(LuaCreateSteamWorkshopItemTask));
         }
-        
+
         [TestMethod]
-        public void WhenCallingUpdateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithUpdateWorkshopItemTaskName() {
+        public void
+            WhenCallingUpdateSteamWorkshopItem__ShouldCallBuildComponentFactoryWithUpdateWorkshopItemTaskName() {
             var factorySpy = new BuildComponentFactorySpy();
             var sut = new EawCiLuaEnvironment(factorySpy, _luaParser);
-            
+
             var table = MakeLuaTable(_luaParser.Lua, "the_table");
             sut.UpdateSteamWorkshopItem(table);
 
             Assert.AreSame("UpdateSteamWorkshopItem", factorySpy.ActualTaskTypeName);
         }
-        
+
         [TestMethod]
         public void WhenCallingUpdateSteamWorkshopItem__ShouldReturnLuaUpdateSteamWorkshopItemTask() {
             var factorySpy = new BuildComponentFactorySpy();
@@ -134,7 +135,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             var table = MakeLuaTable(_luaParser.Lua, "the_table");
             var actual = sut.UpdateSteamWorkshopItem(table);
-            
+
             Assert.IsInstanceOfType(actual, typeof(LuaUpdateSteamWorkshopItemTask));
         }
 
@@ -146,6 +147,5 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             Assert.AreEqual(visibilityTable["private"], WorkshopItemVisibility.Private);
             Assert.AreEqual(visibilityTable["public"], WorkshopItemVisibility.Public);
         }
-
     }
 }

@@ -17,7 +17,7 @@ namespace EawXBuild.Steam {
         public string ItemFolderPath { get; set; }
         public WorkshopItemVisibility Visibility { get; set; }
         public string DescriptionFilePath { get; set; }
-        
+
         public HashSet<string> Tags { get; set; }
 
         public string GetDescriptionTextFromFile() {

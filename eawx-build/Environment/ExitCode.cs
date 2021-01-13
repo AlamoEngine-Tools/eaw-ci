@@ -1,5 +1,4 @@
-namespace EawXBuild.Environment
-{
+namespace EawXBuild.Environment {
     /**
      * Standard exit codes used within bash and C/C++
      * Sources:
@@ -16,8 +15,7 @@ namespace EawXBuild.Environment
      *   </item>
      * </list>
      */
-    public enum ExitCode
-    {
+    public enum ExitCode {
         /**
          * The program ran successfully.
          */
@@ -141,10 +139,12 @@ namespace EawXBuild.Environment
          * User aborted with Control+C, Control-C is fatal error signal 2, (130 = 128 + 2, see above)
          */
         UserAbortedError = 130,
+
         /**
          * Catchall for high error codes.
          */
         ExitOutOfRangeError = 255,
+
         // Reserved ranges:
         // 0-2, 64 - 78, 126 - 165, 255
         // ===== ===== eawx-build specific error codes below ===== =====
@@ -152,10 +152,12 @@ namespace EawXBuild.Environment
          * A single job did not complete successfully.
          */
         SingleJobFailed = 80,
+
         /**
          * Multiple jobs did not complete successfully.
          */
         MultipleJobsFailed = 81,
+
         /**
          * The project run failed.
          */

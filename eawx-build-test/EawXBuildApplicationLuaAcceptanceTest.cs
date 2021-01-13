@@ -16,7 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest {
     [TestClass]
     public class EawXBuildApplicationLuaAcceptanceTest {
-
         private readonly IFileSystem _fileSystem = new FileSystem();
         private const string LuaConfigFilePath = "eaw-ci.lua";
         private IFileInfo _luaConfigFile;
@@ -43,9 +42,9 @@ namespace EawXBuildTest {
             local job = proj:add_job('My-Job')
             job:add_task(copy('eaw-ci.lua', 'newfile.lua'))
             ";
-            
+
             CreateConfigFile(config);
-            
+
             var options = new RunOptions {
                 BackendLua = true,
                 ConfigPath = "eaw-ci.lua",
@@ -60,7 +59,7 @@ namespace EawXBuildTest {
             var actual = _fileSystem.File.Exists("newfile.lua");
             Assert.IsTrue(actual);
         }
-        
+
         [TestMethod]
         public void GivenConfig_With_OneProject_OneJob_And_RunProcessTask__WhenRunning__ShouldRunProcess() {
             const string config = @"
@@ -71,12 +70,12 @@ namespace EawXBuildTest {
                 :arguments('Hello World')
             )
             ";
-            
+
             CreateConfigFile(config);
 
             var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
-            
+
             var options = new RunOptions {
                 BackendLua = true,
                 ConfigPath = "eaw-ci.lua",
@@ -105,8 +104,7 @@ namespace EawXBuildTest {
                 options.AddFilter<ConsoleLoggerProvider>(null, logLevel));
             services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
             services.AddTransient<IIOService, IOService>(serviceProvider =>
-                new IOService(fileSystem,
-                    serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<IOService>()));
+                new IOService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
             services.AddTransient<ILuaParser, NLuaParser>();
             return services;
         }

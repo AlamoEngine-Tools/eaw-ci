@@ -7,9 +7,9 @@ namespace EawXBuild.Tasks.Steam {
         public string Id { get; set; }
 
         public string Name { get; set; }
-        
+
         public uint AppId { get; set; }
-        
+
         public IWorkshopItemChangeSet ChangeSet { get; set; }
 
         public void Run() {
@@ -17,7 +17,7 @@ namespace EawXBuild.Tasks.Steam {
             ValidateChangeSet();
             PublishToWorkshop();
         }
-        
+
         private void ValidateAppId() {
             if (AppId == 0) throw new InvalidOperationException("No AppId set");
         }

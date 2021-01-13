@@ -63,13 +63,6 @@ namespace EawXBuild {
                 exitCode = ioService.ValidatePath(pathIn, currentDirectory, fileExtension);
                 return false;
             }
-            else
-            {
-                if (runOptions.BackendLua)
-                {
-                    buildConfigParser = GetLuaBuildConfigParserInternal();
-                }
-            }
 
             pathOut = ioService.ResolvePath(pathIn, currentDirectory, fileExtension);
             exitCode = ExitCode.Success;

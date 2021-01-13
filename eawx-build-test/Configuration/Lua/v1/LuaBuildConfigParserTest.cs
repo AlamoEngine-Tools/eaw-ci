@@ -15,7 +15,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         private MockFileSystem _fileSystem;
         private MockFileData _mockFileData;
         private LuaMockFileSystemParser _luaMockFileParser;
-        
+
         private static readonly string[] ExpectedTags = {"EAW", "FOC"};
 
         [TestInitialize]
@@ -265,7 +265,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
-        public void GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+        public void
+            GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -294,13 +295,14 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+        public void
+            GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -353,7 +355,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
-        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+        public void
+            GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -384,13 +387,14 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+        public void
+            GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')

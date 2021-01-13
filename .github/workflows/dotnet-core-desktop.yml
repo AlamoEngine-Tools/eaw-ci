@@ -58,7 +58,8 @@ jobs:
     env:
       Solution_Name: eawx-build.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: eawx-build-test/eawx-build-test.csproj                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      
     steps:
     - name: Checkout
       uses: actions/checkout@v2

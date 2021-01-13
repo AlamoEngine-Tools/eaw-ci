@@ -47,30 +47,32 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
             taskBuilderMock.Verify();
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenLuaUpdateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags() {
+        public void
+            GivenLuaUpdateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags() {
             var taskBuilderSpy = new TaskBuilderSpy();
             using var luaInterpreter = new NLua.Lua();
             var table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
-            
+
             var sut = new LuaUpdateSteamWorkshopItemTask(taskBuilderSpy, table);
 
             var actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
-        
+
         /// <summary>
         /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
         /// Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
-        public void GivenLuaUpdateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags() {
+        public void
+            GivenLuaUpdateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags() {
             var taskBuilderSpy = new TaskBuilderSpy();
             using var luaInterpreter = new NLua.Lua();
 
@@ -83,7 +85,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
-        
+
         private static LuaTable CreateConfigurationTableWithOnlyTags(NLua.Lua luaInterpreter) {
             var table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
             var tags = NLuaUtilities.MakeLuaTable(luaInterpreter, "tag_table");

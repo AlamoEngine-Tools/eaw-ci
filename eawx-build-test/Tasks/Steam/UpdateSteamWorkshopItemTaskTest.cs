@@ -16,8 +16,8 @@ namespace EawXBuildTest.Tasks.Steam {
         private const string DescriptionFilePath = "path/to/description";
         private const string ExpectedDirectoryName = "path/to/directory";
         private readonly HashSet<string> ExpectedTags = new HashSet<string> {"EAW", "FOC"};
-        
-        
+
+
         [TestMethod]
         public void
             GivenTaskWithItemId_Title_Description_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings() {
@@ -62,9 +62,9 @@ namespace EawXBuildTest.Tasks.Steam {
                     ChangeSetValidationResult = (true, null)
                 }
             };
-            
+
             sut.Run();
-            
+
             callOrderMock.Verify();
         }
 
@@ -99,7 +99,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             sut.Run();
         }
-        
+
         [TestMethod]
         public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient() {
             var workshopItemSpy = new WorkshopItemStub {Result = PublishResult.Failed};
@@ -115,7 +115,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             Action actual = () => sut.Run();
             Assert.ThrowsException<ProcessFailedException>(actual);
-            
+
             Assert.IsTrue(workshopSpy.WasShutdown);
         }
 
@@ -134,7 +134,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             sut.Run();
         }
-        
+
         [TestMethod]
         public void GivenTaskWithNonExistingItemId__WhenRunningTask__ShouldShutDownSteamClient() {
             var workshopSpy = new SteamWorkshopSpy {
@@ -149,10 +149,10 @@ namespace EawXBuildTest.Tasks.Steam {
 
             Action actual = () => sut.Run();
             Assert.ThrowsException<WorkshopItemNotFoundException>(actual);
-            
+
             Assert.IsTrue(workshopSpy.WasShutdown);
         }
-        
+
         [TestMethod]
         public void GivenTaskWithoutAppId__WhenRunningTask__ShouldThrowException() {
             var workshop = new SteamWorkshopDummy();
@@ -165,7 +165,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             Assert.AreEqual("No AppId set", actual.Message);
         }
-        
+
         [TestMethod]
         public void GivenTaskWithoutAppId__WhenRunningTask__ShouldNotInitWorkshop() {
             var workshop = new SteamWorkshopSpy();
@@ -188,10 +188,10 @@ namespace EawXBuildTest.Tasks.Steam {
             };
 
             var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
-            
+
             Assert.AreEqual("No ItemId set", actual.Message);
         }
-        
+
         [TestMethod]
         public void GivenTaskWithoutItemId__WhenRunningTask__ShouldNotInitWorkshop() {
             var workshop = new SteamWorkshopSpy();
@@ -246,8 +246,7 @@ namespace EawXBuildTest.Tasks.Steam {
             Assert.IsNull(workshopItemSpy.ReceivedSettings);
         }
 
-        
-        
+
         private static WorkshopItemChangeSetStub CreateValidChangeSet() {
             return new WorkshopItemChangeSetStub {
                 ChangeSetValidationResult = (true, null)
