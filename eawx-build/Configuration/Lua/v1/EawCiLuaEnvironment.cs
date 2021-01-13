@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using EawXBuild.Core;
+using EawXBuild.Steam;
 using NLua;
 
 namespace EawXBuild.Configuration.Lua.v1 {
@@ -9,8 +9,11 @@ namespace EawXBuild.Configuration.Lua.v1 {
 
         public List<IProject> Projects { get; } = new List<IProject>();
 
-        public EawCiLuaEnvironment(IBuildComponentFactory factory) {
+        public EawCiLuaEnvironment(IBuildComponentFactory factory, ILuaParser parser) {
             _factory = factory;
+            var luaTable = parser.NewTable("visibility");
+            luaTable["private"] = WorkshopItemVisibility.Private;
+            luaTable["public"] = WorkshopItemVisibility.Public;
         }
 
         [LuaGlobal(Name = "project")]
@@ -39,6 +42,16 @@ namespace EawXBuild.Configuration.Lua.v1 {
         [LuaGlobal(Name = "run_process")]
         public ILuaTask RunProcess(string path) {
             return new LuaRunProcessTask(_factory.Task("RunProgram"), path);
+        }
+        
+        [LuaGlobal(Name = "create_steam_workshop_item")]
+        public ILuaTask CreateSteamWorkshopItem(LuaTable luaTable) {
+            return new LuaCreateSteamWorkshopItemTask(_factory.Task("CreateSteamWorkshopItem"), luaTable);
+        }
+
+        [LuaGlobal(Name = "update_steam_workshop_item")]
+        public ILuaTask UpdateSteamWorkshopItem(LuaTable luaTable) {
+            return new LuaUpdateSteamWorkshopItemTask(_factory.Task("UpdateSteamWorkshopItem"), luaTable);
         }
     }
 }
