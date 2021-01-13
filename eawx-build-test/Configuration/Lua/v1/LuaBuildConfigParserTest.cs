@@ -3,6 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
+using EawXBuild.Steam;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,6 +15,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         private MockFileSystem _fileSystem;
         private MockFileData _mockFileData;
         private LuaMockFileSystemParser _luaMockFileParser;
+        
+        private static readonly string[] ExpectedTags = {"EAW", "FOC"};
 
         [TestInitialize]
         public void SetUp() {
@@ -235,6 +238,186 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
+        public void GivenConfigWithProjectWithJobAndCreateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    tags = {'EAW', 'FOC'},
+                    language = 'English'
+                })  
+            ";
+            _mockFileData.TextContents = lua;
+
+            var jobStub = new JobStub();
+            var taskDummy = new TaskDummy();
+            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+
+            MakeSutAndParse(factoryStub);
+
+            var actualTask = jobStub.Tasks.First();
+            Assert.AreEqual(taskDummy, actualTask);
+        }
+
+        [TestMethod]
+        public void GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English'
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+                {"AppId", (uint) 32470},
+                {"Title", "my-test-item"},
+                {"DescriptionFilePath", "path/to/description"},
+                {"ItemFolderPath", "path/to/folder"},
+                {"Visibility", WorkshopItemVisibility.Private},
+                {"Language", "English"}
+            });
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            taskBuilderMock.Verify();
+        }
+        
+        /// <summary>
+        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
+        /// Instead we're querying the "Tags" key manually
+        /// </summary>
+        [TestMethod]
+        public void GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(create_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English',
+                    tags = {'EAW', 'FOC'}
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderSpy = new TaskBuilderSpy();
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderSpy};
+            MakeSutAndParse(factoryStub);
+
+            var actual = taskBuilderSpy["Tags"];
+            Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
+        }
+
+        [TestMethod]
+        public void GivenConfigWithProjectWithJobAndUpdateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English'
+                })  
+            ";
+            _mockFileData.TextContents = lua;
+
+            var jobStub = new JobStub();
+            var taskDummy = new TaskDummy();
+            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+
+            MakeSutAndParse(factoryStub);
+
+            var actualTask = jobStub.Tasks.First();
+            Assert.AreEqual(taskDummy, actualTask);
+        }
+
+        [TestMethod]
+        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    item_id = 1234,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English'
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+                {"AppId", (uint) 32470},
+                {"ItemId", (ulong) 1234},
+                {"Title", "my-test-item"},
+                {"DescriptionFilePath", "path/to/description"},
+                {"ItemFolderPath", "path/to/folder"},
+                {"Visibility", WorkshopItemVisibility.Private},
+                {"Language", "English"},
+            });
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            taskBuilderMock.Verify();
+        }
+        
+        /// <summary>
+        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
+        /// Instead we're querying the "Tags" key manually
+        /// </summary>
+        [TestMethod]
+        public void GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            const string lua = @"
+                local p = project('test')
+                local j = p:add_job('test-job')
+                j:add_task(update_steam_workshop_item {
+                    app_id = 32470,
+                    item_id = 1234,
+                    title = 'my-test-item',
+                    description_file = 'path/to/description',
+                    item_folder = 'path/to/folder',
+                    visibility = visibility.private,
+                    language = 'English',
+                    tags = {'EAW', 'FOC'}
+                })
+            ";
+            _mockFileData.TextContents = lua;
+
+            var taskBuilderMock = new TaskBuilderSpy();
+
+            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            MakeSutAndParse(factoryStub);
+
+            var actual = taskBuilderMock["Tags"];
+            Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
+        }
+
+        [TestMethod]
         public void GivenJobWithMultipleTasks__WhenCallingParse__JobShouldHaveAllTasks() {
             const string lua = @"
                 local p = project('test')
@@ -244,7 +427,7 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             _mockFileData.TextContents = lua;
 
             var jobStub = new JobStub();
-            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()}; 
+            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()};
             var factoryStub = new BuildComponentFactoryStub {
                 Job = jobStub,
                 TaskBuilder = new IteratingTaskBuilderStub {

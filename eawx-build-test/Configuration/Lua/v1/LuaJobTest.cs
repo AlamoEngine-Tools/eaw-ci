@@ -2,8 +2,8 @@ using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NLua;
 using NLua.Exceptions;
+using static EawXBuildTest.Configuration.Lua.v1.NLuaUtilities;
 
 namespace EawXBuildTest.Configuration.Lua.v1 {
     [TestClass]
@@ -51,10 +51,5 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             sut.add_tasks(invalidTable);
         }
 
-        private static LuaTable MakeLuaTable(NLua.Lua luaInterpreter, string tableName) {
-            luaInterpreter.NewTable(tableName);
-            var taskTable = luaInterpreter.GetTable(tableName);
-            return taskTable;
-        }
     }
 }

@@ -5,23 +5,29 @@ using NLua;
 namespace EawXBuildTest.Configuration.Lua.v1 {
     public class LuaMockFileSystemParser : ILuaParser {
         private readonly MockFileSystem _fileSystem;
-        private NLua.Lua _lua = new NLua.Lua();
 
         public LuaMockFileSystemParser(MockFileSystem fileSystem) {
             _fileSystem = fileSystem;
         }
 
+        public NLua.Lua Lua { get; } = new NLua.Lua();
+
+        public LuaTable NewTable(string fullPath) {
+            Lua.NewTable(fullPath);
+            return Lua.GetTable(fullPath);
+        }
+
         public void RegisterObject(object obj) {
-            LuaRegistrationHelper.TaggedInstanceMethods(_lua, obj);
+            LuaRegistrationHelper.TaggedInstanceMethods(Lua, obj);
         }
 
         public void DoFile(string fileName) {
             var fileData = _fileSystem.GetFile(fileName);
-            _lua.DoString(fileData.TextContents);
+            Lua.DoString(fileData.TextContents);
         }
 
         public void Dispose() {
-            _lua?.Dispose();
+            Lua?.Dispose();
         }
     }
 }

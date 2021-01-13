@@ -16,7 +16,7 @@ namespace EawXBuild.Configuration.Lua.v1 {
         }
 
         public IEnumerable<IProject> Parse(string filePath) {
-            var luaEnvironment = new EawCiLuaEnvironment(_factory);
+            var luaEnvironment = new EawCiLuaEnvironment(_factory, _luaParser);
             _luaParser.RegisterObject(luaEnvironment);
             _luaParser.DoFile(filePath);
             return luaEnvironment.Projects;

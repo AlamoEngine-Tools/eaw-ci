@@ -1,0 +1,189 @@
+using System;
+using System.Collections.Generic;
+using EawXBuild.Exceptions;
+using EawXBuild.Steam;
+using EawXBuild.Tasks.Steam;
+using EawXBuildTest.Steam;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace EawXBuildTest.Tasks.Steam {
+    [TestClass]
+    public class CreateSteamWorkshopItemTaskTest {
+        private const string Title = "My Workshop Item";
+        private const string DescriptionFilePath = "path/to/description";
+        private const string Language = "Spanish";
+        private const string ExpectedDirectoryName = "path/to/directory";
+        private const uint AppId = 32470;
+        private readonly HashSet<string> ExpectedTags = new HashSet<string> {"EAW", "FOC"};
+
+        private static CreateSteamWorkshopItemTask MakeSutWithWorkshopAndChangeSet(ISteamWorkshop workshop,
+            IWorkshopItemChangeSet changeSet) {
+            return new CreateSteamWorkshopItemTask(workshop) {
+                AppId = AppId,
+                ChangeSet = changeSet
+            };
+        }
+
+        [TestMethod]
+        public void
+            GivenTaskWithAppId_Title_Description_Language_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings() {
+            var workshopSpy = MakeSteamWorkshopSpy();
+            var changeSetStub = new WorkshopItemChangeSetStub {
+                ChangeSetValidationResult = (true, null),
+
+                Title = Title,
+                DescriptionFilePath = DescriptionFilePath,
+                ItemFolderPath = ExpectedDirectoryName,
+                Language = Language,
+                Visibility = WorkshopItemVisibility.Public,
+                Tags = ExpectedTags
+            };
+
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, changeSetStub);
+
+            sut.Run();
+
+            var actual = workshopSpy.ReceivedSettings;
+            Assert.AreEqual(AppId, workshopSpy.AppId);
+            Assert.AreEqual(Title, actual.Title);
+            Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
+            Assert.AreEqual(Language, actual.Language);
+            Assert.AreEqual(WorkshopItemVisibility.Public, actual.Visibility);
+            Assert.AreEqual(ExpectedDirectoryName, actual.ItemFolderPath);
+            Assert.AreEqual(ExpectedTags, actual.Tags);
+        }
+
+        [TestMethod]
+        public void
+            GivenConfiguredTaskWithoutLanguage_And_Visibility__WhenRunningTask__ShouldPublishWith_EmptyDescription_PrivateVisibility_And_EnglishLanguage() {
+            var workshopSpy = MakeSteamWorkshopSpy();
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
+
+            sut.Run();
+
+            var actual = workshopSpy.ReceivedSettings;
+            AssertPublishedWithDefaultSettings(actual);
+        }
+
+        [TestMethod]
+        public void
+            GivenTaskWithAppId__WhenRunningTask__ShouldSetAppIdThenPublishThenShutdown() {
+            var workshopSpy = MakeSteamWorkshopSpy();
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
+
+            sut.Run();
+
+            AssertSetAppIdThenPublishThenShutdown(workshopSpy);
+        }
+        
+        [TestMethod]
+        public void
+            GivenValidTask__WhenRunningTask__ShouldShutdownAfterPublishFinished() {
+            var workshopMock = new VerifyAwaitPublishTaskMock {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(1, PublishResult.Ok)
+            };
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopMock, CreateValidChangeSet());
+
+            sut.Run();
+
+            workshopMock.Verify();
+        }
+
+        [TestMethod]
+        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldThrowExceptionFromChangeSet() {
+            var workshopSpy = MakeSteamWorkshopSpy();
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateInvalidChangeSet());
+
+            Action actual = () => sut.Run();
+
+            Assert.ThrowsException<InvalidOperationException>(actual);
+        }
+
+        [TestMethod]
+        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldNotPublishToSteamWorkshop() {
+            var workshopSpy = MakeSteamWorkshopSpy();
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateInvalidChangeSet());
+
+            Action actual = () => sut.Run();
+            Assert.ThrowsException<InvalidOperationException>(actual);
+
+            Assert.IsNull(workshopSpy.ReceivedSettings);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ProcessFailedException))]
+        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldThrowProcessFailedException() {
+            var workshopStub = new SteamWorkshopStub {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)
+            };
+
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopStub, CreateValidChangeSet());
+
+            sut.Run();
+        }
+        
+        [TestMethod]
+        public void
+            GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient() {
+            var workshopSpy = new SteamWorkshopSpy {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(AppId, PublishResult.Failed)
+            };
+
+            var sut = MakeSutWithWorkshopAndChangeSet(workshopSpy, CreateValidChangeSet());
+
+            Action action = () => sut.Run();
+
+            Assert.ThrowsException<ProcessFailedException>(action);
+            Assert.IsTrue(workshopSpy.WasShutdown);
+        }
+
+        [TestMethod]
+        public void GivenTaskWithoutAppId__WhenRunningTask__ShouldThrowException() {
+            var workshop = new SteamWorkshopDummy();
+            var sut = new CreateSteamWorkshopItemTask(workshop) {
+                ChangeSet = CreateValidChangeSet()
+            };
+
+            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+
+            Assert.AreEqual("No AppId set", actual.Message);
+        }
+
+        [TestMethod]
+        public void GivenTaskWithoutChangeSet__WhenRunningTask__ShouldThrowException() {
+            var workshop = new SteamWorkshopDummy();
+            var sut = new CreateSteamWorkshopItemTask(workshop) {AppId = AppId};
+
+            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+
+            Assert.AreEqual("No change set given", actual.Message);
+        }
+
+        private static void AssertSetAppIdThenPublishThenShutdown(SteamWorkshopSpy workshopSpy) {
+            Assert.AreEqual("apd", workshopSpy.CallOrder);
+        }
+
+        private static void AssertPublishedWithDefaultSettings(IWorkshopItemChangeSet actual) {
+            Assert.AreEqual("English", actual.Language);
+            Assert.AreEqual(WorkshopItemVisibility.Private, actual.Visibility);
+        }
+
+        private static SteamWorkshopSpy MakeSteamWorkshopSpy() {
+            return new SteamWorkshopSpy {
+                WorkshopItemPublishResult = new WorkshopItemPublishResult(1, PublishResult.Ok)
+            };
+        }
+
+        private static WorkshopItemChangeSetStub CreateValidChangeSet() {
+            return new WorkshopItemChangeSetStub {
+                ChangeSetValidationResult = (true, null)
+            };
+        }
+
+        private static WorkshopItemChangeSetStub CreateInvalidChangeSet() {
+            return new WorkshopItemChangeSetStub {
+                ChangeSetValidationResult = (false, new InvalidOperationException())
+            };
+        }
+    }
+}

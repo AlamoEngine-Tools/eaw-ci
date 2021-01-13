@@ -8,8 +8,10 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
     internal enum Tasks {
         Clean,
         Copy,
+        CreateSteamWorkshopItem,
         RunProgram,
-        SoftCopy
+        SoftCopy,
+        UpdateSteamWorkshopItem
     }
 
     public class BuildComponentFactory : IBuildComponentFactory {
@@ -35,6 +37,8 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
                 Tasks.Clean => new CleanTaskBuilder(),
                 Tasks.Copy => new CopyTaskBuilder(new CopyPolicy()),
                 Tasks.SoftCopy => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
+                Tasks.CreateSteamWorkshopItem => new CreateSteamWorkshopItemTaskBuilder(),
+                Tasks.UpdateSteamWorkshopItem => new UpdateSteamWorkshopItemTaskBuilder(),
                 _ => null
             };
         }

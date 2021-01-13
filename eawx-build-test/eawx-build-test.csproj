@@ -32,4 +32,22 @@
     <Folder Include="Configuration\Xml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
+      <HintPath>..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+      <HintPath>..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Win64, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+      <HintPath>..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyLibSteam" AfterTargets="AfterBuild">
+    <Copy SourceFiles="..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.so" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
+    <Copy SourceFiles="..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\SteamAPI/libsteam_api.bundle" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('OSX'))" />
+    <Copy SourceFiles="..\eawx-build\Steam\Facepunch.Steamworks\2.3.2\SteamAPI/steam_api64.dll" DestinationFolder="$(OutDir)" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
+  </Target>
+
 </Project>

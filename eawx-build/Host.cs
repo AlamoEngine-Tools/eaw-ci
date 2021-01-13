@@ -52,7 +52,8 @@ namespace EawXBuild
             serviceCollection.AddTransient<IIOService, IOService>(s =>
                 new IOService(new FileSystem(), lsp.GetRequiredService<ILoggerFactory>().CreateLogger<IOService>()));
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
-                new BuildComponentFactory(lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
+                new BuildComponentFactory(
+                    lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
         }
 
         private static void HandleParseErrorsInternal(IEnumerable<Error> errs)
@@ -63,6 +64,7 @@ namespace EawXBuild
                 System.Environment.ExitCode = (int) ExitCode.Success;
                 return;
             }
+
             System.Environment.ExitCode = (int) ExitCode.ExUsage;
         }
     }
