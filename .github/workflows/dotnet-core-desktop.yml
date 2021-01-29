@@ -102,6 +102,11 @@ jobs:
       - name: Install zlib
         run: sudo apt-get install -y zlib1g
 
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.2
         with:
@@ -109,4 +114,4 @@ jobs:
           
       # Execute all unit tests in the solution
       - name: Execute unit tests
-        run: dotnet test eawx-build-test/eawx-build-test.csproj
+        run: dotnet test
