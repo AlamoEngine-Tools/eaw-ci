@@ -45,14 +45,13 @@ on:
     branches: [ master ]
 
 jobs:
-
-  build:
+  build_windows:
 
     strategy:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: [windows-latest, ubuntu-latest]  # For a list of available runner types, refer to
+    runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
@@ -85,4 +84,26 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+        
+        
+  build_ubuntu:
+    runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    env:
+      Solution_Name: eawx-build.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
+      Test_Project_Path: eawx-build-test/eawx-build-test.csproj                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      
+    steps:
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 3.1.101  
+          
+      # Execute all unit tests in the solution
+      - name: Execute unit tests
+        run: dotnet test
