@@ -55,7 +55,7 @@ namespace EawXBuildTest {
 
         [TestInitialize]
         public void SetUp() {
-            _services = ConfigureServices(_fileSystem);
+            _services = ConfigureServices();
         }
 
         [TestCleanup]
@@ -91,8 +91,8 @@ namespace EawXBuildTest {
             Assert.IsTrue(actual);
         }
 
-        [TestMethod]
-        public void WhenRunningWith_OneProject_OneJob_And_RunProgramTask__ShouldRunProgram() {
+        [PlatformSpecificTestMethod("Linux", "OSX")]
+        public void GivenUnixLikeSystem__WhenRunningWith_OneProject_OneJob_And_RunProgramTask__ShouldRunProgram() {
             var options = new RunOptions {
                 BackendXml = true,
                 ConfigPath = "eaw-ci.xml",
@@ -112,7 +112,7 @@ namespace EawXBuildTest {
             Assert.AreEqual("Hello World", actual);
         }
 
-        private static ServiceCollection ConfigureServices(IFileSystem fileSystem, LogLevel logLevel = LogLevel.None) {
+        private static ServiceCollection ConfigureServices(LogLevel logLevel = LogLevel.None) {
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddConsole());
             services.Configure<LoggerFilterOptions>(options =>
