@@ -86,10 +86,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
         }
 
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         public async Task GivenWorkshopItem__WhenUpdatingSuccessfully__ShouldReturnOk() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
@@ -100,11 +98,9 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             Assert.AreEqual(PublishResult.Ok, actual);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         [Ignore]
         public async Task GivenWorkshopItemWithChangedTitle__WhenUpdating__TitleShouldHaveChanged() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
@@ -116,11 +112,9 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             Assert.AreEqual(Title, item.Value.Title);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         [Ignore]
         public async Task GivenWorkshopItemWithChangedDescription__WhenUpdating__DescriptionShouldHaveChanged() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
@@ -134,11 +128,9 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             Assert.AreEqual(Description, item.Value.Description);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         [Ignore]
         public async Task GivenWorkshopItemWithChangedVisibility__WhenUpdating__VisibilityShouldHaveChanged() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             var item = await Item.GetAsync(_itemId);
             Assert.IsNotNull(item);
 
@@ -152,9 +144,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             Assert.IsTrue(item.Value.IsPublic);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         public async Task GivenWorkshopItemWithChangedItemFolderPath__WhenUpdating__ShouldHaveChangedFiles() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
             var item = GetItem(_itemId);
 
             var sut = new FacepunchWorkshopItemAdapter(item);

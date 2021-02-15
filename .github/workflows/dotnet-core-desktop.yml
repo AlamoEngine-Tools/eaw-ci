@@ -45,8 +45,7 @@ on:
     branches: [ master ]
 
 jobs:
-
-  build:
+  build_windows:
 
     strategy:
       matrix:
@@ -85,4 +84,34 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+        
+        
+  build_ubuntu:
+    runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    env:
+      Solution_Name: eawx-build.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
+      Test_Project_Path: eawx-build-test/eawx-build-test.csproj                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+      
+    steps:
+      - name: Install zlib
+        run: sudo apt-get install -y zlib1g
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 3.1.101  
+          
+      # Execute all unit tests in the solution
+      - name: Execute unit tests
+        run: dotnet test

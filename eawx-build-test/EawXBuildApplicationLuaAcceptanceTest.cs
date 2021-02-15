@@ -60,8 +60,8 @@ namespace EawXBuildTest {
             Assert.IsTrue(actual);
         }
 
-        [TestMethod]
-        public void GivenConfig_With_OneProject_OneJob_And_RunProcessTask__WhenRunning__ShouldRunProcess() {
+        [PlatformSpecificTestMethod("Linux", "OSX")]
+        public void GivenUnixLikeSystem_And_Config_With_OneProject_OneJob_And_RunProcessTask__WhenRunning__ShouldRunProcess() {
             const string config = @"
             local proj = project('pid0')
             local job = proj:add_job('My-Job')

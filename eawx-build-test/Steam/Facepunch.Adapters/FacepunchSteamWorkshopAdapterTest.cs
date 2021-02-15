@@ -55,10 +55,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             _itemFolder.Delete(true);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         public async Task GivenWorkshopChangeSet__WhenPublishingToSteam__ItemShouldBeOnWorkshop() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             var changeSet = new WorkshopItemChangeSet(_fileSystem) {
                 Title = Title,
                 DescriptionFilePath = DescriptionFilePath,
@@ -75,10 +73,8 @@ namespace EawXBuildTest.Steam.Facepunch.Adapters {
             await AssertItemMatchesSettings(publishTaskResult);
         }
 
-        [TestMethod]
+        [TestMethodWithRequiredEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT", "YES")]
         public async Task WhenQueryingForItemId__ShouldReturnItemWithId() {
-            if (Environment.GetEnvironmentVariable("EAW_CI_TEST_STEAM_CLIENT") != "YES") Assert.Inconclusive();
-
             _sut.Init(32470);
             const ulong fotrWorkshopId = 1976399102;
             var workshopItem = await _sut.QueryWorkshopItemByIdAsync(fotrWorkshopId);

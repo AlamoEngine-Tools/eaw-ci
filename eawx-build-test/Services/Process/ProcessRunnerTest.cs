@@ -8,7 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EawXBuildTest.Services.Process {
     [TestClass]
     public class ProcessRunnerTest {
-        [TestMethod]
+        
+        [PlatformSpecificTestMethod("Linux", "OSX")]
         public void GivenEcho__WhenStarting__ShouldExitWithCodeZero() {
             var sut = new ProcessRunner();
 
@@ -19,7 +20,7 @@ namespace EawXBuildTest.Services.Process {
             Assert.AreEqual(0, actual);
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Linux", "OSX")]
         public void GivenEchoWithArgs__WhenStarting__ShouldPrintOutArgs() {
             var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
@@ -34,7 +35,7 @@ namespace EawXBuildTest.Services.Process {
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Linux", "OSX")]
         public void GivenProcessStartInfoForEcho__WhenStarting__ShouldPrintOutArgs() {
             var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
@@ -45,6 +46,52 @@ namespace EawXBuildTest.Services.Process {
             var startInfo = new ProcessStartInfo {
                 FileName = "echo",
                 Arguments = expected
+            };
+
+            sut.Start(startInfo);
+            sut.WaitForExit();
+
+            var actual = stringBuilder.ToString().Trim();
+            Assert.AreEqual(expected, actual);
+        }
+        
+        [PlatformSpecificTestMethod("Windows")]
+        public void GivenCmdNoCommand__WhenStarting__ShouldExitWithCodeZero() {
+            var sut = new ProcessRunner();
+
+            sut.Start("cmd.exe", "/c");
+            sut.WaitForExit();
+
+            var actual = sut.ExitCode;
+            Assert.AreEqual(0, actual);
+        }
+
+        [PlatformSpecificTestMethod("Windows")]
+        public void GivenCmdWithEchoCommandAndArgs__WhenStarting__ShouldPrintOutArgs() {
+            var stringBuilder = new StringBuilder();
+            Console.SetOut(new StringWriter(stringBuilder));
+
+            var sut = new ProcessRunner();
+
+            const string expected = "Hello World";
+            sut.Start("cmd.exe", "/c echo " + expected);
+            sut.WaitForExit();
+
+            var actual = stringBuilder.ToString().Trim();
+            Assert.AreEqual(expected, actual);
+        }
+
+        [PlatformSpecificTestMethod("Windows")]
+        public void GivenProcessStartInfoForCmdWithEcho__WhenStarting__ShouldPrintOutArgs() {
+            var stringBuilder = new StringBuilder();
+            Console.SetOut(new StringWriter(stringBuilder));
+
+            var sut = new ProcessRunner();
+
+            const string expected = "Hello World";
+            var startInfo = new ProcessStartInfo {
+                FileName = "cmd.exe",
+                Arguments = "/c echo " + expected
             };
 
             sut.Start(startInfo);

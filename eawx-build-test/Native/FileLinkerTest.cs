@@ -34,10 +34,8 @@ namespace EawXBuildTest.Native {
             Assert.IsFalse(_fileSystem.File.Exists(GetPlatformTargetPath()));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("OSX")]
         public void GivenRunningMacOS__WhenLinkingFileWithUnixStylePath__FileShouldExist() {
-            if (!TestUtility.IsMacOS()) Assert.Inconclusive();
-
             var sut = new MacOSFileLinker();
 
             sut.CreateLink(UnixFilePath, UnixLinkedFilePath);
@@ -45,10 +43,8 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(UnixLinkedFilePath));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("OSX")]
         public void GivenRunningMacOS__WhenLinkingFileWithWinStylePath__FileShouldExist() {
-            if (!TestUtility.IsMacOS()) Assert.Inconclusive();
-
             var sut = new MacOSFileLinker();
 
             sut.CreateLink(WinFilePath, WinLinkedFilePath);
@@ -56,10 +52,8 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(UnixLinkedFilePath));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Windows")]
         public void GivenRunningWindows__WhenLinkingFileWithUnixStylePath__FileShouldExist() {
-            if (!TestUtility.IsWindows()) Assert.Inconclusive();
-
             var sut = new WinFileLinker();
 
             sut.CreateLink(UnixFilePath, UnixLinkedFilePath);
@@ -67,10 +61,8 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(WinLinkedFilePath));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Windows")]
         public void GivenRunningWindows__WhenLinkingFileWithWinStylePath__FileShouldExist() {
-            if (!TestUtility.IsWindows()) Assert.Inconclusive();
-
             var sut = new WinFileLinker();
 
             sut.CreateLink(WinFilePath, WinLinkedFilePath);
@@ -78,10 +70,8 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(WinLinkedFilePath));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Linux")]
         public void GivenRunningLinux__WhenLinkingFileWithUnixStylePath__FileShouldExist() {
-            if (!TestUtility.IsLinux()) Assert.Inconclusive();
-
             var sut = new LinuxFileLinker();
 
             sut.CreateLink(UnixFilePath, UnixLinkedFilePath);
@@ -89,10 +79,8 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(UnixLinkedFilePath));
         }
 
-        [TestMethod]
+        [PlatformSpecificTestMethod("Linux")]
         public void GivenRunningLinux__WhenLinkingFileWithWinStylePath__FileShouldExist() {
-            if (!TestUtility.IsLinux()) Assert.Inconclusive();
-
             var sut = new LinuxFileLinker();
 
             sut.CreateLink(WinFilePath, WinLinkedFilePath);
@@ -100,11 +88,11 @@ namespace EawXBuildTest.Native {
             Assert.IsTrue(_fileSystem.File.Exists(UnixLinkedFilePath));
         }
 
-        private string GetPlatformSourcePath() {
+        private static string GetPlatformSourcePath() {
             return TestUtility.IsWindows() ? WinFilePath : UnixFilePath;
         }
 
-        private string GetPlatformTargetPath() {
+        private static string GetPlatformTargetPath() {
             return TestUtility.IsWindows() ? WinLinkedFilePath : UnixLinkedFilePath;
         }
     }
