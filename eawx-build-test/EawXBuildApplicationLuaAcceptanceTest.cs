@@ -103,8 +103,8 @@ namespace EawXBuildTest {
             services.Configure<LoggerFilterOptions>(options =>
                 options.AddFilter<ConsoleLoggerProvider>(null, logLevel));
             services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
-            services.AddTransient<IIOService, IOService>(serviceProvider =>
-                new IOService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
+            services.AddTransient<IIOHelperService, IOHelperService>(serviceProvider =>
+                new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
             services.AddTransient<ILuaParser, NLuaParser>();
             return services;
         }

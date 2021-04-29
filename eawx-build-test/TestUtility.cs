@@ -44,8 +44,8 @@ namespace EawXBuildTest {
                     options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Trace : LogLevel.Warning);
                 });
             var lsp = serviceCollection.BuildServiceProvider();
-            serviceCollection.AddTransient<IIOService, IOService>(s =>
-                new IOService(mockFileSystem, lsp.GetRequiredService<ILoggerFactory>()));
+            serviceCollection.AddTransient<IIOHelperService, IOHelperService>(s =>
+                new IOHelperService(mockFileSystem, lsp.GetRequiredService<ILoggerFactory>()));
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
                 new BuildComponentFactory(
                     lsp.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));

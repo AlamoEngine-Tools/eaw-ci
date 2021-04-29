@@ -26,7 +26,7 @@ namespace EawXBuildTest.Services.IO {
         public void GivenAbsolutePathToFile__WithRootedPath__IsValidPath__IsExpected__WIN(string absoluteDirectoryPath,
             string fileExtension, bool expected) {
             const string fileName = "test";
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
             Assert.AreEqual(expected, svc.IsValidPath(
                 _fileSystem.Path.Combine(absoluteDirectoryPath, fileName + fileExtension),
                 string.Empty, fileExtension));
@@ -43,7 +43,7 @@ namespace EawXBuildTest.Services.IO {
         public void GivenAbsolutePathToFile__WithRootedPath__IsValidPath__IsExpected__UNX(string absoluteDirectoryPath,
             string fileExtension, bool expected) {
             const string fileName = "test";
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
             Assert.AreEqual(expected, svc.IsValidPath(
                 _fileSystem.Path.Combine(absoluteDirectoryPath, fileName + fileExtension),
                 string.Empty, fileExtension));
@@ -60,7 +60,7 @@ namespace EawXBuildTest.Services.IO {
         public void GivenRelativePathToFile__WithoutRootedPath__IsValidPath__IsFalse_WIN(string absoluteDirectoryPath,
             string fileExtension) {
             const string fileName = "test";
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
             Assert.IsFalse(svc.IsValidPath(
                 _fileSystem.Path.Combine(absoluteDirectoryPath, fileName + fileExtension),
                 string.Empty, fileExtension));
@@ -76,7 +76,7 @@ namespace EawXBuildTest.Services.IO {
         [DataRow("data/path", ".dat")]
         public void GivenRelativePathToFile__WithoutRootedPath__IsValidPath__IsFalse_UNX(string absoluteDirectoryPath,
             string fileExtension) {
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
 
             const string fileName = "test";
             Assert.IsFalse(svc.IsValidPath(
@@ -93,7 +93,7 @@ namespace EawXBuildTest.Services.IO {
         public void GivenRelativePathToFile__IsValidPath__IsExpected_UNX(string relativeDirectoryPath, string basePath,
             string fileExtension, bool expected) {
             const string fileName = "test";
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
             Assert.AreEqual(expected, svc.IsValidPath(
                 _fileSystem.Path.Combine(relativeDirectoryPath, fileName + fileExtension),
                 basePath, fileExtension));
@@ -108,7 +108,7 @@ namespace EawXBuildTest.Services.IO {
         public void GivenRelativePathToFile__IsValidPath__IsExpected_WIN(string relativeDirectoryPath, string basePath,
             string fileExtension, bool expected) {
             const string fileName = "test";
-            var svc = new IOService(_fileSystem);
+            var svc = new IOHelperService(_fileSystem);
             Assert.AreEqual(expected, svc.IsValidPath(
                 _fileSystem.Path.Combine(relativeDirectoryPath, fileName + fileExtension),
                 basePath, fileExtension));

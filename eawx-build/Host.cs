@@ -43,8 +43,8 @@ namespace EawXBuild {
                     options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Trace : LogLevel.Warning);
                 });
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            serviceCollection.AddTransient<IIOService, IOService>(s =>
-                new IOService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
+            serviceCollection.AddTransient<IIOHelperService, IOHelperService>(s =>
+                new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
                 new BuildComponentFactory(
                     serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));

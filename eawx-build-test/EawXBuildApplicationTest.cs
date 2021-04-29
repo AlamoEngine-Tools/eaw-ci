@@ -26,7 +26,7 @@ namespace EawXBuildTest {
         public void GivenAValidServiceProvider__RequiredServicesResolveBackendCorrectly() {
             var app = new EawXBuildApplication(TestUtility.GetConfiguredServiceCollection().BuildServiceProvider(),
                 new RunOptions());
-            var xmlParser = app.GetXmlBuildConfigParserInternal(app.Services.GetService<IIOService>());
+            var xmlParser = app.GetXmlBuildConfigParserInternal(app.Services.GetService<IIOHelperService>());
             Assert.IsInstanceOfType(xmlParser, typeof(XmlBuildConfigParser));
             var luaParser = app.GetLuaBuildConfigParserInternal();
             Assert.IsInstanceOfType(luaParser, typeof(LuaBuildConfigParser));
