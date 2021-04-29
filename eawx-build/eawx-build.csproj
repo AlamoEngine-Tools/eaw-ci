@@ -1,29 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <RootNamespace>EawXBuild</RootNamespace>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
-        <Title>EaW CI</Title>
-        <Authors>Sven Marcus &amp; Lukas Grünwald</Authors>
-        <Copyright>Sven Marcus &amp; Lukas Grünwald</Copyright>
-        <PackageVersion>0.1.0</PackageVersion>
-        <AssemblyVersion>0.1.0.*</AssemblyVersion>
-        <FileVersion>0.1.0</FileVersion>
-        <AssemblyName>eaw-ci</AssemblyName>
-        <IsPackable>false</IsPackable>
-        <PackageId>eaw-ci</PackageId>
-        <Product>eaw-ci</Product>
-        <Version>0.1.0</Version>
-        <RepositoryUrl>https://github.com/AlamoEngine-Tools/eaw-ci</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageProjectUrl>https://github.com/AlamoEngine-Tools/eaw-ci</PackageProjectUrl>
-        <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <StartupObject>EawXBuild.Host</StartupObject>
-        <Deterministic>false</Deterministic>
-    </PropertyGroup>
-
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>EawXBuild</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ProjectGuid>{F680D892-58D2-40B5-B326-7A9225770903}</ProjectGuid>
+    <Title>EaW CI</Title>
+    <Authors>Sven Marcus &amp; Lukas Grünwald</Authors>
+    <Copyright>Copyright © 2021 Sven Marcus &amp; Lukas Grünwald</Copyright>
+    <PackageVersion>0.1.0</PackageVersion>
+    <AssemblyVersion>0.1.0.*</AssemblyVersion>
+    <InformationalVersion>0.1.0</InformationalVersion>
+    <FileVersion>0.1.0</FileVersion>
+    <AssemblyName>eaw-ci</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <PackageId>eaw-ci</PackageId>
+    <Product>eaw-ci</Product>
+    <Version>0.1.0</Version>
+    <RepositoryUrl>https://github.com/AlamoEngine-Tools/eaw-ci</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/AlamoEngine-Tools/eaw-ci</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <StartupObject>EawXBuild.Host</StartupObject>
+    <Deterministic>false</Deterministic>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
@@ -34,43 +33,45 @@
     <PackageReference Include="semver" Version="2.0.6" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.29" />
   </ItemGroup>
-
-    <ItemGroup>
-        <None Remove="Configuration\v1\eaw-ci.xsd" />
-        <None Include="..\LICENSE">
-            <Pack>True</Pack>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\.editorconfig" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
-            <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
-        </Reference>
-        <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
-            <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
-        </Reference>
-        <Reference Include="Facepunch.Steamworks.Win64, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
-            <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
-    <Target Name="CopyLibSteam" AfterTargets="AfterBuild">
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(OutDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(OutDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(OutDir)" />
-    </Target>
-    
-    <Target Name="CopyLibSteamForPublish" AfterTargets="Publish">
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(PublishDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(PublishDir)" />
-        <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(PublishDir)" />
-    </Target>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Configuration\v1\eaw-ci.xsd" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\Xml\v1\eaw-ci.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Posix, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Posix.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Steamworks.Win64, Culture=neutral, PublicKeyToken=null" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+      <HintPath>Steam\Facepunch.Steamworks\2.3.2\Facepunch.Steamworks.Win64.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CopyLibSteam" AfterTargets="AfterBuild">
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(OutDir)" />
+  </Target>    
+  <Target Name="CopyLibSteamForPublish" AfterTargets="Publish">
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(PublishDir)" />
+  </Target>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>eawx-build-test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

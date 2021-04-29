@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Linq;
 using CommandLine;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Logging.Debug;
 
 namespace EawXBuild
 {
+    [ExcludeFromCodeCoverage]
     internal class Host
     {
         private static void Main(string[] args)

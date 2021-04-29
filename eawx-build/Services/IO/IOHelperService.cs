@@ -9,8 +9,6 @@ using EawXBuild.Environment;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-[assembly: InternalsVisibleTo("eawx-build-test")]
-
 namespace EawXBuild.Services.IO
 {
     internal class IOHelperService : IIOHelperService
@@ -27,6 +25,7 @@ namespace EawXBuild.Services.IO
 
         [NotNull] public IFileSystem FileSystem { get; }
 
+        [ExcludeFromCodeCoverage]
         public ExitCode ValidatePath([NotNull] string path, [NotNull] string relativePath = "",
             [NotNull] string fileExtension = "")
         {
