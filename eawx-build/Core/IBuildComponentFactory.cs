@@ -1,5 +1,7 @@
-namespace EawXBuild.Core {
-    public interface IBuildComponentFactory {
+namespace EawXBuild.Core
+{
+    public interface IBuildComponentFactory
+    {
         IProject MakeProject();
 
         IJob MakeJob(string name);

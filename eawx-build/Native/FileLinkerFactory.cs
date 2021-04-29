@@ -1,9 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace EawXBuild.Native {
-    public class FileLinkerFactory : IFileLinkerFactory {
-        public IFileLinker MakeFileLinker() {
+namespace EawXBuild.Native
+{
+    public class FileLinkerFactory : IFileLinkerFactory
+    {
+        public IFileLinker MakeFileLinker()
+        {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return new MacOSFileLinker();
 

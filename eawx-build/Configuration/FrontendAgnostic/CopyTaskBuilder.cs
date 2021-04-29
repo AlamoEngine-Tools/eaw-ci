@@ -3,16 +3,21 @@ using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Tasks;
 
-namespace EawXBuild.Configuration.FrontendAgnostic {
-    public class CopyTaskBuilder : ITaskBuilder {
+namespace EawXBuild.Configuration.FrontendAgnostic
+{
+    public class CopyTaskBuilder : ITaskBuilder
+    {
         private readonly CopyTask _copyTask;
 
-        public CopyTaskBuilder(ICopyPolicy copyPolicy, IFileSystem fileSystem = null) {
+        public CopyTaskBuilder(ICopyPolicy copyPolicy, IFileSystem fileSystem = null)
+        {
             _copyTask = new CopyTask(copyPolicy, fileSystem ?? new FileSystem());
         }
 
-        public ITaskBuilder With(string name, object value) {
-            switch (name) {
+        public ITaskBuilder With(string name, object value)
+        {
+            switch (name)
+            {
                 case "Id":
                     _copyTask.Id = (string) value;
                     break;
@@ -41,7 +46,8 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             return this;
         }
 
-        public ITask Build() {
+        public ITask Build()
+        {
             return _copyTask;
         }
     }

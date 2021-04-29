@@ -13,8 +13,10 @@ using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Core;
 using Microsoft.Extensions.Logging;
 
-namespace EawXBuild.Configuration.Xml.v1 {
-    internal class XmlBuildConfigParser : IBuildConfigParser {
+namespace EawXBuild.Configuration.Xml.v1
+{
+    internal class XmlBuildConfigParser : IBuildConfigParser
+    {
         private const string XsdResourceId = "v1.eaw-ci.xsd";
 
         private const string DefaultXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -33,34 +35,40 @@ namespace EawXBuild.Configuration.Xml.v1 {
 
         private const ConfigVersion ConfigVersion = Configuration.ConfigVersion.V1;
         private const string FileExtension = ".xml";
+        [NotNull] private readonly IBuildComponentFactory _factory;
 
         [NotNull] private readonly IFileSystem _fileSystem;
-        [NotNull] private readonly IBuildComponentFactory _factory;
         private readonly ILogger<XmlBuildConfigParser> _logger;
 
         public XmlBuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
-            ILoggerFactory loggerFactory = null) {
+            ILoggerFactory loggerFactory = null)
+        {
             _fileSystem = fileSystem;
             _factory = factory;
             _logger = loggerFactory?.CreateLogger<XmlBuildConfigParser>();
         }
 
-        public IEnumerable<IProject> Parse(string filePath) {
+        public IEnumerable<IProject> Parse(string filePath)
+        {
             BuildConfigurationType buildConfig = DeserializeBuildConfigInternal(filePath);
 
-            var projects = new IProject[buildConfig.Projects.Length];
-            for (var i = 0; i < buildConfig.Projects.Length; i++) {
-                var buildConfigProject = buildConfig.Projects[i];
+            IProject[] projects = new IProject[buildConfig.Projects.Length];
+            for (int i = 0; i < buildConfig.Projects.Length; i++)
+            {
+                ProjectType buildConfigProject = buildConfig.Projects[i];
                 projects[i] = GetProjectFromConfig(buildConfig, buildConfigProject);
             }
 
             return projects;
         }
 
-        public bool TestIsValidConfiguration(string filePath) {
-            try {
+        public bool TestIsValidConfiguration(string filePath)
+        {
+            try
+            {
                 BuildConfigurationType buildConfig = DeserializeBuildConfigInternal(filePath);
-                if (buildConfig == null) {
+                if (buildConfig == null)
+                {
                     _logger?.LogError($"The provided configuration {filePath} is empty.");
                     return false;
                 }
@@ -76,7 +84,8 @@ namespace EawXBuild.Configuration.Xml.v1 {
                 _logger?.LogInformation(msg);
                 return true;
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 StringBuilder builder = new StringBuilder();
                 string msg = BuildErrorMessage(builder, e);
                 // [gruenwaldlu, 2020-07-27-13:45:55+2]: Required for user feedback. Depending on the configuration, the logger may not print to the console out.
@@ -86,16 +95,20 @@ namespace EawXBuild.Configuration.Xml.v1 {
             }
         }
 
-        private static string BuildErrorMessage(StringBuilder stringBuilder, Exception exception) {
+        public ConfigVersion Version => ConfigVersion;
+        public string ConfiguredFileExtension => FileExtension;
+        public string DefaultConfigFile => DefaultXml;
+
+        private static string BuildErrorMessage(StringBuilder stringBuilder, Exception exception)
+        {
             stringBuilder.Append(exception.Message);
-            if (exception.InnerException != null) {
-                BuildErrorMessage(stringBuilder, exception.InnerException);
-            }
+            if (exception.InnerException != null) BuildErrorMessage(stringBuilder, exception.InnerException);
 
             return stringBuilder.ToString();
         }
 
-        private BuildConfigurationType DeserializeBuildConfigInternal(string filePath) {
+        private BuildConfigurationType DeserializeBuildConfigInternal(string filePath)
+        {
             XmlSerializer xmlDataSerializer = new XmlSerializer(typeof(BuildConfigurationType));
             XmlReaderSettings settings = GetXmlReaderSettings();
             using Stream stream = _fileSystem.File.OpenRead(filePath);
@@ -104,12 +117,9 @@ namespace EawXBuild.Configuration.Xml.v1 {
             return buildConfig;
         }
 
-        public ConfigVersion Version => ConfigVersion;
-        public string ConfiguredFileExtension => FileExtension;
-        public string DefaultConfigFile => DefaultXml;
-
-        private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject) {
-            var project = _factory.MakeProject();
+        private IProject GetProjectFromConfig(BuildConfigurationType buildConfig, ProjectType buildConfigProject)
+        {
+            IProject project = _factory.MakeProject();
             project.Name = buildConfigProject.Id;
             AddJobsToProject(buildConfig, buildConfigProject, project);
 
@@ -117,39 +127,46 @@ namespace EawXBuild.Configuration.Xml.v1 {
         }
 
         private void AddJobsToProject(BuildConfigurationType buildConfig, ProjectType buildConfigProject,
-            IProject project) {
+            IProject project)
+        {
             if (buildConfigProject.Jobs.Length == 0) return;
-            foreach (var buildConfigJob in buildConfigProject.Jobs) {
-                var job = _factory.MakeJob(buildConfigJob.Name);
+            foreach (JobType buildConfigJob in buildConfigProject.Jobs)
+            {
+                IJob job = _factory.MakeJob(buildConfigJob.Name);
                 AddTasksToJob(buildConfig, job, buildConfigJob);
                 project.AddJob(job);
             }
         }
 
-        private void AddTasksToJob(BuildConfigurationType buildConfig, IJob job, JobType buildConfigJob) {
-            var taskList = (TasksType) buildConfigJob.Item;
+        private void AddTasksToJob(BuildConfigurationType buildConfig, IJob job, JobType buildConfigJob)
+        {
+            TasksType taskList = (TasksType) buildConfigJob.Item;
             if (taskList.Items == null) return;
 
-            foreach (var taskListItem in taskList.Items) {
-                var buildConfigTask = GetBuildConfigTaskFromTaskListItem(buildConfig, taskListItem);
+            foreach (object taskListItem in taskList.Items)
+            {
+                object buildConfigTask = GetBuildConfigTaskFromTaskListItem(buildConfig, taskListItem);
 
-                var task = MakeTask(buildConfigTask);
+                ITask task = MakeTask(buildConfigTask);
                 job.AddTask(task);
             }
         }
 
         private static object GetBuildConfigTaskFromTaskListItem(BuildConfigurationType buildConfig,
-            object taskListItem) {
-            var buildConfigTask = taskListItem;
+            object taskListItem)
+        {
+            object buildConfigTask = taskListItem;
             if (taskListItem is TaskReferenceType taskRef)
                 buildConfigTask = GetMatchingGlobalTask(buildConfig, taskRef);
 
             return buildConfigTask;
         }
 
-        private static object GetMatchingGlobalTask(BuildConfigurationType buildConfig, TaskReferenceType taskRef) {
+        private static object GetMatchingGlobalTask(BuildConfigurationType buildConfig, TaskReferenceType taskRef)
+        {
             object buildConfigTask = null;
-            foreach (var globalTask in buildConfig.GlobalTasks) {
+            foreach (AbstractTaskType globalTask in buildConfig.GlobalTasks)
+            {
                 if (!globalTask.Id.Equals(taskRef.ReferenceId)) continue;
                 buildConfigTask = globalTask;
             }
@@ -157,27 +174,31 @@ namespace EawXBuild.Configuration.Xml.v1 {
             return buildConfigTask;
         }
 
-        private ITask MakeTask(object buildConfigTask) {
-            var taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
-            foreach (var prop in buildConfigTask.GetType().GetProperties())
+        private ITask MakeTask(object buildConfigTask)
+        {
+            ITaskBuilder taskBuilder = _factory.Task(buildConfigTask.GetType().Name);
+            foreach (PropertyInfo prop in buildConfigTask.GetType().GetProperties())
                 taskBuilder.With(prop.Name, prop.GetValue(buildConfigTask));
 
-            var task = taskBuilder.Build();
+            ITask task = taskBuilder.Build();
             return task;
         }
 
-        private static XmlReaderSettings GetXmlReaderSettings() {
-            var xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
-            var schemas = new XmlSchemaSet();
+        private static XmlReaderSettings GetXmlReaderSettings()
+        {
+            XmlSerializer xsdSchemaSerializer = new XmlSerializer(typeof(XmlSchema));
+            XmlSchemaSet schemas = new XmlSchemaSet();
             XmlSchema schema;
             string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
                 .Single(str => str.EndsWith(XsdResourceId));
-            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res)) {
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
+            {
                 schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
             }
 
             schemas.Add(schema);
-            var settings = new XmlReaderSettings {
+            XmlReaderSettings settings = new XmlReaderSettings
+            {
                 Schemas = schemas,
                 ValidationType = ValidationType.Schema,
                 ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |

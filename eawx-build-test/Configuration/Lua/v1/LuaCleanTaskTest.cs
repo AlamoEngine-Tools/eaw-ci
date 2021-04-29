@@ -3,17 +3,21 @@ using EawXBuild.Configuration.Lua.v1;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.Lua.v1 {
+namespace EawXBuildTest.Configuration.Lua.v1
+{
     [TestClass]
-    public class LuaCleanTaskTest {
+    public class LuaCleanTaskTest
+    {
         [TestMethod]
-        public void GivenLuaCleanTask__ShouldCallTaskBuilderWithPath() {
+        public void GivenLuaCleanTask__ShouldCallTaskBuilderWithPath()
+        {
             const string path = "folder/file";
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"Path", path}
             });
 
-            var sut = new LuaCleanTask(taskBuilderMock, path);
+            LuaCleanTask sut = new LuaCleanTask(taskBuilderMock, path);
 
             taskBuilderMock.Verify();
         }

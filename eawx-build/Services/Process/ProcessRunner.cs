@@ -1,16 +1,21 @@
 using System;
 using System.Diagnostics;
 
-namespace EawXBuild.Services.Process {
-    public class ProcessRunner : IProcessRunner {
+namespace EawXBuild.Services.Process
+{
+    public class ProcessRunner : IProcessRunner
+    {
         private System.Diagnostics.Process _process;
 
-        public void Start(string executablePath) {
+        public void Start(string executablePath)
+        {
             Start(executablePath, null);
         }
 
-        public void Start(string executablePath, string arguments) {
-            var startInfo = new ProcessStartInfo {
+        public void Start(string executablePath, string arguments)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
                 FileName = executablePath,
                 WorkingDirectory = System.Environment.CurrentDirectory,
                 Arguments = arguments
@@ -19,9 +24,11 @@ namespace EawXBuild.Services.Process {
             Start(startInfo);
         }
 
-        public void Start(ProcessStartInfo startInfo) {
+        public void Start(ProcessStartInfo startInfo)
+        {
             RedirectIOForProcessStartInfo(startInfo);
-            _process = new System.Diagnostics.Process {
+            _process = new System.Diagnostics.Process
+            {
                 StartInfo = startInfo
             };
 
@@ -30,17 +37,19 @@ namespace EawXBuild.Services.Process {
         }
 
 
-        public void WaitForExit() {
+        public void WaitForExit()
+        {
             _process.WaitForExit();
         }
 
-        private static void RedirectIOForProcessStartInfo(ProcessStartInfo startInfo) {
+        public int ExitCode => _process.ExitCode;
+
+        private static void RedirectIOForProcessStartInfo(ProcessStartInfo startInfo)
+        {
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardInput = true;
         }
-
-        public int ExitCode => _process.ExitCode;
     }
 }

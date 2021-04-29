@@ -2,11 +2,14 @@ using System.IO.Abstractions;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
 
-namespace EawXBuild.Tasks {
-    public class CleanTask : ITask {
+namespace EawXBuild.Tasks
+{
+    public class CleanTask : ITask
+    {
         private readonly IFileSystem fileSystem;
 
-        public CleanTask(IFileSystem fileSystem = null) {
+        public CleanTask(IFileSystem fileSystem = null)
+        {
             this.fileSystem = fileSystem ?? new FileSystem();
         }
 
@@ -15,7 +18,8 @@ namespace EawXBuild.Tasks {
         public string Id { get; set; }
         public string Name { get; set; }
 
-        public void Run() {
+        public void Run()
+        {
             if (fileSystem.Path.IsPathRooted(Path)) throw new NoRelativePathException(Path);
             if (fileSystem.Directory.Exists(Path)) fileSystem.Directory.Delete(Path, true);
             else fileSystem.File.Delete(Path);

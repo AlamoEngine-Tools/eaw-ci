@@ -10,40 +10,49 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 
-namespace EawXBuildTest {
-    public static class TestUtility {
+namespace EawXBuildTest
+{
+    public static class TestUtility
+    {
         public const string TEST_TYPE_HOLY = "Holy Test";
         public const string TEST_TYPE_UTILITY = "Utility Test";
 
-        public static bool IsWindows() {
+        public static bool IsWindows()
+        {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
-        public static bool IsLinuxOrMacOS() {
+        public static bool IsLinuxOrMacOS()
+        {
             return IsLinux() || IsMacOS();
         }
 
-        public static bool IsLinux() {
+        public static bool IsLinux()
+        {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         }
 
-        public static bool IsMacOS() {
+        public static bool IsMacOS()
+        {
             return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         }
 
-        public static IServiceCollection GetConfiguredServiceCollection(bool verbose = true) {
-            GetConfiguredMockFileSystem(out var mockFileSystem,
+        public static IServiceCollection GetConfiguredServiceCollection(bool verbose = true)
+        {
+            GetConfiguredMockFileSystem(out MockFileSystem mockFileSystem,
                 out _);
             IServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging(config => {
+            serviceCollection.AddLogging(config =>
+                {
                     config.AddDebug();
                     config.AddConsole();
                 })
-                .Configure<LoggerFilterOptions>(options => {
+                .Configure<LoggerFilterOptions>(options =>
+                {
                     options.AddFilter<DebugLoggerProvider>(null, LogLevel.Trace);
                     options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Trace : LogLevel.Warning);
                 });
-            var lsp = serviceCollection.BuildServiceProvider();
+            ServiceProvider lsp = serviceCollection.BuildServiceProvider();
             serviceCollection.AddTransient<IIOHelperService, IOHelperService>(s =>
                 new IOHelperService(mockFileSystem, lsp.GetRequiredService<ILoggerFactory>()));
             serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
@@ -54,10 +63,12 @@ namespace EawXBuildTest {
         }
 
         public static void GetConfiguredMockFileSystem(out MockFileSystem mockFileSystem,
-            out FileSystemAssertions fileSystemAssertions) {
+            out FileSystemAssertions fileSystemAssertions)
+        {
             mockFileSystem = null;
             fileSystemAssertions = null;
-            if (IsWindows()) {
+            if (IsWindows())
+            {
                 mockFileSystem = new MockFileSystem();
                 mockFileSystem.AddDirectory("C:/data/test/path");
                 mockFileSystem.AddDirectory("C:/data/path");
@@ -70,7 +81,8 @@ namespace EawXBuildTest {
                 fileSystemAssertions.AssertFileExists("C:/data/path/test.xml");
             }
 
-            if (IsLinuxOrMacOS()) {
+            if (IsLinuxOrMacOS())
+            {
                 mockFileSystem = new MockFileSystem();
                 mockFileSystem.AddDirectory("/mnt/c/data/test/path");
                 mockFileSystem.AddDirectory("/mnt/c/data/path");

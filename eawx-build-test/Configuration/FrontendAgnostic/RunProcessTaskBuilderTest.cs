@@ -4,9 +4,11 @@ using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.FrontendAgnostic {
+namespace EawXBuildTest.Configuration.FrontendAgnostic
+{
     [TestClass]
-    public class RunProcessTaskBuilderTest {
+    public class RunProcessTaskBuilderTest
+    {
         private const string PathToExe = "Path/To/Exe";
         private const string Args = "--first=5 --second=yes";
         private const string WorkingDirectory = "Path/To/Another/Dir";
@@ -16,10 +18,11 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         private const string TaskName = "TaskName";
 
         [TestMethod]
-        public void WhenBuildingRunProcessTaskWithExePathAndArguments__ShouldReturnConfiguredTask() {
-            var sut = new RunProcessTaskBuilder(new MockFileSystem());
+        public void WhenBuildingRunProcessTaskWithExePathAndArguments__ShouldReturnConfiguredTask()
+        {
+            RunProcessTaskBuilder sut = new RunProcessTaskBuilder(new MockFileSystem());
 
-            var task = (RunProcessTask) sut
+            RunProcessTask task = (RunProcessTask) sut
                 .With("Id", TaskId)
                 .With("Name", TaskName)
                 .With("ExecutablePath", PathToExe)
@@ -38,8 +41,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void WhenBuildingWithUnknownConfigOption__ShouldThrowInvalidOperationException() {
-            var sut = new RunProcessTaskBuilder(new MockFileSystem());
+        public void WhenBuildingWithUnknownConfigOption__ShouldThrowInvalidOperationException()
+        {
+            RunProcessTaskBuilder sut = new RunProcessTaskBuilder(new MockFileSystem());
 
             sut.With("UnknownOption", string.Empty);
         }

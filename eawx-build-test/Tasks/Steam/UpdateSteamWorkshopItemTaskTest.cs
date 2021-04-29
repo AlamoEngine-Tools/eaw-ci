@@ -7,9 +7,11 @@ using EawXBuild.Tasks.Steam;
 using EawXBuildTest.Steam;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Tasks.Steam {
+namespace EawXBuildTest.Tasks.Steam
+{
     [TestClass]
-    public class UpdateSteamWorkshopItemTaskTest {
+    public class UpdateSteamWorkshopItemTaskTest
+    {
         private const uint AppId = 32470;
         private const ulong ItemId = 1234;
         private const string Title = "My Workshop Item";
@@ -20,16 +22,20 @@ namespace EawXBuildTest.Tasks.Steam {
 
         [TestMethod]
         public void
-            GivenTaskWithItemId_Title_Description_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings() {
-            var workshopItemSpy = new WorkshopItemSpy();
-            var workshopSpy = new SteamWorkshopSpy {
+            GivenTaskWithItemId_Title_Description_Folder_And_Visibility__WhenRunningTask__ShouldPublishWithSettings()
+        {
+            WorkshopItemSpy workshopItemSpy = new WorkshopItemSpy();
+            SteamWorkshopSpy workshopSpy = new SteamWorkshopSpy
+            {
                 WorkshopItemsById = {{ItemId, workshopItemSpy}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopSpy) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopSpy)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
-                ChangeSet = new WorkshopItemChangeSetStub {
+                ChangeSet = new WorkshopItemChangeSetStub
+                {
                     ChangeSetValidationResult = (true, null),
 
                     Title = Title,
@@ -42,7 +48,7 @@ namespace EawXBuildTest.Tasks.Steam {
 
             sut.Run();
 
-            var actual = workshopItemSpy.ReceivedSettings;
+            IWorkshopItemChangeSet actual = workshopItemSpy.ReceivedSettings;
             Assert.AreEqual(AppId, workshopSpy.AppId);
             Assert.AreEqual(Title, actual.Title);
             Assert.AreEqual(DescriptionFilePath, actual.DescriptionFilePath);
@@ -52,13 +58,17 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
         [TestMethod]
-        public void GivenValidTask__WhenRunningTask__ShouldWaitForItemQueryToFinishBeforeUpdating() {
-            var callOrderMock = new VerifySteamClientAndWorkshopItemCallOrderMock();
+        public void GivenValidTask__WhenRunningTask__ShouldWaitForItemQueryToFinishBeforeUpdating()
+        {
+            VerifySteamClientAndWorkshopItemCallOrderMock callOrderMock =
+                new VerifySteamClientAndWorkshopItemCallOrderMock();
 
-            var sut = new UpdateSteamWorkshopItemTask(callOrderMock) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(callOrderMock)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
-                ChangeSet = new WorkshopItemChangeSetStub {
+                ChangeSet = new WorkshopItemChangeSetStub
+                {
                     ChangeSetValidationResult = (true, null)
                 }
             };
@@ -70,13 +80,16 @@ namespace EawXBuildTest.Tasks.Steam {
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GivenTaskWithoutChangeSet__WhenRunningTask__ShouldThrowInvalidOperationException() {
-            var workshopItemStub = new WorkshopItemStub();
-            var workshopStub = new SteamWorkshopStub {
+        public void GivenTaskWithoutChangeSet__WhenRunningTask__ShouldThrowInvalidOperationException()
+        {
+            WorkshopItemStub workshopItemStub = new WorkshopItemStub();
+            SteamWorkshopStub workshopStub = new SteamWorkshopStub
+            {
                 WorkshopItemsById = {{ItemId, workshopItemStub}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopStub) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopStub)
+            {
                 ItemId = ItemId
             };
 
@@ -85,13 +98,16 @@ namespace EawXBuildTest.Tasks.Steam {
 
         [TestMethod]
         [ExpectedException(typeof(ProcessFailedException))]
-        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldThrowProcessFailedException() {
-            var workshopItemSpy = new WorkshopItemStub {Result = PublishResult.Failed};
-            var workshopStub = new SteamWorkshopStub {
+        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldThrowProcessFailedException()
+        {
+            WorkshopItemStub workshopItemSpy = new WorkshopItemStub {Result = PublishResult.Failed};
+            SteamWorkshopStub workshopStub = new SteamWorkshopStub
+            {
                 WorkshopItemsById = {{ItemId, workshopItemSpy}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopStub) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopStub)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
@@ -101,13 +117,16 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
         [TestMethod]
-        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient() {
-            var workshopItemSpy = new WorkshopItemStub {Result = PublishResult.Failed};
-            var workshopSpy = new SteamWorkshopSpy {
+        public void GivenValidTask__WhenRunningTask_ButPublishFails__ShouldShutdownSteamClient()
+        {
+            WorkshopItemStub workshopItemSpy = new WorkshopItemStub {Result = PublishResult.Failed};
+            SteamWorkshopSpy workshopSpy = new SteamWorkshopSpy
+            {
                 WorkshopItemsById = {{ItemId, workshopItemSpy}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopSpy) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopSpy)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
@@ -121,12 +140,15 @@ namespace EawXBuildTest.Tasks.Steam {
 
         [TestMethod]
         [ExpectedException(typeof(WorkshopItemNotFoundException))]
-        public void GivenTaskWithNonExistingItemId__WhenRunningTask__ShouldThrowWorkshopItemNotFoundException() {
-            var workshopStub = new SteamWorkshopStub {
+        public void GivenTaskWithNonExistingItemId__WhenRunningTask__ShouldThrowWorkshopItemNotFoundException()
+        {
+            SteamWorkshopStub workshopStub = new SteamWorkshopStub
+            {
                 WorkshopItemsById = {{ItemId, null}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopStub) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopStub)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
@@ -136,12 +158,15 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
         [TestMethod]
-        public void GivenTaskWithNonExistingItemId__WhenRunningTask__ShouldShutDownSteamClient() {
-            var workshopSpy = new SteamWorkshopSpy {
+        public void GivenTaskWithNonExistingItemId__WhenRunningTask__ShouldShutDownSteamClient()
+        {
+            SteamWorkshopSpy workshopSpy = new SteamWorkshopSpy
+            {
                 WorkshopItemsById = {{ItemId, null}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopSpy) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopSpy)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
@@ -154,68 +179,80 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
         [TestMethod]
-        public void GivenTaskWithoutAppId__WhenRunningTask__ShouldThrowException() {
-            var workshop = new SteamWorkshopDummy();
-            var sut = new UpdateSteamWorkshopItemTask(workshop) {
+        public void GivenTaskWithoutAppId__WhenRunningTask__ShouldThrowException()
+        {
+            SteamWorkshopDummy workshop = new SteamWorkshopDummy();
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshop)
+            {
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
             };
 
-            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+            InvalidOperationException actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
             Assert.AreEqual("No AppId set", actual.Message);
         }
 
         [TestMethod]
-        public void GivenTaskWithoutAppId__WhenRunningTask__ShouldNotInitWorkshop() {
-            var workshop = new SteamWorkshopSpy();
-            var sut = new UpdateSteamWorkshopItemTask(workshop) {
+        public void GivenTaskWithoutAppId__WhenRunningTask__ShouldNotInitWorkshop()
+        {
+            SteamWorkshopSpy workshop = new SteamWorkshopSpy();
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshop)
+            {
                 ItemId = ItemId,
                 ChangeSet = CreateValidChangeSet()
             };
 
-            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+            InvalidOperationException actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
             Assert.IsFalse(workshop.WasInitialized);
         }
 
         [TestMethod]
-        public void GivenTaskWithoutItemId__WhenRunningTask__ShouldThrowInvalidOperationException() {
-            var workshopDummy = new SteamWorkshopDummy();
-            var sut = new UpdateSteamWorkshopItemTask(workshopDummy) {
+        public void GivenTaskWithoutItemId__WhenRunningTask__ShouldThrowInvalidOperationException()
+        {
+            SteamWorkshopDummy workshopDummy = new SteamWorkshopDummy();
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopDummy)
+            {
                 AppId = AppId,
                 ChangeSet = CreateValidChangeSet()
             };
 
-            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+            InvalidOperationException actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
             Assert.AreEqual("No ItemId set", actual.Message);
         }
 
         [TestMethod]
-        public void GivenTaskWithoutItemId__WhenRunningTask__ShouldNotInitWorkshop() {
-            var workshop = new SteamWorkshopSpy();
-            var sut = new UpdateSteamWorkshopItemTask(workshop) {
+        public void GivenTaskWithoutItemId__WhenRunningTask__ShouldNotInitWorkshop()
+        {
+            SteamWorkshopSpy workshop = new SteamWorkshopSpy();
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshop)
+            {
                 AppId = AppId,
                 ChangeSet = CreateValidChangeSet()
             };
 
-            var actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
+            InvalidOperationException actual = Assert.ThrowsException<InvalidOperationException>(() => sut.Run());
 
             Assert.IsFalse(workshop.WasInitialized);
         }
 
         [TestMethod]
-        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldThrowExceptionFromChangeSet() {
-            var workshopItemSpy = new WorkshopItemSpy();
-            var workshopStub = new SteamWorkshopStub {
+        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldThrowExceptionFromChangeSet()
+        {
+            WorkshopItemSpy workshopItemSpy = new WorkshopItemSpy();
+            SteamWorkshopStub workshopStub = new SteamWorkshopStub
+            {
                 WorkshopItemsById = {{ItemId, workshopItemSpy}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopStub) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopStub)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
-                ChangeSet = new WorkshopItemChangeSetStub {
+                ChangeSet = new WorkshopItemChangeSetStub
+                {
                     ChangeSetValidationResult = (false, new FormatException())
                 }
             };
@@ -226,16 +263,20 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
         [TestMethod]
-        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldNotUpdateItem() {
-            var workshopItemSpy = new WorkshopItemSpy();
-            var workshopStub = new SteamWorkshopStub {
+        public void GivenTaskWithInvalidNewChangeSet__WhenRunningTask__ShouldNotUpdateItem()
+        {
+            WorkshopItemSpy workshopItemSpy = new WorkshopItemSpy();
+            SteamWorkshopStub workshopStub = new SteamWorkshopStub
+            {
                 WorkshopItemsById = {{ItemId, workshopItemSpy}}
             };
 
-            var sut = new UpdateSteamWorkshopItemTask(workshopStub) {
+            UpdateSteamWorkshopItemTask sut = new UpdateSteamWorkshopItemTask(workshopStub)
+            {
                 AppId = AppId,
                 ItemId = ItemId,
-                ChangeSet = new WorkshopItemChangeSetStub {
+                ChangeSet = new WorkshopItemChangeSetStub
+                {
                     ChangeSetValidationResult = (false, new FormatException())
                 }
             };
@@ -247,8 +288,10 @@ namespace EawXBuildTest.Tasks.Steam {
         }
 
 
-        private static WorkshopItemChangeSetStub CreateValidChangeSet() {
-            return new WorkshopItemChangeSetStub {
+        private static WorkshopItemChangeSetStub CreateValidChangeSet()
+        {
+            return new WorkshopItemChangeSetStub
+            {
                 ChangeSetValidationResult = (true, null)
             };
         }

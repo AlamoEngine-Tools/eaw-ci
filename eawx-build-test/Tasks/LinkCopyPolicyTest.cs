@@ -1,30 +1,35 @@
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Tasks;
 using EawXBuildTest.Native;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Tasks {
+namespace EawXBuildTest.Tasks
+{
     [TestClass]
-    public class LinkCopyPolicyTest {
+    public class LinkCopyPolicyTest
+    {
         private string _currentDir;
+        private MockFileSystem _fileSystem;
         private string _sourceFileName;
         private string _targetFileName;
-        private MockFileSystem _fileSystem;
 
         [TestInitialize]
-        public void SetUp() {
+        public void SetUp()
+        {
             SetPlatformSpecificPaths();
             SetUpFileSystem();
         }
 
         [TestMethod]
-        public void GivenSourceAndTargetFileInfo__WhenCopyTo__ShouldCallLinkerWithFullFileNames() {
-            var sourceFile = _fileSystem.FileInfo.FromFileName(_sourceFileName);
-            var targetFile = _fileSystem.FileInfo.FromFileName(_targetFileName);
+        public void GivenSourceAndTargetFileInfo__WhenCopyTo__ShouldCallLinkerWithFullFileNames()
+        {
+            IFileInfo sourceFile = _fileSystem.FileInfo.FromFileName(_sourceFileName);
+            IFileInfo targetFile = _fileSystem.FileInfo.FromFileName(_targetFileName);
 
-            var fileLinkerSpy = new FileLinkerSpy();
-            var sut = new LinkCopyPolicy(fileLinkerSpy);
+            FileLinkerSpy fileLinkerSpy = new FileLinkerSpy();
+            LinkCopyPolicy sut = new LinkCopyPolicy(fileLinkerSpy);
 
             sut.CopyTo(sourceFile, targetFile, true);
 
@@ -33,20 +38,23 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
-        public void GivenTargetExistsAndOverwriteFalse__WhenCallingCopyTo__ShouldNotCallLinker() {
-            var sourceFile = _fileSystem.FileInfo.FromFileName(_sourceFileName);
-            var targetFile = _fileSystem.FileInfo.FromFileName(_targetFileName);
+        public void GivenTargetExistsAndOverwriteFalse__WhenCallingCopyTo__ShouldNotCallLinker()
+        {
+            IFileInfo sourceFile = _fileSystem.FileInfo.FromFileName(_sourceFileName);
+            IFileInfo targetFile = _fileSystem.FileInfo.FromFileName(_targetFileName);
 
-            var fileLinkerSpy = new FileLinkerSpy();
-            var sut = new LinkCopyPolicy(fileLinkerSpy);
+            FileLinkerSpy fileLinkerSpy = new FileLinkerSpy();
+            LinkCopyPolicy sut = new LinkCopyPolicy(fileLinkerSpy);
 
             sut.CopyTo(sourceFile, targetFile, false);
 
             Assert.IsFalse(fileLinkerSpy.CreateLinkWasCalled);
         }
 
-        private void SetPlatformSpecificPaths() {
-            if (TestUtility.IsWindows()) {
+        private void SetPlatformSpecificPaths()
+        {
+            if (TestUtility.IsWindows())
+            {
                 _currentDir = @"C:\folder";
                 _sourceFileName = @"C:\folder\sourceFile";
                 _targetFileName = @"C:\home\folder\targetFile";
@@ -58,8 +66,10 @@ namespace EawXBuildTest.Tasks {
             _targetFileName = "/home/folder/targetFile";
         }
 
-        private void SetUpFileSystem() {
-            var files = new Dictionary<string, MockFileData> {
+        private void SetUpFileSystem()
+        {
+            Dictionary<string, MockFileData> files = new Dictionary<string, MockFileData>
+            {
                 {_sourceFileName, string.Empty},
                 {_targetFileName, string.Empty}
             };

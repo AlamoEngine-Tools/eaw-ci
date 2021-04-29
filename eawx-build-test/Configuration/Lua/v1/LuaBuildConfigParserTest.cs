@@ -7,19 +7,22 @@ using EawXBuild.Steam;
 using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.Lua.v1 {
+namespace EawXBuildTest.Configuration.Lua.v1
+{
     [TestClass]
-    public class LuaBuildConfigParserTest {
+    public class LuaBuildConfigParserTest
+    {
         private const string Path = "luaConfig.lua";
-
-        private MockFileSystem _fileSystem;
-        private MockFileData _mockFileData;
-        private LuaMockFileSystemParser _luaMockFileParser;
 
         private static readonly string[] ExpectedTags = {"EAW", "FOC"};
 
+        private MockFileSystem _fileSystem;
+        private LuaMockFileSystemParser _luaMockFileParser;
+        private MockFileData _mockFileData;
+
         [TestInitialize]
-        public void SetUp() {
+        public void SetUp()
+        {
             _mockFileData = new MockFileData(string.Empty);
             _fileSystem = new MockFileSystem();
             _fileSystem.AddFile(Path, _mockFileData);
@@ -27,49 +30,53 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
         }
 
         [TestMethod]
-        public void GivenConfigWithProject__WhenParsing__ShouldReturnProject() {
+        public void GivenConfigWithProject__WhenParsing__ShouldReturnProject()
+        {
             const string lua = "project('test')";
             _mockFileData.TextContents = lua;
 
-            var factoryStub = new BuildComponentFactoryStub();
-            var projects = MakeSutAndParse(factoryStub);
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub();
+            IEnumerable<IProject> projects = MakeSutAndParse(factoryStub);
 
-            var actual = projects.First();
+            IProject actual = projects.First();
             Assert.AreEqual("test", actual.Name);
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectAndDifferentName__WhenParsing__ShouldReturnProject() {
+        public void GivenConfigWithProjectAndDifferentName__WhenParsing__ShouldReturnProject()
+        {
             const string lua = "project('another-project')";
             _mockFileData.TextContents = lua;
 
-            var factoryStub = new BuildComponentFactoryStub();
-            var projects = MakeSutAndParse(factoryStub);
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub();
+            IEnumerable<IProject> projects = MakeSutAndParse(factoryStub);
 
-            var actual = projects.First();
+            IProject actual = projects.First();
             Assert.AreEqual("another-project", actual.Name);
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectAndJob__WhenParsing__ProjectShouldHaveJob() {
+        public void GivenConfigWithProjectAndJob__WhenParsing__ProjectShouldHaveJob()
+        {
             const string lua = @"
                 local p = project('test')
                 p:add_job('test-job')  
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub);
-            var projects = MakeSutAndParse(factoryStub);
+            JobStub jobStub = new JobStub();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub);
+            IEnumerable<IProject> projects = MakeSutAndParse(factoryStub);
 
-            var actual = projects.First() as ProjectStub;
-            var actualJob = actual?.Jobs.First();
+            ProjectStub actual = projects.First() as ProjectStub;
+            IJob actualJob = actual?.Jobs.First();
             Assert.AreSame(jobStub, actualJob);
             Assert.AreEqual("test-job", actualJob?.Name);
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndCopyTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndCopyTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -77,18 +84,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
-        public void GivenConfigWithCopyTaskWithSettings__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithCopyTaskWithSettings__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -99,18 +107,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
-        public void GivenConfigWithCopyTaskWithSettings__WhenParsing__TaskShouldBeConfiguredCorrectly() {
+        public void GivenConfigWithCopyTaskWithSettings__WhenParsing__TaskShouldBeConfiguredCorrectly()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -121,7 +130,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"CopyFromPath", "a"},
                 {"CopyToPath", "b"},
                 {"AlwaysOverwrite", true},
@@ -129,14 +139,15 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"CopySubfolders", true}
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndLinkTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndLinkTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -144,18 +155,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndCleanTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndCleanTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -163,18 +175,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
-        public void GivenConfigWithCleanTask__WhenParsing__TaskShouldBeConfiguredCorrectly() {
+        public void GivenConfigWithCleanTask__WhenParsing__TaskShouldBeConfiguredCorrectly()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -182,18 +195,20 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
-                {"Path", "path"},
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
+                {"Path", "path"}
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndRunProcessTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndRunProcessTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -201,18 +216,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectRunProcessTaskWithSettings__WhenParsing__TaskShouldBeConfiguredCorrectly() {
+        public void GivenConfigWithProjectRunProcessTaskWithSettings__WhenParsing__TaskShouldBeConfiguredCorrectly()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -224,21 +240,23 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"ExecutablePath", "echo"},
                 {"Arguments", "Hello World"},
                 {"WorkingDirectory", "sub/dir"},
                 {"AllowedToFail", true}
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndCreateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndCreateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -254,19 +272,20 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
         public void
-            GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            GivenConfigWithCreateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -281,7 +300,8 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"AppId", (uint) 32470},
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
@@ -290,19 +310,21 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
                 {"Language", "English"}
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
 
         /// <summary>
-        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
-        /// Instead we're querying the "Tags" key manually
+        ///     For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't
+        ///     do deep comparisons.
+        ///     Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
         public void
-            GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            GivenConfigWithCreateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -318,18 +340,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderSpy = new TaskBuilderSpy();
+            TaskBuilderSpy taskBuilderSpy = new TaskBuilderSpy();
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderSpy};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderSpy};
             MakeSutAndParse(factoryStub);
 
-            var actual = taskBuilderSpy["Tags"];
+            object actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
         [TestMethod]
-        public void GivenConfigWithProjectWithJobAndUpdateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask() {
+        public void GivenConfigWithProjectWithJobAndUpdateSteamWorkshopItemTask__WhenParsing__JobShouldHaveTask()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -344,19 +367,20 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
-            var taskDummy = new TaskDummy();
-            var factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
 
             MakeSutAndParse(factoryStub);
 
-            var actualTask = jobStub.Tasks.First();
+            ITask actualTask = jobStub.Tasks.First();
             Assert.AreEqual(taskDummy, actualTask);
         }
 
         [TestMethod]
         public void
-            GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings() {
+            GivenConfigWithUpdateSteamWorkshopItemTask_WithoutTags__WhenParsing__TaskShouldBeConfiguredWithGivenSettings()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -372,29 +396,32 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object> {
+            TaskBuilderMock taskBuilderMock = new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"AppId", (uint) 32470},
                 {"ItemId", (ulong) 1234},
                 {"Title", "my-test-item"},
                 {"DescriptionFilePath", "path/to/description"},
                 {"ItemFolderPath", "path/to/folder"},
                 {"Visibility", WorkshopItemVisibility.Private},
-                {"Language", "English"},
+                {"Language", "English"}
             });
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
         }
 
         /// <summary>
-        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
-        /// Instead we're querying the "Tags" key manually
+        ///     For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't
+        ///     do deep comparisons.
+        ///     Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
         public void
-            GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags() {
+            GivenConfigWithUpdateSteamWorkshopItemTask_WithTags__WhenParsing__TaskShouldBeConfiguredWithGivenTags()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -411,18 +438,19 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var taskBuilderMock = new TaskBuilderSpy();
+            TaskBuilderSpy taskBuilderMock = new TaskBuilderSpy();
 
-            var factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
             MakeSutAndParse(factoryStub);
 
-            var actual = taskBuilderMock["Tags"];
+            object actual = taskBuilderMock["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
         [TestMethod]
-        public void GivenJobWithMultipleTasks__WhenCallingParse__JobShouldHaveAllTasks() {
+        public void GivenJobWithMultipleTasks__WhenCallingParse__JobShouldHaveAllTasks()
+        {
             const string lua = @"
                 local p = project('test')
                 local j = p:add_job('test-job')
@@ -430,35 +458,41 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             ";
             _mockFileData.TextContents = lua;
 
-            var jobStub = new JobStub();
+            JobStub jobStub = new JobStub();
             ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()};
-            var factoryStub = new BuildComponentFactoryStub {
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub
+            {
                 Job = jobStub,
-                TaskBuilder = new IteratingTaskBuilderStub {
+                TaskBuilder = new IteratingTaskBuilderStub
+                {
                     Tasks = expectedTasks.ToList()
                 }
             };
 
             MakeSutAndParse(factoryStub);
 
-            var actualTasks = jobStub.Tasks;
+            List<ITask> actualTasks = jobStub.Tasks;
             CollectionAssert.AreEqual(expectedTasks, actualTasks);
         }
 
-        private static BuildComponentFactoryStub MakeBuildComponentFactoryStub(JobDummy job, TaskDummy task = null) {
-            var factoryStub = new BuildComponentFactoryStub {
+        private static BuildComponentFactoryStub MakeBuildComponentFactoryStub(JobDummy job, TaskDummy task = null)
+        {
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub
+            {
                 Project = new ProjectStub(),
                 Job = job,
-                TaskBuilder = new TaskBuilderStub {
+                TaskBuilder = new TaskBuilderStub
+                {
                     Task = task ?? new TaskDummy()
                 }
             };
             return factoryStub;
         }
 
-        private IEnumerable<IProject> MakeSutAndParse(IBuildComponentFactory factoryStub) {
-            var sut = new LuaBuildConfigParser(_luaMockFileParser, factoryStub);
-            var projects = sut.Parse(Path);
+        private IEnumerable<IProject> MakeSutAndParse(IBuildComponentFactory factoryStub)
+        {
+            LuaBuildConfigParser sut = new LuaBuildConfigParser(_luaMockFileParser, factoryStub);
+            IEnumerable<IProject> projects = sut.Parse(Path);
             return projects;
         }
     }

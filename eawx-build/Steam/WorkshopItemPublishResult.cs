@@ -1,6 +1,9 @@
-namespace EawXBuild.Steam {
-    public class WorkshopItemPublishResult {
-        public WorkshopItemPublishResult(ulong itemId, PublishResult result) {
+namespace EawXBuild.Steam
+{
+    public class WorkshopItemPublishResult
+    {
+        public WorkshopItemPublishResult(ulong itemId, PublishResult result)
+        {
             ItemId = itemId;
             Result = result;
         }

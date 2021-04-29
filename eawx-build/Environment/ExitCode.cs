@@ -1,21 +1,23 @@
-namespace EawXBuild.Environment {
-    /**
+namespace EawXBuild.Environment
+{
+ /**
      * Standard exit codes used within bash and C/C++
      * Sources:
      * <list type="bullet">
-     *   <item>
-     *     <description>
-     *       https://tldp.org/LDP/abs/html/exitcodes.html
-     *     </description>
-     *   </item>
-     *   <item>
-     *     <description>
-     *       https://www.apt-browse.org/browse/ubuntu/trusty/main/amd64/libc6-dev/2.19-0ubuntu6/file/usr/include/sysexits.h
-     *     </description>
-     *   </item>
+     *     <item>
+     *         <description>
+     *             https://tldp.org/LDP/abs/html/exitcodes.html
+     *         </description>
+     *     </item>
+     *     <item>
+     *         <description>
+     *             https://www.apt-browse.org/browse/ubuntu/trusty/main/amd64/libc6-dev/2.19-0ubuntu6/file/usr/include/sysexits.h
+     *         </description>
+     *     </item>
      * </list>
      */
-    public enum ExitCode {
+ public enum ExitCode
+    {
         /**
          * The program ran successfully.
          */

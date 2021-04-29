@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Steam;
-using EawXBuild.Tasks;
 using EawXBuild.Tasks.Steam;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.FrontendAgnostic {
+namespace EawXBuildTest.Configuration.FrontendAgnostic
+{
     [TestClass]
-    public class CreateSteamWorkshopItemTaskBuilderTest {
+    public class CreateSteamWorkshopItemTaskBuilderTest
+    {
         private const uint AppId = 32470;
         private const string Title = "My title";
         private const string DescriptionFilePath = "path/to/description";
@@ -17,10 +18,11 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         private readonly HashSet<string> Tags = new HashSet<string> {"EAW", "FOC"};
 
         [TestMethod]
-        public void GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguring__ShouldReturnConfiguredTask() {
-            var sut = new CreateSteamWorkshopItemTaskBuilder();
+        public void GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguring__ShouldReturnConfiguredTask()
+        {
+            CreateSteamWorkshopItemTaskBuilder sut = new CreateSteamWorkshopItemTaskBuilder();
 
-            var actual = (CreateSteamWorkshopItemTask) sut
+            CreateSteamWorkshopItemTask actual = (CreateSteamWorkshopItemTask) sut
                 .With("AppId", AppId)
                 .With("Title", Title)
                 .With("DescriptionFilePath", DescriptionFilePath)
@@ -41,31 +43,35 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         public void
-            GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithPrivateVisibility__ShouldReturnConfiguredTaskWithPrivateVisibility() {
-            var sut = new CreateSteamWorkshopItemTaskBuilder();
+            GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithPrivateVisibility__ShouldReturnConfiguredTaskWithPrivateVisibility()
+        {
+            CreateSteamWorkshopItemTaskBuilder sut = new CreateSteamWorkshopItemTaskBuilder();
 
-            var actual = (CreateSteamWorkshopItemTask) sut.With("Visibility", WorkshopItemVisibility.Private).Build();
-
-            Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
-        }
-
-        [TestMethod]
-        public void
-            GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithNullVisibility__ShouldReturnTaskWithPrivateVisibility() {
-            var sut = new CreateSteamWorkshopItemTaskBuilder();
-
-            var actual = (CreateSteamWorkshopItemTask) sut.With("Visibility", null).Build();
+            CreateSteamWorkshopItemTask actual =
+                (CreateSteamWorkshopItemTask) sut.With("Visibility", WorkshopItemVisibility.Private).Build();
 
             Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
         }
 
         [TestMethod]
         public void
-            GivenCreateSteamWorkshopItemTaskBuilder_WhenConfiguringTaskWithAppIdOfTypeInt_ShouldReturnTaskWithAppIdOfUInt() {
-            var sut = new CreateSteamWorkshopItemTaskBuilder();
+            GivenCreateSteamWorkshopItemTaskBuilder__WhenConfiguringWithNullVisibility__ShouldReturnTaskWithPrivateVisibility()
+        {
+            CreateSteamWorkshopItemTaskBuilder sut = new CreateSteamWorkshopItemTaskBuilder();
+
+            CreateSteamWorkshopItemTask actual = (CreateSteamWorkshopItemTask) sut.With("Visibility", null).Build();
+
+            Assert.AreEqual(WorkshopItemVisibility.Private, actual.ChangeSet.Visibility);
+        }
+
+        [TestMethod]
+        public void
+            GivenCreateSteamWorkshopItemTaskBuilder_WhenConfiguringTaskWithAppIdOfTypeInt_ShouldReturnTaskWithAppIdOfUInt()
+        {
+            CreateSteamWorkshopItemTaskBuilder sut = new CreateSteamWorkshopItemTaskBuilder();
 
             const int appId = 32470;
-            var actual = (CreateSteamWorkshopItemTask) sut.With("AppId", appId).Build();
+            CreateSteamWorkshopItemTask actual = (CreateSteamWorkshopItemTask) sut.With("AppId", appId).Build();
 
             const uint expected = appId;
             Assert.AreEqual(expected, actual.AppId);
@@ -73,8 +79,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void WhenCallingWithInvalidConfigOption__ShouldThrowInvalidOperationException() {
-            var sut = new CreateSteamWorkshopItemTaskBuilder();
+        public void WhenCallingWithInvalidConfigOption__ShouldThrowInvalidOperationException()
+        {
+            CreateSteamWorkshopItemTaskBuilder sut = new CreateSteamWorkshopItemTaskBuilder();
 
             sut.With("InvalidOption", string.Empty);
         }

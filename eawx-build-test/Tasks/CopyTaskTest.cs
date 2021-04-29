@@ -1,27 +1,34 @@
 using System;
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Tasks {
+namespace EawXBuildTest.Tasks
+{
     [TestClass]
-    public class CopyTaskTest {
-        private MockFileSystem _fileSystem;
+    public class CopyTaskTest
+    {
         private FileSystemAssertions _assertions;
-        private EawXBuild.Tasks.CopyTask _sut;
+        private MockFileSystem _fileSystem;
+        private CopyTask _sut;
+
+        private static DateTimeOffset NewerWriteTime => new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+
+        private static DateTimeOffset OlderWriteTime => new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
 
         [TestInitialize]
-        public void SetUp() {
+        public void SetUp()
+        {
             _fileSystem = new MockFileSystem();
             _assertions = new FileSystemAssertions(_fileSystem);
-            _sut = new EawXBuild.Tasks.CopyTask(new CopyPolicyFake(), _fileSystem);
+            _sut = new CopyTask(new CopyPolicyFake(), _fileSystem);
         }
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCreateFileAtDestination() {
+        public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCreateFileAtDestination()
+        {
             AddFile("Data/MyFile.txt", string.Empty);
 
             const string destination = "Copy/MyFile.txt";
@@ -36,7 +43,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCopyFileToDestination() {
+        public void GivenPathToFileAndCopyDestination__WhenCallingRun__ShouldCopyFileToDestination()
+        {
             const string sourceFile = "Data/MyFile.txt";
             const string destFile = "Copy/MyFile.txt";
 
@@ -51,14 +59,16 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
-        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy() {
-            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
-            var copyPolicySpy = new CopyPolicySpy();
+        public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy()
+        {
+            MockFileSystemWithFileInfoCopySpy fileSystem = new MockFileSystemWithFileInfoCopySpy();
+            CopyPolicySpy copyPolicySpy = new CopyPolicySpy();
             fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
 
             const string destination = "Copy/MyFile.txt";
 
-            _sut = new CopyTask(copyPolicySpy, fileSystem) {
+            _sut = new CopyTask(copyPolicySpy, fileSystem)
+            {
                 Source = "Data/MyFile.txt",
                 Destination = destination
             };
@@ -71,7 +81,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectory__WhenCallingRun__ShouldCreateDirectoryAtDestination() {
+        public void GivenPathToDirectory__WhenCallingRun__ShouldCreateDirectoryAtDestination()
+        {
             const string sourceDirectory = "Data/SourceXML";
             const string destDirectory = "Copy/XML";
 
@@ -87,7 +98,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectoryWithFile__WhenCallingRun__ShouldCreateDirectoryWithFileAtDestination() {
+        public void GivenPathToDirectoryWithFile__WhenCallingRun__ShouldCreateDirectoryWithFileAtDestination()
+        {
             const string sourceDirectory = "Data/SourceXML";
             const string sourceFileName = "Data/SourceXML/MyFile.xml";
 
@@ -108,7 +120,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectoryWithSubDirectory__WhenCallingRun__ShouldAlsoCopySubDirectory() {
+        public void GivenPathToDirectoryWithSubDirectory__WhenCallingRun__ShouldAlsoCopySubDirectory()
+        {
             const string sourceDirectory = "Data/SourceXML";
             const string sourceSubDirectory = "Data/SourceXML/SubDirectory";
 
@@ -128,7 +141,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectoryWithTwoSubDirectoryLevels__WhenCallingRun__ShouldCopyBothLevels() {
+        public void GivenPathToDirectoryWithTwoSubDirectoryLevels__WhenCallingRun__ShouldCopyBothLevels()
+        {
             _fileSystem.AddDirectory("Data/SourceXML");
             _fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
             _fileSystem.AddDirectory("Data/SourceXML/SubDirectory/SubDirectory2");
@@ -143,7 +157,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenPathToDirectoryWithSubDirectoryWithFile__WhenCallingRun__ShouldCopySubDirectoryWithFile() {
+        public void GivenPathToDirectoryWithSubDirectoryWithFile__WhenCallingRun__ShouldCopySubDirectoryWithFile()
+        {
             _fileSystem.AddDirectory("Data/SourceXML");
             _fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
 
@@ -162,7 +177,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenDirectoryWithSubDirectoryWithoutRecursive__WhenCallingRun__ShouldNotCopySubDirectory() {
+        public void GivenDirectoryWithSubDirectoryWithoutRecursive__WhenCallingRun__ShouldNotCopySubDirectory()
+        {
             const string sourceDirectory = "Data/SourceXML";
             const string sourceSubDirectory = "Data/SourceXML/SubDirectory";
 
@@ -182,14 +198,15 @@ namespace EawXBuildTest.Tasks {
         }
 
         [TestMethod]
-        public void GivenDestFileExistsButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideDestFile() {
+        public void GivenDestFileExistsButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideDestFile()
+        {
             const string sourceFile = "Data/MyFile.txt";
             const string destFile = "Copy/MyFile.txt";
 
-            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            DateTimeOffset newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
             AddFile(sourceFile, "New Content", newerWriteTime);
 
-            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            DateTimeOffset olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
             AddFile(destFile, "Old Content", olderWriteTime);
 
             _sut.Source = sourceFile;
@@ -202,16 +219,17 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenDestFileExistAndHasNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile() {
+        public void GivenDestFileExistAndHasNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile()
+        {
             const string sourceFile = "Data/MyFile.txt";
             const string destFile = "Copy/MyFile.txt";
 
             const string expectedContent = "New Content";
 
-            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            DateTimeOffset olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
             AddFile(sourceFile, "Old Content", olderWriteTime);
 
-            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            DateTimeOffset newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
             AddFile(destFile, expectedContent, newerWriteTime);
 
             _sut.Source = sourceFile;
@@ -225,7 +243,8 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void
-            GivenDestDirectoryWithExistingFileButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideFileInDestDirectory() {
+            GivenDestDirectoryWithExistingFileButSourceWasModifiedAfter__WhenCallingRun__ShouldOverrideFileInDestDirectory()
+        {
             const string sourceDir = "Data";
             const string sourceFile = "Data/Sub/MyFile.txt";
 
@@ -246,7 +265,8 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         public void
-            GivenDestDirectoryWithExistingFileAndNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile() {
+            GivenDestDirectoryWithExistingFileAndNewerWriteTimeThanSourceFile__WhenCallingRun__ShouldNotOverrideDestFile()
+        {
             const string sourceDir = "Data";
             const string sourceFile = "Data/Sub/MyFile.txt";
 
@@ -268,7 +288,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         public void
-            GivenDestDirectoryAndNewerWriteTimeThanSourceFile_WithAlwaysOverwrite__WhenCallingRun__ShouldOverwriteDestFile() {
+            GivenDestDirectoryAndNewerWriteTimeThanSourceFile_WithAlwaysOverwrite__WhenCallingRun__ShouldOverwriteDestFile()
+        {
             const string sourceDir = "Data";
             const string sourceFile = "Data/Sub/MyFile.txt";
 
@@ -291,7 +312,8 @@ namespace EawXBuildTest.Tasks {
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
-        public void GivenFilePattern__WhenCallingRun__ShouldOnlyCopyFilesMatchingPattern() {
+        public void GivenFilePattern__WhenCallingRun__ShouldOnlyCopyFilesMatchingPattern()
+        {
             const string sourceDir = "Data";
             const string firstFile = "Data/MyFile.txt";
             const string secondFile = "Data/MySecondFile.txt";
@@ -322,7 +344,8 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoRelativePathException))]
-        public void GivenAbsolutePathAsSourceDir__WhenCallingRun__ShouldThrowNoRelativePathException() {
+        public void GivenAbsolutePathAsSourceDir__WhenCallingRun__ShouldThrowNoRelativePathException()
+        {
             const string sourceDir = "/absolute/path";
             _sut.Source = sourceDir;
 
@@ -332,7 +355,8 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoRelativePathException))]
-        public void GivenAbsolutePathAsDestDir__WhenCallingRun__ShouldThrowNoRelativePathException() {
+        public void GivenAbsolutePathAsDestDir__WhenCallingRun__ShouldThrowNoRelativePathException()
+        {
             const string destDir = "/absolute/path";
             _sut.Destination = destDir;
 
@@ -342,26 +366,26 @@ namespace EawXBuildTest.Tasks {
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
         [ExpectedException(typeof(NoSuchFileSystemObjectException))]
-        public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException() {
+        public void GivenNonExistingSourcePath__WhenCallingRun__ShouldThrowNoSuchFileSystemObjectException()
+        {
             _sut.Source = "NonExistingPath";
             _sut.Run();
         }
 
 
-        private MockFileData GetFile(string path) {
+        private MockFileData GetFile(string path)
+        {
             return _fileSystem.GetFile(path);
         }
 
-        private static DateTimeOffset NewerWriteTime => new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
-
-        private static DateTimeOffset OlderWriteTime => new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
-
-        private void AddFile(string path, string content) {
+        private void AddFile(string path, string content)
+        {
             AddFile(path, content, DateTimeOffset.MinValue);
         }
 
-        private void AddFile(string sourceFile, string content, DateTimeOffset lastWriteTime) {
-            var sourceFileData = new MockFileData(content);
+        private void AddFile(string sourceFile, string content, DateTimeOffset lastWriteTime)
+        {
+            MockFileData sourceFileData = new MockFileData(content);
             sourceFileData.LastWriteTime = lastWriteTime;
             _fileSystem.AddFile(sourceFile, sourceFileData);
         }
