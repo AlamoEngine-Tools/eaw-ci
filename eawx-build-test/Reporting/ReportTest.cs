@@ -22,7 +22,7 @@ namespace EawXBuildTest.Reporting
             {
                 report.AddMessage(message);
             }
-            Assert.IsTrue(messages.Count < report.Messages.Count, "The report should always contain more messages than the base creation.");
+            Assert.IsTrue(messages.Count < ((IReport)report).Messages.Count, "The report should always contain more messages than the base creation.");
         }
 
         [TestMethod]
@@ -31,7 +31,7 @@ namespace EawXBuildTest.Reporting
         {
             List<IMessage> messages = CreateTestMessageList();
             TestReport report = CreateTestReportWithMessages(messages);
-            Assert.AreEqual(messages.Count, report.Messages.Count);
+            Assert.AreEqual(messages.Count, ((IReport)report).Messages.Count);
             report.FinalizeReport();
             Assert.IsTrue(report.IsFinalized);
             report.AddMessage(new Message("Message"));
