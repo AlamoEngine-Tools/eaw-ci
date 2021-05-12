@@ -1,5 +1,7 @@
-namespace EawXBuild.Steam {
-    public enum PublishResult {
+namespace EawXBuild.Steam
+{
+    public enum PublishResult
+    {
         Ok,
         Failed
     }

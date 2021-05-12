@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace EawXBuild.Steam {
-    public interface IWorkshopItemChangeSet {
+namespace EawXBuild.Steam
+{
+    public interface IWorkshopItemChangeSet
+    {
         public string Language { get; set; }
 
         public string Title { get; set; }

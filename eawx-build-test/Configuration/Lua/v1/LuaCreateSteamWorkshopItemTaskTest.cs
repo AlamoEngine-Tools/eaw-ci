@@ -6,10 +6,11 @@ using EawXBuildTest.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NLua;
 
-namespace EawXBuildTest.Configuration.Lua.v1 {
+namespace EawXBuildTest.Configuration.Lua.v1
+{
     [TestClass]
-    public class LuaCreateSteamWorkshopItemTaskTest {
-        private static readonly string[] ExpectedTags = {"EAW", "FOC"};
+    public class LuaCreateSteamWorkshopItemTaskTest
+    {
         private const long AppIdAsLong = 32740;
         private const uint AppIdAsUInt = (uint) AppIdAsLong;
         private const string Title = "My Awesome title";
@@ -19,73 +20,82 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
 
         private const string LuaPublicVisibility = "public";
         private const string LuaPrivateVisibility = "private";
+        private static readonly string[] ExpectedTags = {"EAW", "FOC"};
 
         [TestMethod]
         public void
-            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PublicVisibility__OnCreation__ShouldConfigureTask() {
-            var taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Public);
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PublicVisibility__OnCreation__ShouldConfigureTask()
+        {
+            TaskBuilderMock taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Public);
 
-            using var luaInterpreter = new NLua.Lua();
+            using NLua.Lua luaInterpreter = new NLua.Lua();
             PushVisibilityTable(luaInterpreter);
-            var table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPublicVisibility);
-            var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
+            LuaTable table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPublicVisibility);
+            LuaCreateSteamWorkshopItemTask sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
 
             taskBuilderMock.Verify();
         }
 
         [TestMethod]
         public void
-            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PrivateVisibility__OnCreation__ShouldConfigureTask() {
-            var taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Private);
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_PrivateVisibility__OnCreation__ShouldConfigureTask()
+        {
+            TaskBuilderMock taskBuilderMock = CreateTaskBuilderMock(WorkshopItemVisibility.Private);
 
-            using var luaInterpreter = new NLua.Lua();
+            using NLua.Lua luaInterpreter = new NLua.Lua();
             PushVisibilityTable(luaInterpreter);
-            var table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPrivateVisibility);
-            var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
+            LuaTable table = CreateFullConfigurationTableWithoutTags(luaInterpreter, LuaPrivateVisibility);
+            LuaCreateSteamWorkshopItemTask sut = new LuaCreateSteamWorkshopItemTask(taskBuilderMock, table);
 
             taskBuilderMock.Verify();
         }
 
         /// <summary>
-        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
-        /// Instead we're querying the "Tags" key manually
+        ///     For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't
+        ///     do deep comparisons.
+        ///     Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
         public void
-            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags() {
-            var taskBuilderSpy = new TaskBuilderSpy();
-            using var luaInterpreter = new NLua.Lua();
-            var table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_Tags__OnCreation__ShouldConfigureTaskWithTags()
+        {
+            TaskBuilderSpy taskBuilderSpy = new TaskBuilderSpy();
+            using NLua.Lua luaInterpreter = new NLua.Lua();
+            LuaTable table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
 
-            var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderSpy, table);
+            LuaCreateSteamWorkshopItemTask sut = new LuaCreateSteamWorkshopItemTask(taskBuilderSpy, table);
 
-            var actual = taskBuilderSpy["Tags"];
+            object actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
         /// <summary>
-        /// For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't do deep comparisons.
-        /// Instead we're querying the "Tags" key manually
+        ///     For this test we're not using the TaskBuilderMock, because it uses CollectionAssert under the hood, which doesn't
+        ///     do deep comparisons.
+        ///     Instead we're querying the "Tags" key manually
         /// </summary>
         [TestMethod]
         public void
-            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags() {
-            var taskBuilderSpy = new TaskBuilderSpy();
-            using var luaInterpreter = new NLua.Lua();
+            GivenLuaCreateSteamWorkshopItemTaskWithConfigTable_With_DuplicateTags__OnCreation__ShouldConfigureTaskWithoutDuplicateTags()
+        {
+            TaskBuilderSpy taskBuilderSpy = new TaskBuilderSpy();
+            using NLua.Lua luaInterpreter = new NLua.Lua();
 
-            var table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
+            LuaTable table = CreateConfigurationTableWithOnlyTags(luaInterpreter);
             table["2"] = "EAW";
 
-            var sut = new LuaCreateSteamWorkshopItemTask(taskBuilderSpy, table);
+            LuaCreateSteamWorkshopItemTask sut = new LuaCreateSteamWorkshopItemTask(taskBuilderSpy, table);
 
-            var actual = taskBuilderSpy["Tags"];
+            object actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
             CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
         }
 
-        private static TaskBuilderMock CreateTaskBuilderMock(WorkshopItemVisibility visibility) {
-            return new TaskBuilderMock(new Dictionary<string, object> {
+        private static TaskBuilderMock CreateTaskBuilderMock(WorkshopItemVisibility visibility)
+        {
+            return new TaskBuilderMock(new Dictionary<string, object>
+            {
                 {"AppId", AppIdAsUInt},
                 {"Title", Title},
                 {"DescriptionFilePath", DescriptionFilePath},
@@ -95,18 +105,21 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             });
         }
 
-        private static LuaTable CreateConfigurationTableWithOnlyTags(NLua.Lua luaInterpreter) {
-            var table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
-            var tags = NLuaUtilities.MakeLuaTable(luaInterpreter, "tag_table");
+        private static LuaTable CreateConfigurationTableWithOnlyTags(NLua.Lua luaInterpreter)
+        {
+            LuaTable table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
+            LuaTable tags = NLuaUtilities.MakeLuaTable(luaInterpreter, "tag_table");
             tags[0] = "EAW";
             tags[1] = "FOC";
             table["tags"] = tags;
             return table;
         }
 
-        private static LuaTable CreateFullConfigurationTableWithoutTags(NLua.Lua luaInterpreter, string luaVisibility) {
-            var table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
-            var visibility = (WorkshopItemVisibility) luaInterpreter.GetObjectFromPath("visibility." + luaVisibility);
+        private static LuaTable CreateFullConfigurationTableWithoutTags(NLua.Lua luaInterpreter, string luaVisibility)
+        {
+            LuaTable table = NLuaUtilities.MakeLuaTable(luaInterpreter, "the_table");
+            WorkshopItemVisibility visibility =
+                (WorkshopItemVisibility) luaInterpreter.GetObjectFromPath("visibility." + luaVisibility);
 
             table["app_id"] = AppIdAsLong;
             table["title"] = Title;
@@ -118,9 +131,10 @@ namespace EawXBuildTest.Configuration.Lua.v1 {
             return table;
         }
 
-        private static void PushVisibilityTable(NLua.Lua luaInterpreter) {
+        private static void PushVisibilityTable(NLua.Lua luaInterpreter)
+        {
             luaInterpreter.NewTable("visibility");
-            var luaTable = luaInterpreter.GetTable("visibility");
+            LuaTable luaTable = luaInterpreter.GetTable("visibility");
             luaTable["private"] = WorkshopItemVisibility.Private;
             luaTable["public"] = WorkshopItemVisibility.Public;
         }

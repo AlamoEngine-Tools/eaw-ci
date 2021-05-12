@@ -4,8 +4,10 @@ using EawXBuild.Native;
 using EawXBuild.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace EawXBuild.Configuration.FrontendAgnostic {
-    internal enum Tasks {
+namespace EawXBuild.Configuration.FrontendAgnostic
+{
+    internal enum Tasks
+    {
         Clean,
         Copy,
         CreateSteamWorkshopItem,
@@ -14,25 +16,31 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
         UpdateSteamWorkshopItem
     }
 
-    public class BuildComponentFactory : IBuildComponentFactory {
-        private readonly ILogger _logger;
+    public class BuildComponentFactory : IBuildComponentFactory
+    {
         private readonly FileLinkerFactory _fileLinkerFactory = new FileLinkerFactory();
+        private readonly ILogger _logger;
 
-        public BuildComponentFactory(ILogger logger = null) {
+        public BuildComponentFactory(ILogger logger = null)
+        {
             _logger = logger;
         }
 
-        public IProject MakeProject() {
+        public IProject MakeProject()
+        {
             return new Project();
         }
 
-        public IJob MakeJob(string name) {
+        public IJob MakeJob(string name)
+        {
             return new Job(name);
         }
 
-        public ITaskBuilder Task(string taskTypeName) {
-            var taskType = ParseTaskTypeName(taskTypeName);
-            return taskType switch {
+        public ITaskBuilder Task(string taskTypeName)
+        {
+            Tasks taskType = ParseTaskTypeName(taskTypeName);
+            return taskType switch
+            {
                 Tasks.RunProgram => new RunProcessTaskBuilder(),
                 Tasks.Clean => new CleanTaskBuilder(),
                 Tasks.Copy => new CopyTaskBuilder(new CopyPolicy()),
@@ -43,11 +51,14 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             };
         }
 
-        private static Tasks ParseTaskTypeName(string taskTypeName) {
-            try {
+        private static Tasks ParseTaskTypeName(string taskTypeName)
+        {
+            try
+            {
                 return Enum.Parse<Tasks>(taskTypeName);
             }
-            catch (ArgumentException) {
+            catch (ArgumentException)
+            {
                 throw new InvalidOperationException($"Unknown Task type: {taskTypeName}");
             }
         }

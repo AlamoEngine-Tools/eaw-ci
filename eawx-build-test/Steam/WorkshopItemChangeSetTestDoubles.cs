@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using EawXBuild.Steam;
 
-namespace EawXBuildTest.Steam {
-    public class WorkshopItemChangeSetDummy : IWorkshopItemChangeSet {
+namespace EawXBuildTest.Steam
+{
+    public class WorkshopItemChangeSetDummy : IWorkshopItemChangeSet
+    {
         public string Language { get; set; }
         public string Title { get; set; }
         public string ItemFolderPath { get; set; }
@@ -12,19 +14,23 @@ namespace EawXBuildTest.Steam {
 
         public HashSet<string> Tags { get; set; }
 
-        public virtual (bool, Exception) IsValidChangeSet() {
+        public virtual (bool, Exception) IsValidChangeSet()
+        {
             return (false, null);
         }
 
-        public string GetDescriptionTextFromFile() {
+        public string GetDescriptionTextFromFile()
+        {
             return string.Empty;
         }
     }
 
-    public class WorkshopItemChangeSetStub : WorkshopItemChangeSetDummy {
+    public class WorkshopItemChangeSetStub : WorkshopItemChangeSetDummy
+    {
         public (bool, Exception) ChangeSetValidationResult { get; set; }
 
-        public override (bool, Exception) IsValidChangeSet() {
+        public override (bool, Exception) IsValidChangeSet()
+        {
             return ChangeSetValidationResult;
         }
     }

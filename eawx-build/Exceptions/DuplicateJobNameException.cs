@@ -1,8 +1,12 @@
 using System;
 
-namespace EawXBuild.Exceptions {
+namespace EawXBuild.Exceptions
+{
     [Serializable]
-    public class DuplicateJobNameException : Exception {
-        public DuplicateJobNameException(string jobName) : base($"Duplicate Job {jobName}") { }
+    public class DuplicateJobNameException : Exception
+    {
+        public DuplicateJobNameException(string jobName) : base($"Duplicate Job {jobName}")
+        {
+        }
     }
 }

@@ -4,18 +4,21 @@ using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.FrontendAgnostic {
+namespace EawXBuildTest.Configuration.FrontendAgnostic
+{
     [TestClass]
-    public class CleanTaskBuilderTest {
+    public class CleanTaskBuilderTest
+    {
         [TestMethod]
-        public void WhenBuildingCleanTaskWithNameAndDirectoryPath__ShouldReturnConfiguredCleanTask() {
+        public void WhenBuildingCleanTaskWithNameAndDirectoryPath__ShouldReturnConfiguredCleanTask()
+        {
             const string pathToDirectory = "Path/To/Directory";
             const string expectedId = "taskId";
             const string expectedName = "taskName";
 
-            var sut = new CleanTaskBuilder(new MockFileSystem());
+            CleanTaskBuilder sut = new CleanTaskBuilder(new MockFileSystem());
 
-            var task = (CleanTask) sut
+            CleanTask task = (CleanTask) sut
                 .With("Id", expectedId)
                 .With("Name", expectedName)
                 .With("Path", pathToDirectory)
@@ -28,8 +31,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void WhenBuildingCleanTaskWithUnknownConfigOption__ShouldThrowInvalidOperationException() {
-            var sut = new CleanTaskBuilder(new MockFileSystem());
+        public void WhenBuildingCleanTaskWithUnknownConfigOption__ShouldThrowInvalidOperationException()
+        {
+            CleanTaskBuilder sut = new CleanTaskBuilder(new MockFileSystem());
 
             sut.With("Unknown", "").Build();
         }

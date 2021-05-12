@@ -2,29 +2,33 @@ using System;
 using EawXBuild.Core;
 using EawXBuild.Steam;
 
-namespace EawXBuild.Tasks.Steam {
-    public abstract class SteamWorkshopTask : ITask {
+namespace EawXBuild.Tasks.Steam
+{
+    public abstract class SteamWorkshopTask : ITask
+    {
+        public uint AppId { get; set; }
+
+        public IWorkshopItemChangeSet ChangeSet { get; set; }
         public string Id { get; set; }
 
         public string Name { get; set; }
 
-        public uint AppId { get; set; }
-
-        public IWorkshopItemChangeSet ChangeSet { get; set; }
-
-        public void Run() {
+        public void Run()
+        {
             ValidateAppId();
             ValidateChangeSet();
             PublishToWorkshop();
         }
 
-        private void ValidateAppId() {
+        private void ValidateAppId()
+        {
             if (AppId == 0) throw new InvalidOperationException("No AppId set");
         }
 
-        private void ValidateChangeSet() {
+        private void ValidateChangeSet()
+        {
             if (ChangeSet == null) throw new InvalidOperationException("No change set given");
-            var (isValid, exception) = ChangeSet.IsValidChangeSet();
+            (bool isValid, Exception exception) = ChangeSet.IsValidChangeSet();
             if (!isValid) throw exception;
 
             ChangeSet.Language ??= "English";

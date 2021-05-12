@@ -1,8 +1,10 @@
 using CommandLine;
 
-namespace EawXBuild.Configuration.CLI {
-    [Verb("validate", false, HelpText = "Validates a given configuration file.")]
-    public class ValidateOptions : IOptions {
+namespace EawXBuild.Configuration.CLI
+{
+    [Verb("validate", HelpText = "Validates a given configuration file.")]
+    public class ValidateOptions : IOptions
+    {
         public bool BackendLua { get; set; }
         public bool BackendXml { get; set; }
         public string ConfigPath { get; set; }

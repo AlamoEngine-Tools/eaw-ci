@@ -6,9 +6,11 @@ using EawXBuild.Tasks;
 using EawXBuildTest.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest.Configuration.FrontendAgnostic {
+namespace EawXBuildTest.Configuration.FrontendAgnostic
+{
     [TestClass]
-    public class CopyTaskBuilderTest {
+    public class CopyTaskBuilderTest
+    {
         private const string TheSourcePath = "the/source/path";
         private const string TheDestPath = "the/dest/path";
         private const bool Recursive = true;
@@ -20,12 +22,13 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         public void
-            GivenSourcePathDestPathRecursiveAndFilePattern__WhenCallingBuild__ShouldReturnCopyTaskWithMatchingConfig() {
-            var sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
+            GivenSourcePathDestPathRecursiveAndFilePattern__WhenCallingBuild__ShouldReturnCopyTaskWithMatchingConfig()
+        {
+            CopyTaskBuilder sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
 
             ConfigureTask(sut);
 
-            var task = (CopyTask) sut.Build();
+            CopyTask task = (CopyTask) sut.Build();
 
             Assert.AreEqual(TaskId, task.Id);
             Assert.AreEqual(TaskName, task.Name);
@@ -37,23 +40,26 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
         }
 
         [TestMethod]
-        public void GivenTaskBuiltWithValidConfiguration__WhenRunningTask__ShouldCopyPolicyShouldBeCalled() {
-            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData> {
+        public void GivenTaskBuiltWithValidConfiguration__WhenRunningTask__ShouldCopyPolicyShouldBeCalled()
+        {
+            MockFileSystem fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
                 {TheSourcePath, string.Empty}
             });
-            var copyPolicySpy = new CopyPolicySpy();
+            CopyPolicySpy copyPolicySpy = new CopyPolicySpy();
 
-            var sut = new CopyTaskBuilder(copyPolicySpy, fileSystem);
+            CopyTaskBuilder sut = new CopyTaskBuilder(copyPolicySpy, fileSystem);
 
             ConfigureTask(sut);
-            var task = (CopyTask) sut.Build();
+            CopyTask task = (CopyTask) sut.Build();
 
             task.Run();
 
             Assert.IsTrue(copyPolicySpy.CopyCalled);
         }
 
-        private static void ConfigureTask(CopyTaskBuilder sut) {
+        private static void ConfigureTask(CopyTaskBuilder sut)
+        {
             sut.With("Id", TaskId)
                 .With("Name", TaskName)
                 .With("CopyFromPath", TheSourcePath)
@@ -65,8 +71,9 @@ namespace EawXBuildTest.Configuration.FrontendAgnostic {
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void WhenCallingWith_WithInvalidConfigOption__ShouldThrowInvalidOperationException() {
-            var sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
+        public void WhenCallingWith_WithInvalidConfigOption__ShouldThrowInvalidOperationException()
+        {
+            CopyTaskBuilder sut = new CopyTaskBuilder(new CopyPolicyDummy(), new MockFileSystem());
 
             sut.With("InvalidOption", string.Empty);
         }

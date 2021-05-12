@@ -3,36 +3,43 @@ using System.Linq;
 using System.Threading.Tasks;
 using EawXBuild.Exceptions;
 
-namespace EawXBuild.Core {
-    public class Project : IProject {
+namespace EawXBuild.Core
+{
+    public class Project : IProject
+    {
         private readonly List<IJob> jobs = new List<IJob>();
 
         public string Name { get; set; }
 
-        public void AddJob(IJob job) {
+        public void AddJob(IJob job)
+        {
             if (HasJobWithName(job.Name))
                 throw new DuplicateJobNameException(job.Name);
 
             jobs.Add(job);
         }
 
-        public Task RunJobAsync(string jobName) {
-            var job = FindJobWithName(jobName);
+        public Task RunJobAsync(string jobName)
+        {
+            IJob job = FindJobWithName(jobName);
             if (job == null)
                 throw new JobNotFoundException(jobName);
 
             return Task.Run(() => job.Run());
         }
 
-        public List<Task> RunAllJobsAsync() {
+        public List<Task> RunAllJobsAsync()
+        {
             return jobs.Select(job => Task.Run(job.Run)).ToList();
         }
 
-        private IJob FindJobWithName(string jobName) {
+        private IJob FindJobWithName(string jobName)
+        {
             return jobs.Find(job => job.Name.Equals(jobName));
         }
 
-        private bool HasJobWithName(string jobName) {
+        private bool HasJobWithName(string jobName)
+        {
             return jobs.Exists(j => j.Name.Equals(jobName));
         }
     }

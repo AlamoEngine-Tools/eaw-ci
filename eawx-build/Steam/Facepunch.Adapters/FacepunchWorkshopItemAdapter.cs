@@ -3,11 +3,14 @@ using System.IO;
 using System.Threading.Tasks;
 using Steamworks.Ugc;
 
-namespace EawXBuild.Steam.Facepunch.Adapters {
-    public class FacepunchWorkshopItemAdapter : IWorkshopItem {
+namespace EawXBuild.Steam.Facepunch.Adapters
+{
+    public class FacepunchWorkshopItemAdapter : IWorkshopItem
+    {
         private Item _item;
 
-        public FacepunchWorkshopItemAdapter(Item item) {
+        public FacepunchWorkshopItemAdapter(Item item)
+        {
             _item = item;
         }
 
@@ -15,8 +18,9 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
         public string Title => _item.Title;
         public string Description { get; set; }
 
-        public async Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings) {
-            var editor = _item.Edit();
+        public async Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings)
+        {
+            Editor editor = _item.Edit();
             editor
                 .WithTitle(settings.Title);
             UpdateDescription(settings, ref editor);
@@ -24,24 +28,28 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             UpdateContent(settings, ref editor);
             UpdateTags(settings, ref editor);
 
-            var result = await editor.SubmitAsync();
+            Steamworks.Ugc.PublishResult result = await editor.SubmitAsync();
 
             return result.Success ? PublishResult.Ok : PublishResult.Failed;
         }
 
-        private static void UpdateDescription(IWorkshopItemChangeSet settings, ref Editor editor) {
+        private static void UpdateDescription(IWorkshopItemChangeSet settings, ref Editor editor)
+        {
             string description = null;
-            if (settings.DescriptionFilePath != null) {
-                var descriptionFile = new FileInfo(settings.DescriptionFilePath);
-                using var streamReader = descriptionFile.OpenText();
+            if (settings.DescriptionFilePath != null)
+            {
+                FileInfo descriptionFile = new FileInfo(settings.DescriptionFilePath);
+                using StreamReader streamReader = descriptionFile.OpenText();
                 description = streamReader.ReadToEnd();
             }
 
             editor.WithDescription(description);
         }
 
-        private static void UpdateVisibility(IWorkshopItemChangeSet settings, ref Editor editor) {
-            switch (settings.Visibility) {
+        private static void UpdateVisibility(IWorkshopItemChangeSet settings, ref Editor editor)
+        {
+            switch (settings.Visibility)
+            {
                 case WorkshopItemVisibility.Public:
                     editor.WithPublicVisibility();
                     break;
@@ -53,13 +61,15 @@ namespace EawXBuild.Steam.Facepunch.Adapters {
             }
         }
 
-        private static void UpdateContent(IWorkshopItemChangeSet settings, ref Editor editor) {
+        private static void UpdateContent(IWorkshopItemChangeSet settings, ref Editor editor)
+        {
             if (settings.ItemFolderPath != null)
                 editor.WithContent(settings.ItemFolderPath);
         }
 
-        private static void UpdateTags(IWorkshopItemChangeSet settings, ref Editor editor) {
-            foreach (var tag in settings.Tags) editor.WithTag(tag);
+        private static void UpdateTags(IWorkshopItemChangeSet settings, ref Editor editor)
+        {
+            foreach (string tag in settings.Tags) editor.WithTag(tag);
         }
     }
 }

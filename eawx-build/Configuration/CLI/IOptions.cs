@@ -1,7 +1,9 @@
 using CommandLine;
 
-namespace EawXBuild.Configuration.CLI {
-    public interface IOptions {
+namespace EawXBuild.Configuration.CLI
+{
+    public interface IOptions
+    {
         [Option('l', "lua", Default = false, Group = "backend-lua",
             HelpText = "Run the CI Tool with a lua-based configuration.")]
         public bool BackendLua { get; set; }

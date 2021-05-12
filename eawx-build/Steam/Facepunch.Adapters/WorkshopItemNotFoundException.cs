@@ -1,8 +1,12 @@
 using System;
 
-namespace EawXBuild.Steam.Facepunch.Adapters {
+namespace EawXBuild.Steam.Facepunch.Adapters
+{
     [Serializable]
-    public class WorkshopItemNotFoundException : Exception {
-        public WorkshopItemNotFoundException(string message) : base(message) { }
+    public class WorkshopItemNotFoundException : Exception
+    {
+        public WorkshopItemNotFoundException(string message) : base(message)
+        {
+        }
     }
 }

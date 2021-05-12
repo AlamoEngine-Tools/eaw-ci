@@ -12,9 +12,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EawXBuildTest {
+namespace EawXBuildTest
+{
     [TestClass]
-    public class EawXBuildXmlApplicationTest {
+    public class EawXBuildXmlApplicationTest
+    {
         private const string DefaultXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <eaw-ci:BuildConfiguration ConfigVersion=""1.0.0"" xmlns:eaw-ci=""eaw-ci"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:schemaLocation=""eaw-ci eaw-ci.xsd "">
     <Projects>
@@ -46,35 +48,41 @@ namespace EawXBuildTest {
   <Arguments>Hello World</Arguments>
 </Task>";
 
+        private const string XmlConfigFilePath = "eaw-ci.xml";
+
 
         private readonly IFileSystem _fileSystem = new FileSystem();
-        private const string XmlConfigFilePath = "eaw-ci.xml";
-        private IFileInfo _xmlConfigFile;
         private ServiceCollection _services;
+        private IFileInfo _xmlConfigFile;
 
 
         [TestInitialize]
-        public void SetUp() {
+        public void SetUp()
+        {
             _services = ConfigureServices();
         }
 
         [TestCleanup]
-        public void TearDown() {
+        public void TearDown()
+        {
             _xmlConfigFile.Delete();
 
             if (_fileSystem.File.Exists("newfile.xml"))
                 _fileSystem.File.Delete("newfile.xml");
         }
 
-        private void CreateXmlConfigWithTask(string task) {
-            using var stream = _fileSystem.File.CreateText(XmlConfigFilePath);
+        private void CreateXmlConfigWithTask(string task)
+        {
+            using StreamWriter stream = _fileSystem.File.CreateText(XmlConfigFilePath);
             stream.Write(DefaultXml, task);
             _xmlConfigFile = _fileSystem.FileInfo.FromFileName(XmlConfigFilePath);
         }
 
         [TestMethod]
-        public void WhenRunningWith_OneProject_OneJob_And_CopyTask__ShouldCopyFileToTarget() {
-            var options = new RunOptions {
+        public void WhenRunningWith_OneProject_OneJob_And_CopyTask__ShouldCopyFileToTarget()
+        {
+            RunOptions options = new RunOptions
+            {
                 BackendXml = true,
                 ConfigPath = "eaw-ci.xml",
                 ProjectName = "pid0",
@@ -83,17 +91,19 @@ namespace EawXBuildTest {
 
             CreateXmlConfigWithTask(CopyTask);
 
-            var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
+            EawXBuildApplication sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
             sut.Run();
 
-            var actual = _fileSystem.File.Exists("newfile.xml");
+            bool actual = _fileSystem.File.Exists("newfile.xml");
             Assert.IsTrue(actual);
         }
 
         [PlatformSpecificTestMethod("Linux", "OSX")]
-        public void GivenUnixLikeSystem__WhenRunningWith_OneProject_OneJob_And_RunProgramTask__ShouldRunProgram() {
-            var options = new RunOptions {
+        public void GivenUnixLikeSystem__WhenRunningWith_OneProject_OneJob_And_RunProgramTask__ShouldRunProgram()
+        {
+            RunOptions options = new RunOptions
+            {
                 BackendXml = true,
                 ConfigPath = "eaw-ci.xml",
                 ProjectName = "pid0",
@@ -101,25 +111,26 @@ namespace EawXBuildTest {
             };
 
             CreateXmlConfigWithTask(EchoTask);
-            var stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
 
-            var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
+            EawXBuildApplication sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
             sut.Run();
 
-            var actual = stringBuilder.ToString().Trim();
+            string actual = stringBuilder.ToString().Trim();
             Assert.AreEqual("Hello World", actual);
         }
 
-        private static ServiceCollection ConfigureServices(LogLevel logLevel = LogLevel.None) {
-            var services = new ServiceCollection();
+        private static ServiceCollection ConfigureServices(LogLevel logLevel = LogLevel.None)
+        {
+            ServiceCollection services = new ServiceCollection();
             services.AddLogging(builder => builder.AddConsole());
             services.Configure<LoggerFilterOptions>(options =>
                 options.AddFilter<ConsoleLoggerProvider>(null, logLevel));
             services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
-            services.AddTransient<IIOService, IOService>(serviceProvider =>
-                new IOService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
+            services.AddTransient<IIOHelperService, IOHelperService>(serviceProvider =>
+                new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
             return services;
         }
     }

@@ -4,16 +4,21 @@ using EawXBuild.Core;
 using EawXBuild.Services.Process;
 using EawXBuild.Tasks;
 
-namespace EawXBuild.Configuration.FrontendAgnostic {
-    public class RunProcessTaskBuilder : ITaskBuilder {
+namespace EawXBuild.Configuration.FrontendAgnostic
+{
+    public class RunProcessTaskBuilder : ITaskBuilder
+    {
         private readonly RunProcessTask _runProcessTask;
 
-        public RunProcessTaskBuilder(IFileSystem fileSystem = null) {
+        public RunProcessTaskBuilder(IFileSystem fileSystem = null)
+        {
             _runProcessTask = new RunProcessTask(new ProcessRunner(), fileSystem ?? new FileSystem());
         }
 
-        public ITaskBuilder With(string name, object value) {
-            switch (name) {
+        public ITaskBuilder With(string name, object value)
+        {
+            switch (name)
+            {
                 case "Id":
                     _runProcessTask.Id = (string) value;
                     break;
@@ -39,7 +44,8 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             return this;
         }
 
-        public ITask Build() {
+        public ITask Build()
+        {
             return _runProcessTask;
         }
     }

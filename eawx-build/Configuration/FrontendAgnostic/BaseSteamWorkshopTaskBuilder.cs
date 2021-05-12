@@ -5,19 +5,24 @@ using EawXBuild.Core;
 using EawXBuild.Steam;
 using EawXBuild.Tasks.Steam;
 
-namespace EawXBuild.Configuration.FrontendAgnostic {
-    public abstract class BaseSteamWorkshopTaskBuilder : ITaskBuilder {
-        protected SteamWorkshopTask Task;
+namespace EawXBuild.Configuration.FrontendAgnostic
+{
+    public abstract class BaseSteamWorkshopTaskBuilder : ITaskBuilder
+    {
         protected readonly IWorkshopItemChangeSet ChangeSet;
+        protected SteamWorkshopTask Task;
 
-        protected BaseSteamWorkshopTaskBuilder() {
-            var fileSystem = new FileSystem();
+        protected BaseSteamWorkshopTaskBuilder()
+        {
+            FileSystem fileSystem = new FileSystem();
             ChangeSet = new WorkshopItemChangeSet(fileSystem);
         }
 
-        public virtual ITaskBuilder With(string name, object value) {
+        public virtual ITaskBuilder With(string name, object value)
+        {
             Task ??= CreateTaskWithChangeSet(ChangeSet);
-            switch (name) {
+            switch (name)
+            {
                 case "AppId":
                     Task.AppId = Convert.ToUInt32(value);
                     break;
@@ -47,10 +52,11 @@ namespace EawXBuild.Configuration.FrontendAgnostic {
             return this;
         }
 
-        protected abstract SteamWorkshopTask CreateTaskWithChangeSet(IWorkshopItemChangeSet changeSet);
-
-        public ITask Build() {
+        public ITask Build()
+        {
             return Task;
         }
+
+        protected abstract SteamWorkshopTask CreateTaskWithChangeSet(IWorkshopItemChangeSet changeSet);
     }
 }
