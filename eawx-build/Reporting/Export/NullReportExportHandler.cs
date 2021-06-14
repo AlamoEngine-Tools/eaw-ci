@@ -1,8 +1,22 @@
 namespace EawXBuild.Reporting.Export
 {
-    public class NullReportExportHandler : IReportExportHandler
+    /// <summary>
+    /// Default <see cref="IReportExportHandler"/> that is used by an <see cref="AbstractReport"/> if no explicit
+    /// <see cref="IReportExportHandler"/> is provided.
+    /// </summary>
+    public sealed class NullReportExportHandler : AbstractReportExportHandler
     {
-        public void CreateExport(IReport report, ExportType exportType = ExportType.Full)
+        protected override void CreateErrorExport(IReport report)
+        {
+            // NOP
+        }
+
+        protected override void CreateMessageExport(IReport report)
+        {
+            // NOP
+        }
+
+        protected override void CreateFullExport(IReport report)
         {
             // NOP
         }
