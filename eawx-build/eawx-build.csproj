@@ -22,6 +22,8 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <StartupObject>EawXBuild.Host</StartupObject>
     <Deterministic>false</Deterministic>
+    <Nullable>enable</Nullable>
+    <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
@@ -63,7 +65,7 @@
     <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\steam_api64.dll" DestinationFolder="$(OutDir)" />
-  </Target>    
+  </Target>
   <Target Name="CopyLibSteamForPublish" AfterTargets="Publish">
     <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.so" DestinationFolder="$(PublishDir)" />
     <Copy SourceFiles="Steam\Facepunch.Steamworks\2.3.2\SteamAPI\libsteam_api.bundle" DestinationFolder="$(PublishDir)" />

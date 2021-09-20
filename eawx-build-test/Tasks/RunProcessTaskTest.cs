@@ -2,8 +2,11 @@ using System;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
+using EawXBuildTest.Reporting;
 using EawXBuildTest.Services.Process;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static EawXBuildTest.ReportingAssertions;
+
 
 namespace EawXBuildTest.Tasks
 {
@@ -22,7 +25,7 @@ namespace EawXBuildTest.Tasks
             _filesystem = new MockFileSystem();
             _filesystem.AddFile("myProgram.exe", new MockFileData(string.Empty));
             _executablePath = "myProgram.exe";
-            _sut = new RunProcessTask(_runner, _filesystem) {ExecutablePath = _executablePath};
+            _sut = new RunProcessTask(_runner, _filesystem) { ExecutablePath = _executablePath };
         }
 
         [TestMethod]
@@ -72,8 +75,8 @@ namespace EawXBuildTest.Tasks
         [ExpectedException(typeof(ProcessFailedException))]
         public void GivenExecutableThatExitsWithCodeOne__WhenCallingRun__ShouldThrowProcessFailedException()
         {
-            ProcessRunnerStub runner = new ProcessRunnerStub {ExitCode = 1};
-            RunProcessTask sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = _executablePath};
+            ProcessRunnerStub runner = new ProcessRunnerStub { ExitCode = 1 };
+            RunProcessTask sut = new RunProcessTask(runner, _filesystem) { ExecutablePath = _executablePath };
 
             sut.Run();
         }
@@ -85,7 +88,7 @@ namespace EawXBuildTest.Tasks
             CallOrderVerifyingProcessRunnerMock runner = new CallOrderVerifyingProcessRunnerMock();
 
             const string executablePath = "myProgram.exe";
-            RunProcessTask sut = new RunProcessTask(runner, _filesystem) {ExecutablePath = executablePath};
+            RunProcessTask sut = new RunProcessTask(runner, _filesystem) { ExecutablePath = executablePath };
 
             sut.Run();
 
@@ -95,9 +98,9 @@ namespace EawXBuildTest.Tasks
         [TestMethod]
         public void GivenFailingProcessButAllowedToFail__WhenCallingRun__ShouldNotThrowProcessFailedException()
         {
-            ProcessRunnerStub runner = new ProcessRunnerStub {ExitCode = 1};
+            ProcessRunnerStub runner = new ProcessRunnerStub { ExitCode = 1 };
             RunProcessTask sut = new RunProcessTask(runner, _filesystem)
-                {ExecutablePath = _executablePath, AllowedToFail = true};
+            { ExecutablePath = _executablePath, AllowedToFail = true };
 
             sut.Run();
         }
@@ -117,6 +120,30 @@ namespace EawXBuildTest.Tasks
             _sut.ExecutablePath = "/absolute/path";
             Assert.ThrowsException<NoRelativePathException>(() => _sut.Run());
             Assert.IsFalse(_runner.WasStarted);
+        }
+
+        [TestMethod]
+        public void GivenReport__WhenRunning__ShouldReportProcessToRun()
+        {
+            _sut.ExecutablePath = _executablePath;
+
+            var reportSpy = new ReportSpy();
+            _sut.Run(reportSpy);
+
+
+            var message = reportSpy.Messages[0];
+            AssertMessageContentEquals($"Running process {_executablePath}", message);
+        }
+
+        [TestMethod]
+        public void GivenAbsolutePath__WhenCallingRun__ShouldNotAddMessage()
+        {
+            _sut.ExecutablePath = "/absolute/path";
+
+            var reportSpy = new ReportSpy();
+            Assert.ThrowsException<NoRelativePathException>(() => _sut.Run(reportSpy));
+
+            Assert.AreEqual(0, reportSpy.Messages.Count);
         }
 
         private static void AssertProcessWasStartedWithExecutable(ProcessRunnerSpy runner, string executablePath)

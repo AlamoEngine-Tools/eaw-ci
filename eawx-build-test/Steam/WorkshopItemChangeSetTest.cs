@@ -24,7 +24,7 @@ namespace EawXBuildTest.Steam
                 ItemFolderPath = itemFolderPath
             };
 
-            (bool isValid, Exception exception) = sut.IsValidChangeSet();
+            var (isValid, exception) = sut.IsValidChangeSet();
 
             Assert.IsTrue(isValid);
             Assert.IsNull(exception);

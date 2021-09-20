@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EawXBuild.Reporting;
 
 namespace EawXBuild.Core
 {
@@ -13,9 +14,18 @@ namespace EawXBuild.Core
 
         public string Name { get; }
 
-        public void Run()
+        public void Run(Report report = null)
         {
-            foreach (ITask task in _tasks) task.Run();
+            foreach (var task in _tasks)
+            {
+                Report(report, $"Starting task \"{task.Name}\"");
+                task.Run(report);
+                Report(report, $"Finished task \"{task.Name}\"");
+            }
+        }
+        private static void Report(Report report, string messageContent)
+        {
+            report?.AddMessage(new Message(messageContent));
         }
 
         public void AddTask(ITask task)

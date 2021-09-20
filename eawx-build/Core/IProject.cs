@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EawXBuild.Reporting;
 
 namespace EawXBuild.Core
 {
@@ -8,7 +9,7 @@ namespace EawXBuild.Core
         string Name { get; set; }
         void AddJob(IJob job);
 
-        Task RunJobAsync(string jobName);
+        Task RunJobAsync(string jobName, Report report);
         List<Task> RunAllJobsAsync();
     }
 }

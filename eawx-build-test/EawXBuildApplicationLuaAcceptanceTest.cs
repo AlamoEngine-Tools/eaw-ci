@@ -7,6 +7,7 @@ using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
+using EawXBuild.Reporting.Reporter;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace EawXBuildTest
         [TestInitialize]
         public void SetUp()
         {
-            _services = ConfigureServices(_fileSystem);
+            _services = ConfigureServices();
         }
 
         [TestCleanup]
@@ -50,19 +51,13 @@ namespace EawXBuildTest
 
             CreateConfigFile(config);
 
-            RunOptions options = new RunOptions
-            {
-                BackendLua = true,
-                ConfigPath = "eaw-ci.lua",
-                ProjectName = "pid0",
-                JobName = "My-Job"
-            };
+            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
 
-            EawXBuildApplication sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
+            var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
             sut.Run();
 
-            bool actual = _fileSystem.File.Exists("newfile.lua");
+            var actual = _fileSystem.File.Exists("newfile.lua");
             Assert.IsTrue(actual);
         }
 
@@ -81,43 +76,76 @@ namespace EawXBuildTest
 
             CreateConfigFile(config);
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
 
-            RunOptions options = new RunOptions
-            {
-                BackendLua = true,
-                ConfigPath = "eaw-ci.lua",
-                ProjectName = "pid0",
-                JobName = "My-Job"
-            };
+            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
 
-            EawXBuildApplication sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
+            var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
             sut.Run();
 
-            string actual = stringBuilder.ToString().Trim();
+            var actual = stringBuilder.ToString().Trim();
+            Assert.AreEqual("Hello World", actual);
+        }
+        
+        [PlatformSpecificTestMethod("Windows")]
+        public void
+            GivenWindowsSystem_And_Config_With_OneProject_OneJob_And_RunProcessTask__WhenRunning__ShouldRunProcess()
+        {
+            const string config = @"
+            local proj = project('pid0')
+            local job = proj:add_job('My-Job')
+            job:add_task(
+                run_process('cmd')
+                :arguments('/c echo Hello World')
+            )
+            ";
+
+            CreateConfigFile(config);
+
+            var stringBuilder = new StringBuilder();
+            Console.SetOut(new StringWriter(stringBuilder));
+
+            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
+
+            var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
+
+            sut.Run();
+
+            var actual = stringBuilder.ToString().Trim();
             Assert.AreEqual("Hello World", actual);
         }
 
         private void CreateConfigFile(string content)
         {
-            using StreamWriter stream = _fileSystem.File.CreateText(LuaConfigFilePath);
+            using var stream = _fileSystem.File.CreateText(LuaConfigFilePath);
             stream.Write(content);
             _luaConfigFile = _fileSystem.FileInfo.FromFileName(LuaConfigFilePath);
         }
 
-        private static ServiceCollection ConfigureServices(IFileSystem fileSystem, LogLevel logLevel = LogLevel.None)
+        private static ServiceCollection ConfigureServices()
         {
-            ServiceCollection services = new ServiceCollection();
+            var services = new ServiceCollection();
+            AddLoggingService(services);
+            AddIOService(services);
+            services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
+            services.AddTransient<ILuaParser, NLuaParser>();
+            services.AddTransient<IReporter, DummyReporter>();
+            return services;
+        }
+
+        private static void AddLoggingService(IServiceCollection services)
+        {
             services.AddLogging(builder => builder.AddConsole());
             services.Configure<LoggerFilterOptions>(options =>
-                options.AddFilter<ConsoleLoggerProvider>(null, logLevel));
-            services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
+                options.AddFilter<ConsoleLoggerProvider>(null, LogLevel.None));
+        }
+
+        private static void AddIOService(ServiceCollection services)
+        {
             services.AddTransient<IIOHelperService, IOHelperService>(serviceProvider =>
                 new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
-            services.AddTransient<ILuaParser, NLuaParser>();
-            return services;
         }
     }
 }

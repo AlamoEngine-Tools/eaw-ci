@@ -9,11 +9,12 @@ using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Configuration.Xml.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
+using EawXBuild.Reporting;
+using EawXBuild.Reporting.Reporter;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-
 namespace EawXBuild
 {
     internal class EawXBuildApplication
@@ -24,7 +25,7 @@ namespace EawXBuild
         {
             Services = services;
             Opts = opts;
-            ILoggerFactory loggerFactory = Services.GetRequiredService<ILoggerFactory>() ?? new NullLoggerFactory();
+            var loggerFactory = Services.GetRequiredService<ILoggerFactory>() ?? new NullLoggerFactory();
             _logger = loggerFactory.CreateLogger<EawXBuildApplication>();
             _logger.LogTrace("Application initialised successfully");
         }
@@ -46,7 +47,7 @@ namespace EawXBuild
         private ExitCode RunInternal(RunOptions runOptions)
         {
             _logger.LogInformation("Running application in RUN mode");
-            IIOHelperService? ioService = Services.GetService<IIOHelperService>();
+            var ioService = Services.GetService<IIOHelperService>();
             IBuildConfigParser buildConfigParser = null;
             if (runOptions.BackendLua)
                 buildConfigParser = GetLuaBuildConfigParserInternal();
@@ -58,8 +59,8 @@ namespace EawXBuild
 
             return !TryExtractAndValidatePathInternal(ioService, runOptions.ConfigPath,
                 buildConfigParser.ConfiguredFileExtension,
-                out string path,
-                out ExitCode exitCode)
+                out var path,
+                out var exitCode)
                 ? exitCode
                 : ExecRunInternal(runOptions, buildConfigParser, path);
         }
@@ -68,7 +69,7 @@ namespace EawXBuild
             string fileExtension,
             out string pathOut, out ExitCode exitCode)
         {
-            string currentDirectory = iioHelperService.FileSystem.Directory.GetCurrentDirectory();
+            var currentDirectory = iioHelperService.FileSystem.Directory.GetCurrentDirectory();
             if (!iioHelperService.IsValidPath(pathIn, currentDirectory, fileExtension))
             {
                 pathOut = null;
@@ -83,8 +84,8 @@ namespace EawXBuild
 
         private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string path)
         {
-            IEnumerable<IProject> projects = buildConfigParser.Parse(path);
-            IProject project = projects.FirstOrDefault(p =>
+            var projects = buildConfigParser.Parse(path);
+            var project = projects.FirstOrDefault(p =>
                 p.Name.Equals(runOptions.ProjectName, StringComparison.CurrentCulture));
 
             if (project == null)
@@ -93,11 +94,26 @@ namespace EawXBuild
                 return ExitCode.ExUsage;
             }
 
-            List<Task> tasks = RunMatchingTasks(runOptions, project);
+            var tasks = new List<Task>();
+            var report = new Report();
+            var reporter = Services.GetService<IReporter>();
 
-            Task.WaitAll(tasks.ToArray());
-            int errCount = 0;
-            foreach (Task task in tasks.Where(task => null != task.Exception))
+            report.MessageAddedEvent += (obj, msg) => reporter.ReportMessage(msg);
+            report.ErrorMessageAddedEvent += (obj, msg) => reporter.ReportError(msg);
+
+            try
+            {
+                tasks = RunMatchingTasks(runOptions, project, report);
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (AggregateException e)
+            {
+                var baseException = e.GetBaseException().Message;
+                report.AddMessage(new ErrorMessage($"An error occured: {baseException}"));
+            }
+
+            var errCount = 0;
+            foreach (var task in tasks.Where(task => null != task.Exception))
             {
                 errCount += 1;
                 _logger.LogError(task.Exception, "An error occured running the job {0}.{1}", project.Name,
@@ -121,29 +137,11 @@ namespace EawXBuild
             return ExitCode.MultipleJobsFailed;
         }
 
-        private List<Task> RunMatchingTasks(RunOptions runOptions, IProject project)
+        private List<Task> RunMatchingTasks(RunOptions runOptions, IProject project, Report report)
         {
-            List<Task> tasks = new List<Task>();
-            if (string.IsNullOrEmpty(runOptions.JobName) || string.IsNullOrWhiteSpace(runOptions.JobName))
-                try
-                {
-                    tasks.AddRange(project.RunAllJobsAsync());
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError($"An error occured running all tasks for {project.Name}: ", e);
-                }
-            else
-                try
-                {
-                    tasks.Add(project.RunJobAsync(runOptions.JobName));
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError($"An error occured running the job {project.Name}.{runOptions.JobName}: ", e);
-                }
-
-            return tasks;
+            bool noJobName = string.IsNullOrWhiteSpace(runOptions.JobName);
+            if (noJobName) return project.RunAllJobsAsync();
+            return new List<Task> { project.RunJobAsync(runOptions.JobName, report) };
         }
 
         internal IBuildConfigParser GetXmlBuildConfigParserInternal(IIOHelperService iioHelperService)
@@ -164,7 +162,7 @@ namespace EawXBuild
         private ExitCode RunValidateInternal(IOptions validateOptions)
         {
             _logger.LogInformation("Running application in VALIDATION mode.");
-            IIOHelperService? ioService = Services.GetService<IIOHelperService>();
+            var ioService = Services.GetService<IIOHelperService>();
             string fileExtension = null;
             IBuildConfigParser buildConfigParser = null;
 
@@ -185,8 +183,8 @@ namespace EawXBuild
             if (string.IsNullOrWhiteSpace(fileExtension) || null == buildConfigParser) return ExitCode.ExUsage;
 
             if (!TryExtractAndValidatePathInternal(ioService, validateOptions.ConfigPath, fileExtension,
-                out string path,
-                out ExitCode exitCode))
+                out var path,
+                out var exitCode))
                 return exitCode;
 
             return buildConfigParser.TestIsValidConfiguration(path) ? ExitCode.Success : ExitCode.ExConfig;

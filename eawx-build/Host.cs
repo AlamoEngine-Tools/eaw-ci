@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Linq;
@@ -8,12 +9,12 @@ using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Configuration.Lua.v1;
 using EawXBuild.Core;
 using EawXBuild.Environment;
+using EawXBuild.Reporting.Reporter;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
-
 namespace EawXBuild
 {
     [ExcludeFromCodeCoverage]
@@ -29,13 +30,40 @@ namespace EawXBuild
 
         private static void ExecInternal(IOptions opts)
         {
-            ServiceCollection serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection, opts.Verbose);
-            EawXBuildApplication application = new EawXBuildApplication(serviceCollection.BuildServiceProvider(), opts);
-            System.Environment.ExitCode = (int) application.Run();
+            var serviceCollection = ConfigureServices(opts.Verbose);
+            var application = new EawXBuildApplication(serviceCollection.BuildServiceProvider(), opts);
+            System.Environment.ExitCode = (int)application.Run();
         }
 
-        private static void ConfigureServices(IServiceCollection serviceCollection, bool verbose)
+        private static ServiceCollection ConfigureServices(bool verbose)
+        {
+            var serviceCollection = new ServiceCollection();
+            ConfigureLogging(serviceCollection, verbose);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            serviceCollection.AddTransient<ILuaParser, NLuaParser>();
+            serviceCollection.AddTransient<IReporter, ConsoleReporter>();
+            serviceCollection.AddTransient<IIOHelperService>(CreateIOHelperService);
+            serviceCollection.AddTransient<IBuildComponentFactory>(CreateBuildComponentFactory);
+
+            return serviceCollection;
+        }
+
+        private static IBuildComponentFactory CreateBuildComponentFactory(IServiceProvider s)
+        {
+            return new BuildComponentFactory(GetLoggerFactory(s).CreateLogger<BuildComponentFactory>());
+        }
+
+        private static IIOHelperService CreateIOHelperService(IServiceProvider s)
+        {
+            return new IOHelperService(new FileSystem(), GetLoggerFactory(s));
+        }
+
+        private static ILoggerFactory GetLoggerFactory(IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetRequiredService<ILoggerFactory>();
+        }
+
+        private static void ConfigureLogging(IServiceCollection serviceCollection, bool verbose)
         {
             serviceCollection.AddLogging(config =>
                 {
@@ -51,13 +79,6 @@ namespace EawXBuild
 #endif
                     options.AddFilter<ConsoleLoggerProvider>(null, verbose ? LogLevel.Trace : LogLevel.Warning);
                 });
-            ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
-            serviceCollection.AddTransient<IIOHelperService, IOHelperService>(s =>
-                new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
-            serviceCollection.AddTransient<IBuildComponentFactory, BuildComponentFactory>(s =>
-                new BuildComponentFactory(
-                    serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger<BuildComponentFactory>()));
-            serviceCollection.AddTransient<ILuaParser, NLuaParser>(s => new NLuaParser());
         }
 
         private static void HandleParseErrorsInternal(IEnumerable<Error> errs)
@@ -65,11 +86,11 @@ namespace EawXBuild
             IEnumerable<Error> errors = errs as Error[] ?? errs.ToArray();
             if (errors.OfType<HelpVerbRequestedError>().Any() || errors.OfType<HelpRequestedError>().Any())
             {
-                System.Environment.ExitCode = (int) ExitCode.Success;
+                System.Environment.ExitCode = (int)ExitCode.Success;
                 return;
             }
 
-            System.Environment.ExitCode = (int) ExitCode.ExUsage;
+            System.Environment.ExitCode = (int)ExitCode.ExUsage;
         }
     }
 }

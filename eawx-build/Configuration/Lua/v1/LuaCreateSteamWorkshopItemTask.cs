@@ -18,8 +18,8 @@ namespace EawXBuild.Configuration.Lua.v1
                 .With("Visibility", table["visibility"])
                 .With("Language", table["language"]);
 
-            LuaTable tags = (LuaTable) table["tags"];
-            HashSet<string> stringTags = tags?.Values.Cast<string>().ToHashSet();
+            LuaTable tags = (LuaTable)table["tags"];
+            var stringTags = tags?.Values.Cast<string>().ToHashSet();
             if (stringTags != null)
                 taskBuilder.With("Tags", stringTags);
 

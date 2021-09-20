@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EawXBuild.Core;
+using EawXBuild.Reporting;
 
 namespace EawXBuildTest.Core
 {
@@ -12,7 +13,7 @@ namespace EawXBuildTest.Core
         {
         }
 
-        public virtual void Run()
+        public virtual void Run(Report report = null)
         {
         }
     }
@@ -33,9 +34,19 @@ namespace EawXBuildTest.Core
     {
         public bool WasRun { get; private set; }
 
-        public override void Run()
+        public IReport Report { get; private set; }
+        public override void Run(Report report = null)
         {
+            Report = report;
             WasRun = true;
+        }
+    }
+
+    public class ReportingJob : JobStub
+    {
+        public override void Run(Report report = null)
+        {
+            report?.AddMessage(new Message("ReportingJob"));
         }
     }
 
@@ -48,7 +59,7 @@ namespace EawXBuildTest.Core
             _exceptionMessage = exceptionMessage;
         }
 
-        public override void Run()
+        public override void Run(Report report = null)
         {
             throw new Exception(_exceptionMessage);
         }

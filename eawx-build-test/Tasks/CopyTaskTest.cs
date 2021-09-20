@@ -2,7 +2,9 @@ using System;
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
+using EawXBuildTest.Reporting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static EawXBuildTest.ReportingAssertions;
 
 namespace EawXBuildTest.Tasks
 {
@@ -59,19 +61,36 @@ namespace EawXBuildTest.Tasks
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public void GivenPathToFileAndCopyDestinationWithReport__WhenCallingRun__ShouldReportCopying()
+        {
+            const string source = "Data/MyFile.txt";
+            const string destination = "Copy/MyFile.txt";
+
+            AddFile(source, string.Empty);
+
+            _sut.Source = source;
+            _sut.Destination = destination;
+
+            var report = new ReportSpy();
+            _sut.Run(report);
+
+            var message = report.Messages[0];
+            var sourceFileInfo = _fileSystem.FileInfo.FromFileName(source);
+            var destinationFileInfo = _fileSystem.FileInfo.FromFileName(destination);
+            AssertMessageContentEquals($"Copying file {sourceFileInfo.FullName} to {destinationFileInfo.FullName}", message);
+        }
+
+        [TestMethod]
         public void GivenPathToFileAndDestination__WhenCallingRun__ShouldCopyUsingCopyPolicy()
         {
-            MockFileSystemWithFileInfoCopySpy fileSystem = new MockFileSystemWithFileInfoCopySpy();
-            CopyPolicySpy copyPolicySpy = new CopyPolicySpy();
+            var fileSystem = new MockFileSystemWithFileInfoCopySpy();
+            var copyPolicySpy = new CopyPolicySpy();
             fileSystem.FileSystem.AddFile("Data/MyFile.txt", string.Empty);
 
             const string destination = "Copy/MyFile.txt";
 
-            _sut = new CopyTask(copyPolicySpy, fileSystem)
-            {
-                Source = "Data/MyFile.txt",
-                Destination = destination
-            };
+            _sut = new CopyTask(copyPolicySpy, fileSystem) {Source = "Data/MyFile.txt", Destination = destination};
 
             _sut.Run();
 
@@ -116,6 +135,31 @@ namespace EawXBuildTest.Tasks
 
             _assertions.AssertFileExists(destFileName);
             _assertions.AssertFileContentsAreEqual(GetFile(sourceFileName), GetFile(destFileName));
+        }
+        
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public void GivenPathToDirectoryWithFileAndReport__WhenCallingRun__ShouldReportCopyingOfFile()
+        {
+            const string sourceDirectory = "Data/SourceXML";
+            const string sourceFileName = "Data/SourceXML/MyFile.xml";
+
+            const string destDirectory = "Copy/XML";
+            const string destFileName = "Copy/XML/MyFile.xml";
+
+            _fileSystem.AddDirectory(sourceDirectory);
+            AddFile(sourceFileName, "File Content");
+
+            _sut.Source = sourceDirectory;
+            _sut.Destination = destDirectory;
+
+            var report = new ReportSpy();
+            _sut.Run(report);
+
+            var message = report.Messages[0];
+            var sourceFileInfo = _fileSystem.FileInfo.FromFileName(sourceFileName);
+            var destinationFileInfo = _fileSystem.FileInfo.FromFileName(destFileName);
+            AssertMessageContentEquals($"Copying file {sourceFileInfo.FullName} to {destinationFileInfo.FullName}", message);
         }
 
         [TestMethod]
@@ -174,6 +218,27 @@ namespace EawXBuildTest.Tasks
             _assertions.AssertFileExists(actual);
             _assertions.AssertFileContentsAreEqual(GetFile(expected), GetFile(actual));
         }
+        
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public void GivenPathToDirectoryWithSubDirectoryAndFileAndReport__WhenCallingRun__ShouldReportCopyingOfFile()
+        {
+            _fileSystem.AddDirectory("Data/SourceXML");
+            _fileSystem.AddDirectory("Data/SourceXML/SubDirectory");
+
+            AddFile("Data/SourceXML/SubDirectory/MyFile.xml", "File Content");
+
+            _sut.Source = "Data/SourceXML";
+            _sut.Destination = "Copy/XML";
+
+            var report = new ReportSpy();
+            _sut.Run(report);
+
+            var message = report.Messages[0];
+            var sourceFileInfo = _fileSystem.FileInfo.FromFileName("Data/SourceXML/SubDirectory/MyFile.xml");
+            var destinationFileInfo = _fileSystem.FileInfo.FromFileName("Copy/XML/SubDirectory/MyFile.xml");
+            AssertMessageContentEquals($"Copying file {sourceFileInfo.FullName} to {destinationFileInfo.FullName}", message);
+        }
 
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
@@ -203,10 +268,10 @@ namespace EawXBuildTest.Tasks
             const string sourceFile = "Data/MyFile.txt";
             const string destFile = "Copy/MyFile.txt";
 
-            DateTimeOffset newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
             AddFile(sourceFile, "New Content", newerWriteTime);
 
-            DateTimeOffset olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
             AddFile(destFile, "Old Content", olderWriteTime);
 
             _sut.Source = sourceFile;
@@ -226,10 +291,10 @@ namespace EawXBuildTest.Tasks
 
             const string expectedContent = "New Content";
 
-            DateTimeOffset olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
+            var olderWriteTime = new DateTimeOffset(new DateTime(2020, 3, 26), TimeSpan.Zero);
             AddFile(sourceFile, "Old Content", olderWriteTime);
 
-            DateTimeOffset newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
+            var newerWriteTime = new DateTimeOffset(new DateTime(2020, 3, 27), TimeSpan.Zero);
             AddFile(destFile, expectedContent, newerWriteTime);
 
             _sut.Source = sourceFile;
@@ -385,7 +450,7 @@ namespace EawXBuildTest.Tasks
 
         private void AddFile(string sourceFile, string content, DateTimeOffset lastWriteTime)
         {
-            MockFileData sourceFileData = new MockFileData(content);
+            var sourceFileData = new MockFileData(content);
             sourceFileData.LastWriteTime = lastWriteTime;
             _fileSystem.AddFile(sourceFile, sourceFileData);
         }

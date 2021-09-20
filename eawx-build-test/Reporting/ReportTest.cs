@@ -9,7 +9,7 @@ namespace EawXBuildTest.Reporting
     [TestClass]
     public class ReportTest
     {
-        private class TestReport : AbstractReport
+        private class TestReport : Report
         {
         }
 
