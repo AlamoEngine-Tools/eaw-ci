@@ -75,7 +75,7 @@ namespace EawXBuildTest
             local job = proj:job('My-Job')
             job:tasks {
                 {
-                    name = 'Run Echo Unix'
+                    name = 'Run Echo Unix',
                     action = run_process('echo')
                                 :arguments('Hello World')
                 }
