@@ -9,7 +9,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic
     {
         private readonly CopyTask _copyTask;
 
-        public CopyTaskBuilder(ICopyPolicy copyPolicy, IFileSystem fileSystem = null)
+        public CopyTaskBuilder(ICopyPolicy copyPolicy, IFileSystem? fileSystem = null)
         {
             _copyTask = new CopyTask(copyPolicy, fileSystem ?? new FileSystem());
         }

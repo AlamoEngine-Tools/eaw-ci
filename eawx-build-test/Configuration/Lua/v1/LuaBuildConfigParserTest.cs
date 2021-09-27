@@ -14,7 +14,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
     {
         private const string Path = "luaConfig.lua";
 
-        private static readonly string[] ExpectedTags = {"EAW", "FOC"};
+        private static readonly string[] ExpectedTags = { "EAW", "FOC" };
 
         private MockFileSystem _fileSystem;
         private LuaMockFileSystemParser _luaMockFileParser;
@@ -60,7 +60,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                p:add_job('test-job')  
+                p:job('test-job')  
             ";
             _mockFileData.TextContents = lua;
 
@@ -79,8 +79,13 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(copy('a', 'b'))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'CopyTask',
+                        action = copy('a', 'b')
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -95,15 +100,46 @@ namespace EawXBuildTest.Configuration.Lua.v1
         }
 
         [TestMethod]
+        public void GivenConfigWithTaskWithName__WhenParsing__TaskObjectShouldHaveName()
+        {
+            const string lua = @"
+                local p = project('test')
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'CopyTask',
+                        action = copy('a', 'b')
+                    }
+                }  
+            ";
+
+            _mockFileData.TextContents = lua;
+
+            JobStub jobStub = new JobStub();
+            TaskDummy taskDummy = new TaskDummy();
+            BuildComponentFactoryStub factoryStub = MakeBuildComponentFactoryStub(jobStub, taskDummy);
+
+            MakeSutAndParse(factoryStub);
+
+            ITask actualTask = jobStub.Tasks.First();
+            Assert.AreEqual(taskDummy.Name, "CopyTask");
+        }
+
+        [TestMethod]
         public void GivenConfigWithCopyTaskWithSettings__WhenParsing__JobShouldHaveTask()
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(copy('a', 'b'):
-                           overwrite(true):
-                           pattern('*.xml'):
-                           recursive(true))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'CopyTask',
+                        action = copy('a', 'b'):
+                                overwrite(true):
+                                pattern('*.xml'):
+                                recursive(true)
+                    }
+                }  
             ";
             _mockFileData.TextContents = lua;
 
@@ -122,11 +158,16 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(copy('a', 'b'):
-                           overwrite(true):
-                           pattern('*.xml'):
-                           recursive(true))  
+                local j = p:job('test-job')
+                j:tasks{
+                    {
+                        name = 'CopyTask',
+                        action = copy('a', 'b'):
+                                    overwrite(true):
+                                    pattern('*.xml'):
+                                    recursive(true)
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -139,7 +180,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
                 {"CopySubfolders", true}
             });
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
@@ -150,8 +191,13 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(link('a', 'b'))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'LinkTask',
+                        action = link('a', 'b')
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -170,8 +216,13 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(clean('a'))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'CleanTask',
+                        action = clean('a'),
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -190,8 +241,13 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(clean('path'))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'CleanTask',
+                        action = clean('path')
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -200,7 +256,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
                 {"Path", "path"}
             });
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
@@ -211,8 +267,13 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(run_process('echo'))  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'RunEcho',
+                        action = run_process('echo')
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -231,12 +292,16 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(run_process('echo'):
-                           arguments('Hello World'):
-                           working_directory('sub/dir'):
-                           allowed_to_fail(true)
-                )  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'RunEcho',
+                        action = run_process('echo'):
+                                    arguments('Hello World'):
+                                    working_directory('sub/dir'):
+                                    allowed_to_fail(true)
+                    }
+                }  
             ";
             _mockFileData.TextContents = lua;
 
@@ -248,7 +313,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
                 {"AllowedToFail", true}
             });
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
@@ -259,16 +324,21 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(create_steam_workshop_item {
-                    app_id = 32470,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    tags = {'EAW', 'FOC'},
-                    language = 'English'
-                })  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Create Workshop Item',
+                        action = create_steam_workshop_item {
+                            app_id = 32470,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            tags = {'EAW', 'FOC'},
+                            language = 'English'
+                        }
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -288,15 +358,20 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(create_steam_workshop_item {
-                    app_id = 32470,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    language = 'English'
-                })
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Create Workshop Item',
+                        action = create_steam_workshop_item {
+                            app_id = 32470,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            language = 'English'
+                        }
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
@@ -310,7 +385,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
                 {"Language", "English"}
             });
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
@@ -327,27 +402,32 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(create_steam_workshop_item {
-                    app_id = 32470,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    language = 'English',
-                    tags = {'EAW', 'FOC'}
-                })
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Create Workshop Item',
+                        action = create_steam_workshop_item {
+                            app_id = 32470,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            language = 'English',
+                            tags = {'EAW', 'FOC'}
+                        }
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
             TaskBuilderSpy taskBuilderSpy = new TaskBuilderSpy();
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderSpy};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderSpy };
             MakeSutAndParse(factoryStub);
 
             object actual = taskBuilderSpy["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
-            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>)actual).ToArray());
         }
 
         [TestMethod]
@@ -355,15 +435,21 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(update_steam_workshop_item {
-                    app_id = 32470,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    language = 'English'
-                })  
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Update Item',
+                        action = update_steam_workshop_item {
+                            app_id = 32470,
+                            item_id = 1234,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            language = 'English'
+                        }
+                    }
+                }  
             ";
             _mockFileData.TextContents = lua;
 
@@ -383,16 +469,21 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(update_steam_workshop_item {
-                    app_id = 32470,
-                    item_id = 1234,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    language = 'English'
-                })
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Update Item',
+                        action = update_steam_workshop_item {
+                            app_id = 32470,
+                            item_id = 1234,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            language = 'English'
+                        }
+                    }
+                }  
             ";
             _mockFileData.TextContents = lua;
 
@@ -407,7 +498,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
                 {"Language", "English"}
             });
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             taskBuilderMock.Verify();
@@ -424,28 +515,33 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_task(update_steam_workshop_item {
-                    app_id = 32470,
-                    item_id = 1234,
-                    title = 'my-test-item',
-                    description_file = 'path/to/description',
-                    item_folder = 'path/to/folder',
-                    visibility = visibility.private,
-                    language = 'English',
-                    tags = {'EAW', 'FOC'}
-                })
+                local j = p:job('test-job')
+                j:tasks {
+                    {
+                        name = 'Update Item',
+                        action = update_steam_workshop_item {
+                            app_id = 32470,
+                            item_id = 1234,
+                            title = 'my-test-item',
+                            description_file = 'path/to/description',
+                            item_folder = 'path/to/folder',
+                            visibility = visibility.private,
+                            language = 'English',
+                            tags = {'EAW', 'FOC'}
+                        }
+                    }
+                }
             ";
             _mockFileData.TextContents = lua;
 
             TaskBuilderSpy taskBuilderMock = new TaskBuilderSpy();
 
-            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub {TaskBuilder = taskBuilderMock};
+            BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub { TaskBuilder = taskBuilderMock };
             MakeSutAndParse(factoryStub);
 
             object actual = taskBuilderMock["Tags"];
             Assert.IsInstanceOfType(actual, typeof(IEnumerable<string>));
-            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>) actual).ToArray());
+            CollectionAssert.AreEquivalent(ExpectedTags, ((IEnumerable<string>)actual).ToArray());
         }
 
         [TestMethod]
@@ -453,13 +549,22 @@ namespace EawXBuildTest.Configuration.Lua.v1
         {
             const string lua = @"
                 local p = project('test')
-                local j = p:add_job('test-job')
-                j:add_tasks { run_process('echo'), copy('a', 'b') }  
+                local j = p:job('test-job')
+                j:tasks { 
+                    {
+                        name = 'Run Echo',
+                        action = run_process('echo')
+                    },
+                    {
+                        name = 'Copy things',
+                        action = copy('a', 'b') 
+                    }
+                }  
             ";
             _mockFileData.TextContents = lua;
 
             JobStub jobStub = new JobStub();
-            ITask[] expectedTasks = {new TaskDummy(), new TaskDummy()};
+            ITask[] expectedTasks = { new TaskDummy(), new TaskDummy() };
             BuildComponentFactoryStub factoryStub = new BuildComponentFactoryStub
             {
                 Job = jobStub,

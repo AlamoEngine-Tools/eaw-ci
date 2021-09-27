@@ -7,6 +7,6 @@ namespace EawXBuild.Core
 
         string Name { get; set; }
 
-        void Run(Report report = null);
+        void Run(Report? report = null);
     }
 }

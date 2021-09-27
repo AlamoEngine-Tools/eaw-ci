@@ -109,5 +109,14 @@ namespace EawXBuildTest.Services.Process
             string actual = stringBuilder.ToString().Trim();
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ProcessNotStartedException))]
+        public void GivenNoProcessStarted__WhenGettingExitCode__ShouldThrowProcessNotStartedException()
+        {
+            var sut = new ProcessRunner();
+
+            var actual = sut.ExitCode;
+        }
     }
 }

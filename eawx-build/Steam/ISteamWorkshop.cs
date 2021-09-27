@@ -10,6 +10,6 @@ namespace EawXBuild.Steam
 
         Task<WorkshopItemPublishResult> PublishNewWorkshopItemAsync(IWorkshopItemChangeSet settings);
 
-        Task<IWorkshopItem> QueryWorkshopItemByIdAsync(ulong id);
+        Task<IWorkshopItem?> QueryWorkshopItemByIdAsync(ulong id);
     }
 }

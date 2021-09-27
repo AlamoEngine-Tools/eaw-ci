@@ -8,9 +8,9 @@ namespace EawXBuild.Reporting
     {
         public DateTime CreatedTimestamp { get; }
         public string MessageContent { get; }
-        public Exception AssociatedException { get; }
+        public Exception? AssociatedException { get; }
 
-        public ErrorMessage([NotNull] string messageContent, Exception associatedException = null)
+        public ErrorMessage([NotNull] string messageContent, Exception? associatedException = null)
         {
             CreatedTimestamp = DateTime.Now;
             MessageContent = messageContent;

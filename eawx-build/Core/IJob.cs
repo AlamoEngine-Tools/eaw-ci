@@ -1,4 +1,3 @@
-#nullable enable
 using EawXBuild.Reporting;
 namespace EawXBuild.Core
 {
@@ -8,6 +7,6 @@ namespace EawXBuild.Core
 
         void AddTask(ITask task);
 
-        void Run(Report report = null);
+        void Run(Report? report = null);
     }
 }

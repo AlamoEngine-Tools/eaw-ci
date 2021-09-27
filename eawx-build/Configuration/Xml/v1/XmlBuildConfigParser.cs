@@ -38,10 +38,10 @@ namespace EawXBuild.Configuration.Xml.v1
         [NotNull] private readonly IBuildComponentFactory _factory;
 
         [NotNull] private readonly IFileSystem _fileSystem;
-        private readonly ILogger<XmlBuildConfigParser> _logger;
+        private readonly ILogger<XmlBuildConfigParser>? _logger;
 
         public XmlBuildConfigParser([NotNull] IFileSystem fileSystem, [NotNull] IBuildComponentFactory factory,
-            ILoggerFactory loggerFactory = null)
+            ILoggerFactory? loggerFactory = null)
         {
             _fileSystem = fileSystem;
             _factory = factory;
@@ -113,7 +113,7 @@ namespace EawXBuild.Configuration.Xml.v1
             XmlReaderSettings settings = GetXmlReaderSettings();
             using Stream stream = _fileSystem.File.OpenRead(filePath);
             using XmlReader reader = XmlReader.Create(stream, settings);
-            BuildConfigurationType buildConfig = (BuildConfigurationType) xmlDataSerializer.Deserialize(reader);
+            BuildConfigurationType buildConfig = (BuildConfigurationType)xmlDataSerializer.Deserialize(reader);
             return buildConfig;
         }
 
@@ -140,31 +140,30 @@ namespace EawXBuild.Configuration.Xml.v1
 
         private void AddTasksToJob(BuildConfigurationType buildConfig, IJob job, JobType buildConfigJob)
         {
-            TasksType taskList = (TasksType) buildConfigJob.Item;
+            TasksType taskList = (TasksType)buildConfigJob.Item;
             if (taskList.Items == null) return;
 
             foreach (object taskListItem in taskList.Items)
             {
-                object buildConfigTask = GetBuildConfigTaskFromTaskListItem(buildConfig, taskListItem);
-
-                ITask task = MakeTask(buildConfigTask);
+                var buildConfigTask = GetBuildConfigTaskFromTaskListItem(buildConfig, taskListItem);
+                ITask task = MakeTask(buildConfigTask!);
                 job.AddTask(task);
             }
         }
 
-        private static object GetBuildConfigTaskFromTaskListItem(BuildConfigurationType buildConfig,
+        private static object? GetBuildConfigTaskFromTaskListItem(BuildConfigurationType buildConfig,
             object taskListItem)
         {
-            object buildConfigTask = taskListItem;
+            var buildConfigTask = taskListItem;
             if (taskListItem is TaskReferenceType taskRef)
                 buildConfigTask = GetMatchingGlobalTask(buildConfig, taskRef);
 
             return buildConfigTask;
         }
 
-        private static object GetMatchingGlobalTask(BuildConfigurationType buildConfig, TaskReferenceType taskRef)
+        private static object? GetMatchingGlobalTask(BuildConfigurationType buildConfig, TaskReferenceType taskRef)
         {
-            object buildConfigTask = null;
+            object? buildConfigTask = null;
             foreach (AbstractTaskType globalTask in buildConfig.GlobalTasks)
             {
                 if (!globalTask.Id.Equals(taskRef.ReferenceId)) continue;
@@ -191,9 +190,9 @@ namespace EawXBuild.Configuration.Xml.v1
             XmlSchema schema;
             string res = Assembly.GetExecutingAssembly().GetManifestResourceNames()
                 .Single(str => str.EndsWith(XsdResourceId));
-            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res))
+            using (Stream xsdStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res)!)
             {
-                schema = xsdSchemaSerializer.Deserialize(xsdStream) as XmlSchema;
+                schema = (XmlSchema)xsdSchemaSerializer.Deserialize(xsdStream);
             }
 
             schemas.Add(schema);

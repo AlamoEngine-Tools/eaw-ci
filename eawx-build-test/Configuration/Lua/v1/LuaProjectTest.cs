@@ -30,7 +30,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
             };
 
             LuaProject sut = new LuaProject("TestProject", factoryStub);
-            sut.add_job("test-job");
+            sut.job("test-job");
 
             ProjectStub actual = sut.Project as ProjectStub;
             IJob actualJob = actual?.Jobs.First();
@@ -49,7 +49,7 @@ namespace EawXBuildTest.Configuration.Lua.v1
             };
 
             LuaProject sut = new LuaProject("TestProject", factoryStub);
-            LuaJob actual = sut.add_job("test-job");
+            LuaJob actual = sut.job("test-job");
             Assert.IsInstanceOfType(actual, typeof(LuaJob));
         }
     }

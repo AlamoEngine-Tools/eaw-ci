@@ -15,7 +15,7 @@ namespace EawXBuild.Configuration.Lua.v1
 
         public IProject Project { get; }
 
-        public LuaJob add_job(string jobName)
+        public LuaJob job(string jobName)
         {
             IJob job = _factory.MakeJob(jobName);
             Project.AddJob(job);

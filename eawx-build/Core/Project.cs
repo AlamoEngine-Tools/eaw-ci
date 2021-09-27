@@ -10,7 +10,7 @@ namespace EawXBuild.Core
     {
         private readonly List<IJob> _jobs = new List<IJob>();
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         public void AddJob(IJob job)
         {
@@ -39,7 +39,7 @@ namespace EawXBuild.Core
             return _jobs.Select(job => Task.Run(() => job.Run())).ToList();
         }
 
-        private IJob FindJobWithName(string jobName)
+        private IJob? FindJobWithName(string jobName)
         {
             return _jobs.Find(job => job.Name.Equals(jobName));
         }

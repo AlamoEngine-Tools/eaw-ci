@@ -47,8 +47,8 @@ namespace EawXBuild
         private ExitCode RunInternal(RunOptions runOptions)
         {
             _logger.LogInformation("Running application in RUN mode");
-            var ioService = Services.GetService<IIOHelperService>();
-            IBuildConfigParser buildConfigParser = null;
+            var ioService = Services.GetRequiredService<IIOHelperService>();
+            IBuildConfigParser? buildConfigParser = null;
             if (runOptions.BackendLua)
                 buildConfigParser = GetLuaBuildConfigParserInternal();
             else if (runOptions.BackendXml)
@@ -67,7 +67,7 @@ namespace EawXBuild
 
         private static bool TryExtractAndValidatePathInternal(IIOHelperService iioHelperService, string pathIn,
             string fileExtension,
-            out string pathOut, out ExitCode exitCode)
+            out string? pathOut, out ExitCode exitCode)
         {
             var currentDirectory = iioHelperService.FileSystem.Directory.GetCurrentDirectory();
             if (!iioHelperService.IsValidPath(pathIn, currentDirectory, fileExtension))
@@ -82,7 +82,7 @@ namespace EawXBuild
             return true;
         }
 
-        private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string path)
+        private ExitCode ExecRunInternal(RunOptions runOptions, IBuildConfigParser buildConfigParser, string? path)
         {
             var projects = buildConfigParser.Parse(path);
             var project = projects.FirstOrDefault(p =>
@@ -98,8 +98,8 @@ namespace EawXBuild
             var report = new Report();
             var reporter = Services.GetService<IReporter>();
 
-            report.MessageAddedEvent += (obj, msg) => reporter.ReportMessage(msg);
-            report.ErrorMessageAddedEvent += (obj, msg) => reporter.ReportError(msg);
+            report.MessageAddedEvent += (obj, msg) => reporter?.ReportMessage(msg);
+            report.ErrorMessageAddedEvent += (obj, msg) => reporter?.ReportError(msg);
 
             try
             {
@@ -148,7 +148,7 @@ namespace EawXBuild
         {
             _logger.LogInformation("Running application with XML backend.");
             return new XmlBuildConfigParser(iioHelperService.FileSystem,
-                Services.GetService<IBuildComponentFactory>(),
+                Services.GetRequiredService<IBuildComponentFactory>(),
                 Services.GetRequiredService<ILoggerFactory>());
         }
 
@@ -156,15 +156,15 @@ namespace EawXBuild
         {
             _logger.LogInformation("Running application LUA backend.");
             return new LuaBuildConfigParser(
-                Services.GetService<ILuaParser>(), Services.GetService<IBuildComponentFactory>());
+                Services.GetRequiredService<ILuaParser>(), Services.GetRequiredService<IBuildComponentFactory>());
         }
 
         private ExitCode RunValidateInternal(IOptions validateOptions)
         {
             _logger.LogInformation("Running application in VALIDATION mode.");
-            var ioService = Services.GetService<IIOHelperService>();
-            string fileExtension = null;
-            IBuildConfigParser buildConfigParser = null;
+            var ioService = Services.GetRequiredService<IIOHelperService>();
+            string? fileExtension = null;
+            IBuildConfigParser? buildConfigParser = null;
 
             if (validateOptions.BackendLua)
             {

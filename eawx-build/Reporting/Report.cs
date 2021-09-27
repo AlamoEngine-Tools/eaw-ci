@@ -8,9 +8,9 @@ namespace EawXBuild.Reporting
 {
     public class Report : IReport
     {
-        public event EventHandler<IMessage> MessageAddedEvent;
-        public event EventHandler<IErrorMessage> ErrorMessageAddedEvent;
-        public event EventHandler<bool> ReportFinalizedEvent;
+        public event EventHandler<IMessage>? MessageAddedEvent;
+        public event EventHandler<IErrorMessage>? ErrorMessageAddedEvent;
+        public event EventHandler<bool>? ReportFinalizedEvent;
         
         private DateTime _reportEndTime;
         private TimeSpan _reportDuration = TimeSpan.Zero;
@@ -38,7 +38,7 @@ namespace EawXBuild.Reporting
         {
         }
 
-        protected Report(IReportExportHandler exportHandler)
+        protected Report(IReportExportHandler? exportHandler)
         {
             _exportHandler = exportHandler ?? new NullReportExportHandler();
             ReportStartTime = DateTime.Now;

@@ -14,7 +14,7 @@ namespace EawXBuild.Core
 
         public string Name { get; }
 
-        public void Run(Report report = null)
+        public void Run(Report? report = null)
         {
             foreach (var task in _tasks)
             {
@@ -23,7 +23,7 @@ namespace EawXBuild.Core
                 Report(report, $"Finished task \"{task.Name}\"");
             }
         }
-        private static void Report(Report report, string messageContent)
+        private static void Report(Report? report, string messageContent)
         {
             report?.AddMessage(new Message(messageContent));
         }

@@ -45,13 +45,18 @@ namespace EawXBuildTest
         {
             const string config = @"
             local proj = project('pid0')
-            local job = proj:add_job('My-Job')
-            job:add_task(copy('eaw-ci.lua', 'newfile.lua'))
+            local job = proj:job('My-Job')
+            job:tasks {
+                {
+                    name = 'Copy eaw-ci',
+                    action = copy('eaw-ci.lua', 'newfile.lua')
+                }
+            }
             ";
 
             CreateConfigFile(config);
 
-            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
+            var options = new RunOptions { BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job" };
 
             var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
@@ -67,11 +72,14 @@ namespace EawXBuildTest
         {
             const string config = @"
             local proj = project('pid0')
-            local job = proj:add_job('My-Job')
-            job:add_task(
-                run_process('echo')
-                :arguments('Hello World')
-            )
+            local job = proj:job('My-Job')
+            job:tasks {
+                {
+                    name = 'Run Echo Unix'
+                    action = run_process('echo')
+                                :arguments('Hello World')
+                }
+            }
             ";
 
             CreateConfigFile(config);
@@ -79,7 +87,7 @@ namespace EawXBuildTest
             var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
 
-            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
+            var options = new RunOptions { BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job" };
 
             var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 
@@ -88,18 +96,21 @@ namespace EawXBuildTest
             var actual = stringBuilder.ToString().Trim();
             Assert.AreEqual("Hello World", actual);
         }
-        
+
         [PlatformSpecificTestMethod("Windows")]
         public void
             GivenWindowsSystem_And_Config_With_OneProject_OneJob_And_RunProcessTask__WhenRunning__ShouldRunProcess()
         {
             const string config = @"
             local proj = project('pid0')
-            local job = proj:add_job('My-Job')
-            job:add_task(
-                run_process('cmd')
-                :arguments('/c echo Hello World')
-            )
+            local job = proj:job('My-Job')
+            job:tasks {
+                {
+                    name = 'Run Echo Windows',
+                    action = run_process('cmd')
+                                :arguments('/c echo Hello World')
+                }
+            }
             ";
 
             CreateConfigFile(config);
@@ -107,7 +118,7 @@ namespace EawXBuildTest
             var stringBuilder = new StringBuilder();
             Console.SetOut(new StringWriter(stringBuilder));
 
-            var options = new RunOptions {BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job"};
+            var options = new RunOptions { BackendLua = true, ConfigPath = "eaw-ci.lua", ProjectName = "pid0", JobName = "My-Job" };
 
             var sut = new EawXBuildApplication(_services.BuildServiceProvider(), options);
 

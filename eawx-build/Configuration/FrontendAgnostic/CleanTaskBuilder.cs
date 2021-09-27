@@ -9,7 +9,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic
     {
         private readonly CleanTask _cleanTask;
 
-        public CleanTaskBuilder(IFileSystem fileSystem = null)
+        public CleanTaskBuilder(IFileSystem? fileSystem = null)
         {
             _cleanTask = new CleanTask(fileSystem ?? new FileSystem());
         }

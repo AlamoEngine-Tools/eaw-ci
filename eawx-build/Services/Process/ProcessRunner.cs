@@ -5,11 +5,11 @@ namespace EawXBuild.Services.Process
 {
     public class ProcessRunner : IProcessRunner
     {
-        private System.Diagnostics.Process _process;
+        private System.Diagnostics.Process? _process;
 
         public void Start(string executablePath)
         {
-            Start(executablePath, null);
+            Start(executablePath, "");
         }
 
         public void Start(string executablePath, string arguments)
@@ -39,10 +39,10 @@ namespace EawXBuild.Services.Process
 
         public void WaitForExit()
         {
-            _process.WaitForExit();
+            _process?.WaitForExit();
         }
 
-        public int ExitCode => _process.ExitCode;
+        public int ExitCode => _process?.ExitCode ?? throw new ProcessNotStartedException("No process started");
 
         private static void RedirectIOForProcessStartInfo(ProcessStartInfo startInfo)
         {
