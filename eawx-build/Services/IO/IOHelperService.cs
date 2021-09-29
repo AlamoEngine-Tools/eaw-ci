@@ -15,7 +15,7 @@ namespace EawXBuild.Services.IO
     {
         private readonly ILogger<IOHelperService> _logger;
 
-        public IOHelperService(IFileSystem fileSystem, ILoggerFactory loggerFactory = null)
+        public IOHelperService(IFileSystem fileSystem, ILoggerFactory? loggerFactory = null)
         {
             ILoggerFactory lf = loggerFactory ?? new NullLoggerFactory();
             _logger = lf.CreateLogger<IOHelperService>();

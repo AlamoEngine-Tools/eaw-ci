@@ -4,6 +4,6 @@ namespace EawXBuild.Steam
     {
         public PublishResult Result { get; }
 
-        public IWorkshopItem Item { get; }
+        public IWorkshopItem? Item { get; }
     }
 }

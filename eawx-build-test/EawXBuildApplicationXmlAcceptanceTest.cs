@@ -6,6 +6,7 @@ using EawXBuild;
 using EawXBuild.Configuration.CLI;
 using EawXBuild.Configuration.FrontendAgnostic;
 using EawXBuild.Core;
+using EawXBuild.Reporting.Reporter;
 using EawXBuild.Services.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -131,6 +132,7 @@ namespace EawXBuildTest
             services.AddTransient<IBuildComponentFactory, BuildComponentFactory>();
             services.AddTransient<IIOHelperService, IOHelperService>(serviceProvider =>
                 new IOHelperService(new FileSystem(), serviceProvider.GetRequiredService<ILoggerFactory>()));
+            services.AddTransient<IReporter, DummyReporter>();
             return services;
         }
     }

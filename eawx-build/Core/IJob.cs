@@ -1,3 +1,4 @@
+using EawXBuild.Reporting;
 namespace EawXBuild.Core
 {
     public interface IJob
@@ -6,6 +7,6 @@ namespace EawXBuild.Core
 
         void AddTask(ITask task);
 
-        void Run();
+        void Run(Report? report = null);
     }
 }

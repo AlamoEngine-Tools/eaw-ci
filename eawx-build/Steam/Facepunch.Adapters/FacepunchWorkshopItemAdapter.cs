@@ -16,7 +16,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters
 
         public ulong ItemId => _item.Id;
         public string Title => _item.Title;
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public async Task<PublishResult> UpdateItemAsync(IWorkshopItemChangeSet settings)
         {
@@ -35,7 +35,7 @@ namespace EawXBuild.Steam.Facepunch.Adapters
 
         private static void UpdateDescription(IWorkshopItemChangeSet settings, ref Editor editor)
         {
-            string description = null;
+            string? description = null;
             if (settings.DescriptionFilePath != null)
             {
                 FileInfo descriptionFile = new FileInfo(settings.DescriptionFilePath);

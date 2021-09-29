@@ -2,45 +2,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EawXBuild.Exceptions;
+using EawXBuild.Reporting;
 
 namespace EawXBuild.Core
 {
     public class Project : IProject
     {
-        private readonly List<IJob> jobs = new List<IJob>();
+        private readonly List<IJob> _jobs = new List<IJob>();
 
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         public void AddJob(IJob job)
         {
             if (HasJobWithName(job.Name))
                 throw new DuplicateJobNameException(job.Name);
 
-            jobs.Add(job);
+            _jobs.Add(job);
         }
 
-        public Task RunJobAsync(string jobName)
+        public Task RunJobAsync(string jobName, Report report)
         {
-            IJob job = FindJobWithName(jobName);
+            var job = FindJobWithName(jobName);
             if (job == null)
                 throw new JobNotFoundException(jobName);
 
-            return Task.Run(() => job.Run());
+            return Task.Run(() =>
+            {
+                Report(report, $"Starting job \"{jobName}\"");
+                job.Run(report);
+                Report(report, $"Finished job \"{jobName}\"");
+            });
         }
 
         public List<Task> RunAllJobsAsync()
         {
-            return jobs.Select(job => Task.Run(job.Run)).ToList();
+            return _jobs.Select(job => Task.Run(() => job.Run())).ToList();
         }
 
-        private IJob FindJobWithName(string jobName)
+        private IJob? FindJobWithName(string jobName)
         {
-            return jobs.Find(job => job.Name.Equals(jobName));
+            return _jobs.Find(job => job.Name.Equals(jobName));
         }
 
         private bool HasJobWithName(string jobName)
         {
-            return jobs.Exists(j => j.Name.Equals(jobName));
+            return _jobs.Exists(j => j.Name.Equals(jobName));
+        }
+
+        private void Report(Report report, string messageContent)
+        {
+            report?.AddMessage(new Message(messageContent));
         }
     }
 }

@@ -10,7 +10,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic
     {
         private readonly RunProcessTask _runProcessTask;
 
-        public RunProcessTaskBuilder(IFileSystem fileSystem = null)
+        public RunProcessTaskBuilder(IFileSystem? fileSystem = null)
         {
             _runProcessTask = new RunProcessTask(new ProcessRunner(), fileSystem ?? new FileSystem());
         }

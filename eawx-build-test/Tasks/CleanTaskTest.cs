@@ -1,7 +1,9 @@
 using System.IO.Abstractions.TestingHelpers;
 using EawXBuild.Exceptions;
 using EawXBuild.Tasks;
+using EawXBuildTest.Reporting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static EawXBuildTest.ReportingAssertions;
 
 namespace EawXBuildTest.Tasks
 {
@@ -43,7 +45,7 @@ namespace EawXBuildTest.Tasks
         {
             const string dirPath = "Data";
 
-            MockFileSystem fileSystem = new MockFileSystem();
+            var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(dirPath);
 
             _sut.Path = dirPath;
@@ -77,6 +79,22 @@ namespace EawXBuildTest.Tasks
             _sut.Path = "/absolute/path";
 
             _sut.Run();
+        }
+
+        [TestMethod]
+        public void GivenFileToDelete__WhenCallingRun__ShouldReportDeletion()
+        {
+            const string filePath = "Data/MyFile.txt";
+            _fileSystem.AddFile(filePath, new MockFileData(string.Empty));
+
+            var report = new ReportSpy();
+
+            _sut.Path = filePath;
+
+            _sut.Run(report);
+
+            var actualMessage = report.Messages[0];
+            AssertMessageContentEquals($"Deleting file {filePath}", actualMessage);
         }
     }
 }

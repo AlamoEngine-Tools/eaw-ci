@@ -1,5 +1,6 @@
 using System;
 using EawXBuild.Core;
+using EawXBuild.Reporting;
 using EawXBuild.Steam;
 
 namespace EawXBuild.Tasks.Steam
@@ -13,7 +14,7 @@ namespace EawXBuild.Tasks.Steam
 
         public string Name { get; set; }
 
-        public void Run()
+        public void Run(Report report = null)
         {
             ValidateAppId();
             ValidateChangeSet();

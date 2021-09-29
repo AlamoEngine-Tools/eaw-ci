@@ -17,7 +17,7 @@ namespace EawXBuild.Steam
 
         public HashSet<string> Tags { get; set; }
 
-        (bool isValid, Exception exception) IsValidChangeSet();
+        (bool isValid, Exception? exception) IsValidChangeSet();
 
         public string GetDescriptionTextFromFile();
     }

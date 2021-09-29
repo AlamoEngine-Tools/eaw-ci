@@ -7,7 +7,7 @@ namespace EawXBuild.Configuration.CLI
     {
         public bool BackendLua { get; set; }
         public bool BackendXml { get; set; }
-        public string ConfigPath { get; set; }
+        public string ConfigPath { get; set; } = "";
         public ConfigVersion Version { get; set; }
         public bool Verbose { get; set; }
     }

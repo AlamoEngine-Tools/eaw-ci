@@ -16,11 +16,11 @@ namespace EawXBuild.Configuration.FrontendAgnostic
         {
             FileSystem fileSystem = new FileSystem();
             ChangeSet = new WorkshopItemChangeSet(fileSystem);
+            Task ??= CreateTaskWithChangeSet(ChangeSet);
         }
 
         public virtual ITaskBuilder With(string name, object value)
         {
-            Task ??= CreateTaskWithChangeSet(ChangeSet);
             switch (name)
             {
                 case "AppId":

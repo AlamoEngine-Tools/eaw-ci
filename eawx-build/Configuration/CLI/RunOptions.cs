@@ -6,15 +6,15 @@ namespace EawXBuild.Configuration.CLI
     internal class RunOptions : IOptions
     {
         [Option('p', "project", Required = true, HelpText = "Name of the CI project to run.")]
-        public string ProjectName { get; set; }
+        public string ProjectName { get; set; } = "";
 
         [Option('j', "job", Required = false, HelpText = "Name of a job specified within a CI project to run.")]
-        public string JobName { get; set; }
+        public string JobName { get; set; } = "";
 
         public bool BackendLua { get; set; }
 
         public bool BackendXml { get; set; }
-        public string ConfigPath { get; set; }
+        public string ConfigPath { get; set; } = "";
 
         public ConfigVersion Version { get; set; }
 

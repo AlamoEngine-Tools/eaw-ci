@@ -4,6 +4,6 @@ namespace EawXBuild.Reporting
 {
     public interface IErrorMessage : IMessage
     {
-        Exception AssociatedException { get; }
+        Exception? AssociatedException { get; }
     }
 }

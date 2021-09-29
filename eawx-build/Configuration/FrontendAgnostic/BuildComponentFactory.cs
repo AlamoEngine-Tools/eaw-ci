@@ -19,9 +19,9 @@ namespace EawXBuild.Configuration.FrontendAgnostic
     public class BuildComponentFactory : IBuildComponentFactory
     {
         private readonly FileLinkerFactory _fileLinkerFactory = new FileLinkerFactory();
-        private readonly ILogger _logger;
+        private readonly ILogger? _logger;
 
-        public BuildComponentFactory(ILogger logger = null)
+        public BuildComponentFactory(ILogger? logger = null)
         {
             _logger = logger;
         }
@@ -47,7 +47,7 @@ namespace EawXBuild.Configuration.FrontendAgnostic
                 Tasks.SoftCopy => new CopyTaskBuilder(new LinkCopyPolicy(_fileLinkerFactory.MakeFileLinker())),
                 Tasks.CreateSteamWorkshopItem => new CreateSteamWorkshopItemTaskBuilder(),
                 Tasks.UpdateSteamWorkshopItem => new UpdateSteamWorkshopItemTaskBuilder(),
-                _ => null
+                _ => throw new InvalidOperationException($"Unknown Task type: {taskTypeName}")
             };
         }
 

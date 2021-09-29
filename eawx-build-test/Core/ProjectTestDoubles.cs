@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EawXBuild.Core;
+using EawXBuild.Reporting;
 
 namespace EawXBuildTest.Core
 {
@@ -13,7 +14,7 @@ namespace EawXBuildTest.Core
         {
         }
 
-        public virtual Task RunJobAsync(string jobName)
+        public virtual Task RunJobAsync(string jobName, Report report)
         {
             return null;
         }
@@ -35,7 +36,7 @@ namespace EawXBuildTest.Core
             Jobs.Add(job);
         }
 
-        public override Task RunJobAsync(string jobName)
+        public override Task RunJobAsync(string jobName, Report report)
         {
             return Task.CompletedTask;
         }

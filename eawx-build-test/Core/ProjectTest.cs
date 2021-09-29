@@ -1,7 +1,9 @@
 using System.Threading.Tasks;
 using EawXBuild.Core;
 using EawXBuild.Exceptions;
+using EawXBuildTest.Reporting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static EawXBuildTest.ReportingAssertions;
 
 namespace EawXBuildTest.Core
 {
@@ -9,10 +11,12 @@ namespace EawXBuildTest.Core
     public class ProjectTest
     {
         private Project _sut;
+        private ReportSpy _report;
 
         [TestInitialize]
         public void SetUp()
         {
+            _report = new ReportSpy();
             _sut = new Project();
         }
 
@@ -20,12 +24,24 @@ namespace EawXBuildTest.Core
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public async Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldRunJob()
         {
-            JobSpy jobSpy = MakeJobSpy("job");
+            var jobSpy = MakeJobSpy("job");
             _sut.AddJob(jobSpy);
 
-            await _sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job", _report);
 
             AssertJobWasRun(jobSpy);
+        }
+
+        [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_HOLY)]
+        public async Task GivenProjectWithNamedJob__WhenCallingRunWithJobName__ShouldPassReportToJob()
+        {
+            var jobSpy = MakeJobSpy("job");
+            _sut.AddJob(jobSpy);
+
+            await _sut.RunJobAsync("job", _report);
+
+            AssertReceivedReport(jobSpy);
         }
 
         [TestMethod]
@@ -33,24 +49,39 @@ namespace EawXBuildTest.Core
         public async Task
             GivenProjectWithTwoJobs__WhenCallingRunWithJobName__ShouldOnlyRunWithMatchingName()
         {
-            JobSpy otherJob = MakeJobSpy("other");
+            var otherJob = MakeJobSpy("other");
             _sut.AddJob(otherJob);
-            JobSpy expected = MakeJobSpy("job");
+            var expected = MakeJobSpy("job");
             _sut.AddJob(expected);
 
-            await _sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job", _report);
 
             AssertJobWasRun(expected);
             AssertJobWasNotRun(otherJob);
         }
 
         [TestMethod]
+        [TestCategory(TestUtility.TEST_TYPE_UTILITY)]
+        public async Task GivenJobWithReport__WhenRunning__ShouldReportJobStartThenRunJobThenReportEnd()
+        {
+            const string name = "job";
+            var jobSpy = new ReportingJob {Name = name};
+            _sut.AddJob(jobSpy);
+
+            await _sut.RunJobAsync(name, _report);
+
+            var messages = _report.Messages;
+            AssertMessageContentEquals($"Starting job \"{name}\"", messages[0]);
+            AssertMessageContentEquals($"Finished job \"{name}\"", messages[2]);
+        }
+
+        [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         public void GivenProjectWithMultipleJobs__WhenCallingRunAll__AllJobsRan()
         {
-            JobSpy job1 = MakeJobSpy("job1");
+            var job1 = MakeJobSpy("job1");
             _sut.AddJob(job1);
-            JobSpy job2 = MakeJobSpy("job2");
+            var job2 = MakeJobSpy("job2");
             _sut.AddJob(job2);
 
             Task.WaitAll(_sut.RunAllJobsAsync().ToArray());
@@ -63,9 +94,9 @@ namespace EawXBuildTest.Core
         [TestMethod]
         [TestCategory(TestUtility.TEST_TYPE_HOLY)]
         [ExpectedException(typeof(JobNotFoundException))]
-        public void GivenProjectWithNoJobs__WhenCallingRunJob__ShouldThrowJobNotFoundException()
+        public async Task GivenProjectWithNoJobs__WhenCallingRunJob__ShouldThrowJobNotFoundException()
         {
-            _sut.RunJobAsync("job");
+            await _sut.RunJobAsync("job", _report);
         }
 
         [TestMethod]
@@ -73,16 +104,15 @@ namespace EawXBuildTest.Core
         [ExpectedException(typeof(DuplicateJobNameException))]
         public void GivenProjectWithJob__WhenAddingJobWithSameName__ShouldThrowDuplicateJobNameException()
         {
-            JobSpy jobSpy = MakeJobSpy("job");
-
-            Assert.IsNotNull(_sut != null, nameof(_sut) + " != null");
+            var jobSpy = MakeJobSpy("job");
             _sut.AddJob(jobSpy);
+
             _sut.AddJob(MakeJobSpy("job"));
         }
 
         private static JobSpy MakeJobSpy(string name)
         {
-            JobSpy jobSpy = new JobSpy {Name = name};
+            var jobSpy = new JobSpy {Name = name};
 
             return jobSpy;
         }
@@ -97,6 +127,11 @@ namespace EawXBuildTest.Core
         {
             Assert.IsNotNull(otherJob != null, nameof(otherJob) + " != null");
             Assert.IsFalse(otherJob.WasRun, $"Should not have run Job {otherJob.Name}, but did.");
+        }
+
+        private void AssertReceivedReport(JobSpy jobSpy)
+        {
+            Assert.AreEqual(_report, jobSpy.Report);
         }
     }
 }

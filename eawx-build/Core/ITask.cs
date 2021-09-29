@@ -1,3 +1,4 @@
+using EawXBuild.Reporting;
 namespace EawXBuild.Core
 {
     public interface ITask
@@ -6,6 +7,6 @@ namespace EawXBuild.Core
 
         string Name { get; set; }
 
-        void Run();
+        void Run(Report? report = null);
     }
 }

@@ -6,11 +6,11 @@ using EawXBuild.Reporting.Export;
 
 namespace EawXBuild.Reporting
 {
-    public abstract class AbstractReport : IReport
+    public class Report : IReport
     {
-        public event EventHandler<IMessage> MessageAddedEvent;
-        public event EventHandler<IErrorMessage> ErrorMessageAddedEvent;
-        public event EventHandler<bool> ReportFinalizedEvent;
+        public event EventHandler<IMessage>? MessageAddedEvent;
+        public event EventHandler<IErrorMessage>? ErrorMessageAddedEvent;
+        public event EventHandler<bool>? ReportFinalizedEvent;
         
         private DateTime _reportEndTime;
         private TimeSpan _reportDuration = TimeSpan.Zero;
@@ -34,11 +34,11 @@ namespace EawXBuild.Reporting
 
         IReportExportHandler IReport.ExportHandler => _exportHandler;
 
-        protected internal AbstractReport() : this(null)
+        protected internal Report() : this(null)
         {
         }
 
-        protected AbstractReport(IReportExportHandler exportHandler)
+        protected Report(IReportExportHandler? exportHandler)
         {
             _exportHandler = exportHandler ?? new NullReportExportHandler();
             ReportStartTime = DateTime.Now;
@@ -75,7 +75,7 @@ namespace EawXBuild.Reporting
         {
             if (m.GetType().IsInstanceOfType(typeof(IErrorMessage)))
             {
-                ErrorMessageAddedEvent?.Invoke(this, m as IErrorMessage);
+                ErrorMessageAddedEvent?.Invoke(this, (IErrorMessage) m);
             }
             MessageAddedEvent?.Invoke(this, m);
         }
